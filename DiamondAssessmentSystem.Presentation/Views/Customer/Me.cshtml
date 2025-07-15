@@ -1,0 +1,33 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CustomerDto
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Email:</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+
+        <dt class="col-sm-2">IdCard:</dt>
+        <dd class="col-sm-10">@Model.IdCard</dd>
+
+        <dt class="col-sm-2">Address:</dt>
+        <dd class="col-sm-10">@Model.Address</dd>
+
+        <dt class="col-sm-2">UnitName:</dt>
+        <dd class="col-sm-10">@Model.UnitName</dd>
+
+        <dt class="col-sm-2">Tax Code:</dt>
+        <dd class="col-sm-10">@Model.TaxCode</dd>
+
+        <!-- Thêm các trường profile khác nếu có -->
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit">Edit Profile</a>
+</div>

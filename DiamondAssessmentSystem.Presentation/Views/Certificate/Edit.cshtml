@@ -1,0 +1,67 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CertificateDto
+
+@{
+    ViewData["Title"] = "Edit Certificate";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <!-- Change asp-action to EditPost -->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CertificateId" class="control-label"></label>
+                <input asp-for="CertificateId" class="form-control" />
+                <span asp-validation-for="CertificateId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ResultId" class="control-label"></label>
+                <input asp-for="ResultId" class="form-control" />
+                <span asp-validation-for="ResultId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CertificateNumber" class="control-label"></label>
+                <input asp-for="CertificateNumber" class="form-control" />
+                <span asp-validation-for="CertificateNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IssueDate" class="control-label"></label>
+                <input asp-for="IssueDate" class="form-control" />
+                <span asp-validation-for="IssueDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ApprovedBy" class="control-label"></label>
+                <input asp-for="ApprovedBy" class="form-control" />
+                <span asp-validation-for="ApprovedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ApprovedDate" class="control-label"></label>
+                <input asp-for="ApprovedDate" class="form-control" />
+                <span asp-validation-for="ApprovedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Management">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

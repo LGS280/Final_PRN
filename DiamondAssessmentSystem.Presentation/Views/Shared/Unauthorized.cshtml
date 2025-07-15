@@ -1,0 +1,22 @@
+﻿@* Views/Shared/Unauthorized.cshtml *@
+@{
+    ViewData["Title"] = "Unauthorized";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-danger">Unauthorized</h1>
+            <p>You do not have permission to access this resource.</p>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                <p>Please verify that you have logged in or change to account with more credentials to load</p>
+            }
+            else
+            {
+                <p>Please log in if you are a user.</p>
+                <a asp-area="" asp-page="/Account/Login">Login</a>
+            }
+        </div>
+    </div>
+</div>

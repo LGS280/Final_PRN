@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.CertificateDto>
+
+@{
+    ViewData["Title"] = "My Certificates";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Certificate ID</th>
+                <th>Certificate Number</th>
+                <th>Approved Date</th>
+                <th>Status</th>
+                <!-- Add other properties from CertificateDto as table headers -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.CertificateId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CertificateNumber)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ApprovedDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                    <!-- Add other data properties from the DTO here -->
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CertificateId">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No certificates found.</p>
+}
