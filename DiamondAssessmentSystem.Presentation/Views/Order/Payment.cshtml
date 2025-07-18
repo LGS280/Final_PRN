@@ -1,0 +1,21 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderPaymentDto
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="payment" method="post">
+    <div class="form-group">
+        <label asp-for="RequestId"></label>
+        <input asp-for="RequestId" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentType"></label>
+        <input asp-for="PaymentType" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Pay</button>
+</form>

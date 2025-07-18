@@ -1,14 +1,15 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DiamondAssessmentSystem.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class OrderController : ControllerBase
+    [Authorize]
+    public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
         private readonly ICurrentUserService _currentUser;
@@ -19,102 +20,140 @@ namespace DiamondAssessmentSystem.Controllers
             _currentUser = currentUser;
         }
 
-        // GET: api/order
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> GetCustomerOrders()
+        // GET: Order
+        public async Task<IActionResult> MyOrder()   //Get all order
         {
+
             var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            {
+                // If not authenticated, redirect to login page.
+                return RedirectToAction("Login", "Auth");
+            }
 
-            var orders = await _orderService.GetOrdersByCustomerAsync(userId);
-            return Ok(orders);
+            var orders = await _orderService.GetOrdersByCustomerAsync(userId); //loads with user
+            return View(orders);
         }
 
-        // GET: api/order/all
-        [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllOrders()
+        // GET: Order/All
+        //[Authorize(Roles = "Admin")]//To require authentication here. - for extra code when able too-
+        public async Task<IActionResult> Index()  //Get all types to control order (To edit code and more).
         {
             var orders = await _orderService.GetOrdersAsync();
-            return Ok(orders);
+            return View(orders);
         }
 
-        // GET: api/order/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> GetOrderById(int id)
+        // GET: Order/Details/{id}
+        public async Task<IActionResult> Details(int id) //View detail of each line.
         {
             var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null)
-                return NotFound();
+            {
+                return NotFound();  //Test each and make to test well so it looks good
+            }
+            return View(order);  //Load
 
-            return Ok(order);
         }
 
-        // POST: api/order
+        // GET: Order/Create
+        public IActionResult Create()  // To have code for a profile (page)
+        {
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderCreateCombineDto order)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("PaymentInfo, OrderData")] OrderCreateCombineDto order)    //Take form that will be send over with all parts of the code
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+            //Validate the Code for Login - IMPORTANT
             var userId = _currentUser.UserId;
+            //Authenticate
+            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Auth");
+
             if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            {
+                ModelState.AddModelError(string.Empty, "Authentication not found. Make sure that is not invalid");
+                return View();
+            }
+            // Validate that has every code they need
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //Check to see if it connects
 
-            var created = await _orderService.CreateOrderAsync(
-                userId,
-                order.PaymentInfo.RequestId,
-                order.OrderData,
-                order.PaymentInfo.PaymentType,
-                order.PaymentInfo.PaymentRequest);
+                    var created = await _orderService.CreateOrderAsync(
+                       userId,
+                       order.PaymentInfo.RequestId,
+                       order.OrderData,
+                       order.PaymentInfo.PaymentType,
+                       order.PaymentInfo.PaymentRequest);
 
-            if (!created)
-                return BadRequest("Could not create order.");
+                    if (!created)
+                    {
+                        //If there is, what action to prevent it and load
+                        ModelState.AddModelError(string.Empty, "Request for a new page did not fully load");
+                        return View(CreateView());
+                    }
 
-            return NoContent();
+                    return RedirectToAction(nameof(Index)); //Return here
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"If any errors, what do you want the pages to do. \nMessage{ex.Message}");
+                    return View(ex.Message); //Return 
+                }
+            }
+            return View(order); //Test the loading, will happen if there is bad request.
         }
 
-        // PUT: api/order/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(int id, [FromBody] OrderCreateDto orderDto)
+        // GET: Order/Edit/{id}
+        public IActionResult Edit(int Id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var updated = await _orderService.UpdateOrderAsync(id, orderDto);
-            if (!updated)
-                return NotFound();
-
-            return NoContent();
+            return View();   // To do in the future.
         }
 
-        // DELETE: api/order/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> CancelOrder(int id)
+        // GET: Order/Cancel/{id}
+        [HttpPost, ActionName("Cancel")]
+        public async Task<IActionResult> CancelOrder(int id)   //Posts to canel a confirm file.
         {
-            var canceled = await _orderService.CancelOrderAsync(id);
-            if (!canceled)
-                return NotFound();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+            try
+            {
+                //Get the user Id.
+                var userId = _currentUser.UserId;
+                var success = await _orderService.CancelOrderAsync(id);
 
-            return NoContent();
+                if (!success)
+                {
+                    //If there is still errors to complete.
+                    ModelState.AddModelError(string.Empty, "An update with current process will not let this request validate, try to resolve this.");
+                    return View();  //What happens with cancel, goes back to start
+                }
+
+                return RedirectToAction(nameof(Index));   //Load the Home Page
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Cannot validate any action. \n Error{ex}");
+                return RedirectToAction(nameof(Index));   //What is it will occur that will be the outcome.
+            }
         }
 
-        // PUT: api/order/payment
-        [HttpPut("payment")]
-        public async Task<IActionResult> UpdatePayment([FromBody] UpdatePaymentDto paymentDto)
+
+        public ActionResult CreateView()  //Loads Create
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            return View();   //Return to code to test and make sure it loads.
+        }
 
-            var userId = _currentUser.UserId;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
 
-            var updated = await _orderService.UpdatePaymentAsync(userId, paymentDto.OrderId, paymentDto.Status);
-            if (!updated)
-                return BadRequest();
-
-            return NoContent();
+        // PUT: api/Order/payment
+        public ActionResult payment()   //Payments for code, not sure to check payment codes from API in Controller.
+        {
+            return View();
         }
     }
 }

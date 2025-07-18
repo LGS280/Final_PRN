@@ -1,0 +1,45 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.ServicePriceDto>
+
+@{
+    ViewData["Title"] = "Service Prices";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Service ID</th>
+            <th>Service Type</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Duration</th>
+            <th>Employee ID</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ServiceId)</td>
+                <td>@Html.DisplayFor(modelItem => item.ServiceType)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>@Html.DisplayFor(modelItem => item.Duration)</td>
+                <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.ServiceId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.ServiceId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ServiceId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

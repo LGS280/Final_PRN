@@ -1,0 +1,32 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderDto
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Order ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderId)</dd>
+        <dt class="col-sm-2">Order Date</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderDate)</dd>
+        <dt class="col-sm-2">Service Id</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceId)</dd>
+        <dt class="col-sm-2">Service Type</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceType)</dd>
+        <dt class="col-sm-2">Total Price</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.TotalPrice)</dd>
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
+
+        @*Test every aspect that is in the data table too
+                Check the other files for code snippets that can assist here too*@
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.OrderId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

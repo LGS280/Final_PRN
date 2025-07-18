@@ -1,0 +1,43 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.EmployeeDto
+
+@{
+    ViewData["Title"] = "My Employee Profile";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@*To test or debug if loading the information, use code, and remove, DO NOT SKIP*
+   if this display the information, then data is correctly set up
+    If there is an error, it's one step at a time and inspect again.
+@Html.DisplayFor(model => model.EmployeeId)
+
+<hr />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Employee ID:</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.EmployeeId)</dd>
+           @*This is to test the code, for each property. if it work then all the properties are set. This can be removed after*@
+<!-- Display the more info using dt-->
+
+<dt class="col-sm-2">First Name: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.FirstName)</dd>
+<dt class="col-sm-2">Lst Name: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.LastName)</dd>
+<dt class="col-sm-2">Email: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.Email)</dd>
+<dt class="col-sm-2">Phone: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.Phone)</dd>
+<dt class="col-sm-2">Gender: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.Gender)</dd>
+<dt class="col-sm-2">Salary: </dt>
+<dd class="col-sm-2">@Html.DisplayFor(model => model.Salary)</dd>
+
+</dl>
+</div>
+
+<div>
+    @*After validating and running properly, remove all this and implement what design you plan.*@
+    <a asp-action="Edit">Edit Profile</a> |
+    @*Check all the routing and model and make sure the routes are all set correctly, otherwise things will not load.*@
+</div>

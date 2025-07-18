@@ -1,0 +1,101 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ResultCreateDto
+
+@{
+    ViewData["Title"] = "Edit Result";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="DiamondId" class="control-label"></label>
+                <input asp-for="DiamondId" class="form-control" />
+                <span asp-validation-for="DiamondId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RequestId" class="control-label"></label>
+                <input asp-for="RequestId" class="form-control" />
+                <span asp-validation-for="RequestId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiamondOrigin" class="control-label"></label>
+                <input asp-for="DiamondOrigin" class="form-control" />
+                <span asp-validation-for="DiamondOrigin" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Shape" class="control-label"></label>
+                <input asp-for="Shape" class="form-control" />
+                <span asp-validation-for="Shape" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Measurements" class="control-label"></label>
+                <input asp-for="Measurements" class="form-control" />
+                <span asp-validation-for="Measurements" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CaratWeight" class="control-label"></label>
+                <input asp-for="CaratWeight" class="form-control" />
+                <span asp-validation-for="CaratWeight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Color" class="control-label"></label>
+                <input asp-for="Color" class="form-control" />
+                <span asp-validation-for="Color" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Clarity" class="control-label"></label>
+                <input asp-for="Clarity" class="form-control" />
+                <span asp-validation-for="Clarity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cut" class="control-label"></label>
+                <input asp-for="Cut" class="form-control" />
+                <span asp-validation-for="Cut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Proportions" class="control-label"></label>
+                <input asp-for="Proportions" class="form-control" />
+                <span asp-validation-for="Proportions" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Polish" class="control-label"></label>
+                <input asp-for="Polish" class="form-control" />
+                <span asp-validation-for="Polish" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Symmetry" class="control-label"></label>
+                <input asp-for="Symmetry" class="form-control" />
+                <span asp-validation-for="Symmetry" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fluorescence" class="control-label"></label>
+                <input asp-for="Fluorescence" class="form-control" />
+                <span asp-validation-for="Fluorescence" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Edit" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

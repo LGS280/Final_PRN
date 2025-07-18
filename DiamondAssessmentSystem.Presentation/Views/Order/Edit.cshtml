@@ -1,0 +1,28 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderDto
+
+@{
+    ViewData["Title"] = "Edit Order";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="OrderId" />
+
+    <div class="form-group">
+        <label asp-for="OrderDate"></label>
+        <input asp-for="OrderDate" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ServiceId"></label>
+        <input asp-for="ServiceId" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TotalPrice"></label>
+        <input asp-for="TotalPrice" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+</form>

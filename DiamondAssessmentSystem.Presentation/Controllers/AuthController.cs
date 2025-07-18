@@ -1,11 +1,13 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Controllers
 {
@@ -99,6 +101,19 @@ namespace DiamondAssessmentSystem.Controllers
 
             return View(registerDto);
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(
+                 CookieAuthenticationDefaults.AuthenticationScheme,
+                 new AuthenticationProperties
+                 {
+                     RedirectUri = "/Auth/Login"  // Redirect url to login after
+                 });
+
+            return RedirectToAction("Login", "Auth");
         }
     }
 }

@@ -5,6 +5,7 @@ using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
 using DiamondAssessmentSystem.Infrastructure.Repository;
 using DiamondAssessmentSystem.Infrastructure.SeedData;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,15 @@ namespace DiamondAssessmentSystem.Presentation
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
             });
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                  .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                  {
+                      options.Cookie.Name = "CookieAuth"; //Important for code with authentication!
+                      options.LoginPath = "/Auth/Login";  // Specify the login path
+                      //options.AccessDeniedPath = "/Auth/AccessDenied"; // Specify where to redirect for unauthorized access
+                      options.LogoutPath = "/Auth/Logout";
+                  });
 
             // ==================== Application Services ====================
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();

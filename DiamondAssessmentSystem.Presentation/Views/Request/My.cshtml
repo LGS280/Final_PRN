@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.RequestDto>
+
+@{
+    ViewData["Title"] = "My Requests";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Form Type</th>
+                <th>Request Date</th>
+                <th>CustomerID</th>
+                <th>ServiceID</th>
+                <th>Request Type</th>
+                <th>Employee ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.RequestId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.FormType)</td>
+                    <td>@Html.DisplayFor(modelItem => item.RequestDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CustomerId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ServiceId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.RequestType)</td>
+                    <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.RequestId">Details</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No requests found for the current user.</p>
+}

@@ -1,0 +1,38 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.ResultDto>
+
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Result ID</th>
+                <!-- Add more properties from ResultDto as table headers -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.ResultId)</td>
+                    @*Add more to see,
+          you also can edit too!*@
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ResultId">Details</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No results found for the current user.</p>
+}

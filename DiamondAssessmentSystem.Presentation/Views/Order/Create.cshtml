@@ -1,0 +1,29 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderCreateCombineDto
+
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="OrderData.ServiceId"></label>
+        <input asp-for="OrderData.ServiceId" class="form-control" />
+        <span asp-validation-for="OrderData.ServiceId" class="text-danger"></span>
+    </div>
+
+    @* <div class="form-group">
+        <label asp-for="PaymentInfo.RequestId"></label>
+        <input asp-for="PaymentInfo.RequestId" class="form-control" />
+        <span asp-validation-for="PaymentInfo.RequestId" class="text-danger"></span>
+    </div> *@
+
+    @* <div class="form-group">
+        <label asp-for="PaymentInfo.PaymentType"></label>
+        <input asp-for="PaymentInfo.PaymentType" class="form-control" />
+        <span asp-validation-for="PaymentInfo.PaymentType" class="text-danger"></span>
+    </div> *@
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

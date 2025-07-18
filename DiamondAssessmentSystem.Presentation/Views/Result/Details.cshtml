@@ -1,0 +1,49 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ResultDto
+
+@{
+    ViewData["Title"] = "Result Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Result ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.ResultId)</dd>
+        <dt class="col-sm-2">Assessment Staff</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.AssessmentStaff)</dd>
+        <dt class="col-sm-2">Diamond ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.DiamondId)</dd>
+        <dt class="col-sm-2">Request ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestId)</dd>
+        <dt class="col-sm-2">Diamond Origin</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.DiamondOrigin)</dd>
+        <dt class="col-sm-2">Shape</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Shape)</dd>
+        <dt class="col-sm-2">Measurements</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Measurements)</dd>
+        <dt class="col-sm-2">Carat Weight</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CaratWeight)</dd>
+        <dt class="col-sm-2">Color</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Color)</dd>
+        <dt class="col-sm-2">Clarity</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Clarity)</dd>
+        <dt class="col-sm-2">Cut</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Cut)</dd>
+        <dt class="col-sm-2">Proportions</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Proportions)</dd>
+        <dt class="col-sm-2">Polish</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Polish)</dd>
+        <dt class="col-sm-2">Symmetry</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Symmetry)</dd>
+        <dt class="col-sm-2">Fluorescence</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Fluorescence)</dd>
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ResultId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

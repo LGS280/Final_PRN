@@ -1,0 +1,36 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.OrderDto>
+
+@{
+    ViewData["Title"] = "All Orders";
+}
+
+<h1>@ViewData["Title"]</h1>
+<a asp-action="MyOrder" >My Order</a>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Service Type</th>
+            <th>Status</th>
+            <!-- Add column names-->
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.OrderId)</td>
+                <td>@Html.DisplayFor(modelItem => item.ServiceType)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <!-- Add display the information-->
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.OrderId">Details</a>
+                    @*You may add more code as necesssary*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,42 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.RequestDto
+
+@{
+    ViewData["Title"] = "Request Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Request ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestId)</dd>
+        <dt class="col-sm-2">Form Type</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.FormType)</dd>
+        <dt class="col-sm-2">Request Date</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestDate)</dd>
+        <dt class="col-sm-2">CustomerID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CustomerId)</dd>
+        <dt class="col-sm-2">ServiceID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceId)</dd>
+        <dt class="col-sm-2">Request Type</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestType)</dd>
+        <dt class="col-sm-2">Employee ID</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.EmployeeId)</dd>
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
+    </dl>
+</div>
+<div>
+    @if (Model.Status != "Pending")
+    {
+    <a asp-action="Edit" asp-route-id="@Model.RequestId">Edit |</a>
+    }
+    <a asp-action="Index">Back to List</a>
+</div>

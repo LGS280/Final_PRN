@@ -1,0 +1,50 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.RequestCreateDto
+
+@{
+    ViewData["Title"] = "Create Request";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="ServiceId" class="control-label"></label>
+                <input asp-for="ServiceId" class="form-control" />
+                <span asp-validation-for="ServiceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RequestType" class="control-label"></label>
+                <input asp-for="RequestType" class="form-control" />
+                <span asp-validation-for="RequestType" class="text-danger"></span>
+            </div>
+            <!--What will happen after subitting-->
+
+            <div class="form-group">
+                <input type="submit" name="action" value="Submit" class="btn btn-primary" asp-action="CreateRequest" asp-route-action="Submit" />
+                <input type="submit" name="action" value="Save" class="btn btn-secondary" asp-action="CreateRequest" asp-route-action="Draft" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
