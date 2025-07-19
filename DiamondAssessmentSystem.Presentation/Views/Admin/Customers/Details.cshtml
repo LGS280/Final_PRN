@@ -1,0 +1,59 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CustomerDto
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<div class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Customer Details</h1>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-700">
+        <div>
+            <dt class="font-semibold">First Name</dt>
+            <dd>@Model.FirstName</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Last Name</dt>
+            <dd>@Model.LastName</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Email</dt>
+            <dd>@Model.Email</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Phone</dt>
+            <dd>@Model.Phone</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Gender</dt>
+            <dd>@Model.Gender</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">ID Card</dt>
+            <dd>@Model.IdCard</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Address</dt>
+            <dd>@Model.Address</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Unit Name</dt>
+            <dd>@Model.UnitName</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Tax Code</dt>
+            <dd>@Model.TaxCode</dd>
+        </div>
+        <div>
+            <dt class="font-semibold">Point</dt>
+            <dd>@Model.Point</dd>
+        </div>
+        <div class="sm:col-span-2">
+            <dt class="font-semibold">Note</dt>
+            <dd>@Model.Note</dd>
+        </div>
+    </dl>
+
+    <div class="mt-6 flex justify-end">
+        <a asp-action="Customers" class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">Back</a>
+    </div>
+</div>

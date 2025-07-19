@@ -16,7 +16,11 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public ResultService(IResultRepository resultRepository, IMapper mapper, ICertificateRepository certificateRepository, IOrderRepository orderRepository)
+        public ResultService(
+            IResultRepository resultRepository,
+            IMapper mapper,
+            ICertificateRepository certificateRepository,
+            IOrderRepository orderRepository)
         {
             _resultRepository = resultRepository;
             _mapper = mapper;
@@ -24,97 +28,73 @@ namespace DiamondAssessmentSystem.Application.Services
             _orderRepository = orderRepository;
         }
 
-        // Lấy danh sách kết quả
-        public async Task<IEnumerable<ResultDto>> GetResultsAsync()
+        public async Task<IEnumerable<ResultDto>> GetResultsAsync() =>
+            _mapper.Map<IEnumerable<ResultDto>>(await _resultRepository.GetResultsAsync());
+
+        public async Task<IEnumerable<ResultDto>> GetResultsAsync(int customerId) =>
+            _mapper.Map<IEnumerable<ResultDto>>(await _resultRepository.GetResultsAsync(customerId));
+
+        public async Task<IEnumerable<ResultDto>> GetPersonalResults(string userId) =>
+            _mapper.Map<IEnumerable<ResultDto>>(await _resultRepository.GetPersonalResults(userId));
+
+        public async Task<ResultDto?> GetResultByIdAsync(int id)
         {
-            var results = await _resultRepository.GetResultsAsync();
-            return _mapper.Map<IEnumerable<ResultDto>>(results);  
+            var result = await _resultRepository.GetResultByIdAsync(id);
+            return result == null ? null : _mapper.Map<ResultDto>(result);
         }
 
-        public async Task<IEnumerable<ResultDto>> GetResultsAsync(int customerId)
+        public async Task<bool> CreateResultAsync(int orderId, ResultCreateDto dto)
         {
-            var results = await _resultRepository.GetResultsAsync(customerId);
-            return _mapper.Map<IEnumerable<ResultDto>>(results);
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order == null || order.Status != "Completed")
+                return false;
+
+            if (order.Service == null || dto.RequestId != order.Service.ServiceId)
+                return false;
+
+            var result = _mapper.Map<Result>(dto);
+            return await _resultRepository.CreateResultAsync(result) != null;
         }
 
-        public async Task<IEnumerable<ResultDto>> GetPersonalResults(string userId)
+        public async Task<bool> UpdateResultAsync(int id, ResultCreateDto dto)
         {
-            var results = await _resultRepository.GetPersonalResults(userId);
-            return _mapper.Map<IEnumerable<ResultDto>>(results); 
+            var existingResult = await _resultRepository.GetResultByIdAsync(id);
+            if (existingResult == null)
+                return false;
+
+            var cert = await _certificateRepository.GetByResultIdAsync(id);
+            if (cert?.Status == "Issued")
+                return false;
+
+            _mapper.Map(dto, existingResult);
+
+            // Tạo Certificate nếu chưa có và trạng thái là Completed
+            if (existingResult.Status == "Completed" && cert == null)
+            {
+                var newCert = new Certificate
+                {
+                    ResultId = existingResult.ResultId,
+                    IssueDate = DateTime.UtcNow,
+                    Status = "Pending"
+                };
+                await _certificateRepository.CreateCertificateAsync(newCert);
+            }
+
+            return await _resultRepository.UpdateResultAsync(existingResult);
         }
 
-        // Lấy kết quả theo ID
-        public async Task<ResultDto> GetResultByIdAsync(int id)
+        public async Task<bool> DeleteResultAsync(int id)
         {
             var result = await _resultRepository.GetResultByIdAsync(id);
             if (result == null)
-            {
-                return null; 
-            }
-
-            return _mapper.Map<ResultDto>(result);  
-        }
-
-        // Tạo kết quả mới
-        public async Task<bool> CreateResultAsync(int orderId, ResultCreateDto resultCreateDto)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            
-            if (order == null)
-            {
                 return false;
-            }
 
-            var result = _mapper.Map<Result>(resultCreateDto);  
-
-            var createdResult = await _resultRepository.CreateResultAsync(result);
-
-            if (createdResult == null)
-            {
+            var cert = await _certificateRepository.GetByResultIdAsync(id);
+            if (cert?.Status == "Issued")
                 return false;
-            }
-            return true;
-        }
 
-        // Cập nhật kết quả
-        public async Task<bool> UpdateResultAsync(int id, ResultCreateDto resultCreateDto)
-        {
-            var existingResult = await _resultRepository.GetResultByIdAsync(id);
-
-            if (existingResult == null)
-            {
-                return false; 
-            }
-
-            _mapper.Map(resultCreateDto, existingResult);  
-
-            if (existingResult.Status == "Completed")
-            {
-                var cer = new Certificate
-                {
-                    IssueDate = DateTime.Now,
-                    ResultId = id,
-                    Status = "Pending"
-                };
-
-                await _certificateRepository.CreateCertificateAsync(cer);
-            }
-
-            return await _resultRepository.UpdateResultAsync(existingResult); 
-        }
-
-        // Xóa kết quả
-        public async Task<bool> DeleteResultAsync(int id)
-        {
-            var existingResult = await _resultRepository.GetResultByIdAsync(id);
-
-            if (existingResult == null)
-            {
-                return false;
-            }
-
-            existingResult.Status = "InActive";
-            return await _resultRepository.UpdateResultAsync(existingResult);
+            result.Status = "InActive";
+            return await _resultRepository.UpdateResultAsync(result);
         }
     }
 }

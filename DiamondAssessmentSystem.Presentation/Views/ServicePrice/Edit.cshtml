@@ -1,57 +1,59 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.ServicePriceCreateDto
-
 @{
-    ViewData["Title"] = "Edit Service Price";
+    ViewData["Title"] = "Create Service Price";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-2xl mx-auto px-6 py-10 bg-white shadow-md rounded-xl">
+    <h1 class="text-2xl font-bold text-yellow-600 mb-6">✏️ Edit Service Price</h1>
 
-<hr />
+    <form asp-action="Create" method="post" class="space-y-5">
+        <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" asp-route-id="@ViewBag.Id">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ServiceType" class="control-label"></label>
-                <input asp-for="ServiceType" class="form-control" />
-                <span asp-validation-for="ServiceType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Duration" class="control-label"></label>
-                <input asp-for="Duration" class="form-control" />
-                <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <input asp-for="EmployeeId" class="form-control" />
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+        <div>
+            <label asp-for="ServiceType" class="block font-semibold text-gray-700">Service Type</label>
+            <input asp-for="ServiceType" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="ServiceType" class="text-red-500 text-sm"></span>
+        </div>
 
-            <div class="form-group">
-                <input type="submit" value="submit" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        <div>
+            <label asp-for="Price" class="block font-semibold text-gray-700">Price</label>
+            <input asp-for="Price" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="Price" class="text-red-500 text-sm"></span>
+        </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div>
+            <label asp-for="Description" class="block font-semibold text-gray-700">Description</label>
+            <input asp-for="Description" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Duration" class="block font-semibold text-gray-700">Duration (Days)</label>
+            <input asp-for="Duration" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="Duration" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="EmployeeId" class="block font-semibold text-gray-700">Employee ID</label>
+            <input asp-for="EmployeeId" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="EmployeeId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Status" class="block font-semibold text-gray-700">Status</label>
+            <select asp-for="Status" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-300">
+                <option value="">-- Select Status --</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg">Update</button>
+            <a asp-action="Index" class="text-gray-500 hover:text-blue-600 text-sm">← Back to List</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {

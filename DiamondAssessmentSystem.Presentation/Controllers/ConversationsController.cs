@@ -2,11 +2,9 @@
 using DiamondAssessmentSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [ApiController]
-    [Route("api/conversations")]
-    public class ConversationsController : ControllerBase
+    public class ConversationsController : Controller
     {
         private readonly IConversationService _conversationService;
 
@@ -15,32 +13,32 @@ namespace DiamondAssessmentSystem.Controllers
             _conversationService = conversationService;
         }
 
-        [HttpPost("start")]
-        public async Task<ActionResult<ConversationDTO>> StartOrGetConversation()
-        {
-            var conversation = await _conversationService.StartOrGetConversationAsync();
-            return Ok(conversation);
-        }
-
-        [HttpPost("{id:int}/assign")]
-        public async Task<IActionResult> AssignConversation(int id)
-        {
-            await _conversationService.AssignEmployeeAsync(id);
-            return NoContent();
-        }
-
-        [HttpGet("unassigned")]
-        public async Task<ActionResult<List<ConversationDTO>>> GetUnassigned()
-        {
-            var conversations = await _conversationService.GetUnassignedConversationsAsync();
-            return Ok(conversations);
-        }
-
-        [HttpGet("my")]
-        public async Task<ActionResult<List<ConversationDTO>>> GetMyAssigned()
+        [HttpGet]
+        public async Task<IActionResult> My()
         {
             var conversations = await _conversationService.GetMyAssignedConversationsAsync();
-            return Ok(conversations);
+            return View(conversations); 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Unassigned()
+        {
+            var conversations = await _conversationService.GetUnassignedConversationsAsync();
+            return View(conversations); 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Assign(int id)
+        {
+            await _conversationService.AssignEmployeeAsync(id);
+            return RedirectToAction(nameof(Unassigned));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> StartOrGet()
+        {
+            var conversation = await _conversationService.StartOrGetConversationAsync();
+            return RedirectToAction("Index", "ChatMessages", new { conversationId = conversation.ConversationId });
         }
     }
 }

@@ -1,8 +1,55 @@
-﻿@{
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <h1 class="text-5xl font-extrabold text-center mb-16 text-gray-900 tracking-tight">
+        📝 Featured Blog Posts
+    </h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+        @foreach (var blog in Model)
+        {
+            <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl border border-gray-200 transition-all duration-300">
+                <!-- Image with overlay -->
+                <div class="relative h-56 overflow-hidden">
+                    <img src="@blog.ImageUrl" alt="Blog image"
+                         class="w-full h-full object-cover transform group-hover:scale-105 transition duration-300" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-3">
+                    @if (!string.IsNullOrEmpty(blog.BlogType))
+                    {
+                        <span class="inline-block px-3 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full uppercase tracking-wide shadow">
+                            @blog.BlogType
+                        </span>
+                    }
+
+                    <h2 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition duration-200 line-clamp-2">
+                        @blog.Title
+                    </h2>
+
+                    <p class="text-gray-600 text-sm line-clamp-3">
+                        @blog.Description
+                    </p>
+
+                    <div class="flex items-center justify-between pt-4 text-sm text-gray-400">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-full w-6 h-6" />
+                            <span>@blog.CreatedDate.ToString("dd MMM yyyy")</span>
+                        </div>
+
+                        <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })"
+                           class="bg-blue-100 text-blue-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                            Read More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>

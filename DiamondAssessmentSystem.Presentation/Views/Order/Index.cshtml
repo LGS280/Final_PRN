@@ -1,36 +1,58 @@
 ﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.OrderDto>
-
 @{
     ViewData["Title"] = "All Orders";
 }
 
-<h1>@ViewData["Title"]</h1>
-<a asp-action="MyOrder" >My Order</a>
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
+        <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">📦 My Orders</a>
+    </div>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Service Type</th>
-            <th>Status</th>
-            <!-- Add column names-->
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.OrderId)</td>
-                <td>@Html.DisplayFor(modelItem => item.ServiceType)</td>
-                <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                <!-- Add display the information-->
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.OrderId">Details</a>
-                    @*You may add more code as necesssary*@
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-xl overflow-hidden">
+            <thead class="bg-gray-100 text-gray-700 text-left">
+                <tr>
+                    <th class="px-4 py-3">Order ID</th>
+                    <th class="px-4 py-3">Service Type</th>
+                    <th class="px-4 py-3">Total</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="px-4 py-3">@item.OrderId</td>
+                        <td class="px-4 py-3">@item.ServiceType</td>
+                        <td class="px-4 py-3">@item.TotalPrice.ToString("C")</td>
+                        <td class="px-4 py-3">
+                            @if (item.Status == "Completed")
+                            {
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded">Completed</span>
+                            }
+                            else if (item.Status == "Pending")
+                            {
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded">Pending</span>
+                            }
+                            else
+                            {
+                                <span class="bg-gray-200 text-gray-800 text-xs font-medium px-2.5 py-1 rounded">@item.Status</span>
+                            }
+                        </td>
+                        <td class="px-4 py-3 space-x-2">
+                            <a asp-action="Details" asp-route-id="@item.OrderId" class="text-blue-600 hover:underline text-sm">Details</a>
+                            @if (item.Status != "Completed" && item.Status != "Canceled" && item.Status != "Paid")
+                            {
+                                <form asp-action="Cancel" asp-route-id="@item.OrderId" method="post" class="inline" onsubmit="return confirm('Cancel this order?');">
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">Cancel</button>
+                                </form>
+                            }
+                        </td>   
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

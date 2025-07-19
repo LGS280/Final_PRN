@@ -1,82 +1,124 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DiamondAssessmentSystem.Presentation</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Diamond Assessment</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DiamondAssessmentSystem.Presentation.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DiamondAssessmentSystem.Presentation</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Account</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Certificate" asp-action="Management">Certificate</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Me">Customer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Me">Employee</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Request" asp-action="Index">Request</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">Order</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="Index">Result</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ServicePrice" asp-action="Index">Service</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - DiamondAssessmentSystem.Presentation - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="/" class="text-2xl font-extrabold text-blue-600 tracking-tight hover:opacity-90">
+                💎 DiamondSys
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex space-x-4 text-sm font-medium">
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">Blog</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Customer</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">Employee</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Request</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">Order</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+
+                <!-- ✅ Chat access -->
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Home">💬 Chat (Customer)</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
+
+                <!-- Auth & Admin -->
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Customers">Manage Customers</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Employees">Manage Employees</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
+            </nav>
+
+            @inject IHttpContextAccessor HttpContextAccessor
+            @{
+                var username = HttpContextAccessor.HttpContext?.User?.Identity?.Name;
+            }
+
+            <!-- Right: Logged in user -->
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="flex items-center space-x-2">
+                    <img src="https://i.pravatar.cc/32?u=@username" class="w-8 h-8 rounded-full border" />
+                    <span class="text-sm font-medium text-gray-700">@username</span>
+                    <a asp-controller="Auth" asp-action="Logout"
+                       class="text-red-600 hover:underline text-sm ml-2">Logout</a>
+                </div>
+            }
+            else
+            {
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
+            }
+
+            <!-- Mobile Nav Toggle -->
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden px-4 pb-4">
+            <div class="space-y-2 text-sm font-medium">
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">Blog</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Customer</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">Employee</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Request</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">Order</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Account" asp-action="Index">Account</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
+                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="max-w-7xl mx-auto px-4 py-10 min-h-[75vh]">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-5 text-sm text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <p>&copy; 2025 Diamond Assessment System</p>
+            <a asp-controller="Home" asp-action="Privacy" class="hover:text-blue-600">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Tailwind & Script -->
+    <script>
+        const btn = document.getElementById("mobile-menu-btn");
+        const menu = document.getElementById("mobile-menu");
+        btn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="@Html.Raw("https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js")"></script>
 </body>
 </html>

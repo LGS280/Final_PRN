@@ -1,0 +1,79 @@
+﻿@using DiamondAssessmentSystem.Application.DTO
+@model IEnumerable<EmployeeDto>
+@{
+    ViewData["Title"] = "Employee Management";
+}
+
+<div class="max-w-6xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">@ViewData["Title"]</h1>
+
+    <div class="overflow-x-auto bg-white rounded-xl shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100 text-xs font-semibold uppercase text-gray-700">
+                <tr>
+                    <th class="px-4 py-3 text-left">Name</th>
+                    <th class="px-4 py-3 text-left">Email</th>
+                    <th class="px-4 py-3 text-left">Phone</th>
+                    <th class="px-4 py-3 text-left">Gender</th>
+                    <th class="px-4 py-3 text-left">Salary</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 text-sm">
+                @foreach (var emp in Model)
+                {
+                    @Html.Partial("Employees/_EmployeeRow", emp)
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- DEACTIVATE MODAL EMPLOYEE -->
+<div id="deactivateModalEmp" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Deactivation</h2>
+        <p class="text-sm text-gray-600 mb-6">Are you sure you want to deactivate this employee?</p>
+        <div class="flex justify-end space-x-3">
+            <button onclick="hideDeactivateEmployee()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+            <a id="confirmDeactivateEmpBtn" href="#" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Deactivate</a>
+        </div>
+    </div>
+</div>
+
+<!-- ACTIVATE MODAL EMPLOYEE -->
+<div id="activateModalEmp" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Activation</h2>
+        <p class="text-sm text-gray-600 mb-6">Do you want to activate this employee again?</p>
+        <div class="flex justify-end space-x-3">
+            <button onclick="hideActivateEmployee()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+            <a id="confirmActivateEmpBtn" href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Activate</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDeactivateEmployee(userId) {
+        document.getElementById("deactivateModalEmp").classList.remove("hidden");
+        document.getElementById("deactivateModalEmp").classList.add("flex");
+        document.getElementById("confirmDeactivateEmpBtn").href = `/Admin/DeactivateEmployee/${userId}`;
+    }
+
+    function hideDeactivateEmployee() {
+        document.getElementById("deactivateModalEmp").classList.remove("flex");
+        document.getElementById("deactivateModalEmp").classList.add("hidden");
+    }
+
+    function showActivateEmployee(userId) {
+        document.getElementById("activateModalEmp").classList.remove("hidden");
+        document.getElementById("activateModalEmp").classList.add("flex");
+        document.getElementById("confirmActivateEmpBtn").href = `/Admin/ActivateEmployee/${userId}`;
+    }
+
+    function hideActivateEmployee() {
+        document.getElementById("activateModalEmp").classList.remove("flex");
+        document.getElementById("activateModalEmp").classList.add("hidden");
+    }
+</script>

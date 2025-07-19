@@ -1,53 +1,87 @@
 ﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.RequestDto>
-
 @{
     ViewData["Title"] = "All Requests";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📋 All Requests</h1>
+        <div class="space-x-2">
+            <a asp-action="Create" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                + Create New
+            </a>
+            <a asp-action="My" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">
+                📁 My Requests
+            </a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-    <a asp-action="My">My Requests</a>
-</p>
+    <div class="overflow-x-auto shadow border rounded-lg bg-white">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+                <tr>
+                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left">Form Type</th>
+                    <th class="px-4 py-3 text-left">Request Date</th>
+                    <th class="px-4 py-3 text-left">Customer ID</th>
+                    <th class="px-4 py-3 text-left">Service ID</th>
+                    <th class="px-4 py-3 text-left">Type</th>
+                    <th class="px-4 py-3 text-left">Employee</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-gray-700">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 font-mono">@item.RequestId</td>
+                        <td class="px-4 py-3">@item.FormType</td>
+                        <td class="px-4 py-3">@item.RequestDate.ToString("dd MMM yyyy")</td>
+                        <td class="px-4 py-3">@item.CustomerId</td>
+                        <td class="px-4 py-3">@item.ServiceId</td>
+                        <td class="px-4 py-3">@item.RequestType</td>
+                        <td class="px-4 py-3">@item.EmployeeId</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold @GetStatusClass(item.Status)">
+                                @item.Status
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex justify-center gap-2">
+                                <a asp-action="Details" asp-route-id="@item.RequestId" class="text-blue-600 hover:underline text-sm">Details</a>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Request ID</th>
-            <th>Form Type</th>
-            <th>Request Date</th>
-            <th>CustomerID</th>
-            <th>ServiceID</th>
-            <th>Request Type</th>
-            <th>Employee ID</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+                                @if (item.Status == "Draft")
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.RequestId" class="text-yellow-600 hover:underline text-sm">Edit</a>
+
+                                    <form asp-action="Cancel" method="post" asp-route-id="@item.RequestId" onsubmit="return confirm('Are you sure you want to cancel this request?');">
+                                        <button type="submit" class="text-red-500 hover:underline text-sm">Cancel</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-400 text-sm">Locked</span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    string GetStatusClass(string? status)
+    {
+        return status switch
         {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.RequestId)</td>
-                <td>@Html.DisplayFor(modelItem => item.FormType)</td>
-                <td>@Html.DisplayFor(modelItem => item.RequestDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.CustomerId)</td>
-                <td>@Html.DisplayFor(modelItem => item.ServiceId)</td>
-                <td>@Html.DisplayFor(modelItem => item.RequestType)</td>
-                <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
-                <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.RequestId">Details</a>
-                    @if (item.Status == "Draft")
-                    {
-                        <form asp-action="Cancel" method="post" asp-route-id="@item.RequestId" style="display:inline; margin-left: 5px;">
-                            <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
-                        </form>
-                    }
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            "Draft" => "bg-yellow-100 text-yellow-800",
+            "Pending" => "bg-blue-100 text-blue-800",
+            "Completed" => "bg-green-100 text-green-800",
+            "Canceled" => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-700"
+        };
+    }
+}

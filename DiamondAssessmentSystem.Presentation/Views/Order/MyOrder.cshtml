@@ -1,40 +1,53 @@
 ﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.OrderDto>
-
 @{
     ViewData["Title"] = "My Orders";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
+        <a asp-action="Create" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">➕ Create New Order</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Order Date</th>
-            <th>Service Type</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.OrderId)</td>
-                <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.ServiceType)</td>
-                <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
-                <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
-                    @*  <a asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> | *@  @*Disable edit for now*@
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="overflow-x-auto bg-white shadow rounded-xl">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-3 text-left">Order ID</th>
+                    <th class="px-4 py-3 text-left">Order Date</th>
+                    <th class="px-4 py-3 text-left">Service Type</th>
+                    <th class="px-4 py-3 text-left">Total Price</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 text-sm">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="px-4 py-3">@item.OrderId</td>
+                        <td class="px-4 py-3">@item.OrderDate.ToShortDateString()</td>
+                        <td class="px-4 py-3">@item.ServiceType</td>
+                        <td class="px-4 py-3">@item.TotalPrice.ToString("C")</td>
+                        <td class="px-4 py-3">
+                            <span class="inline-block px-2 py-1 rounded text-xs font-medium @(
+                                  item.Status == "Completed" ? "bg-green-100 text-green-700" :
+                                  item.Status == "Pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-800")">
+                            @item.Status
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 space-x-2">
+                        <a asp-action="Details" asp-route-id="@item.OrderId" class="text-blue-600 hover:underline">Details</a>
+                        @if (item.Status != "Completed" && item.Status != "Canceled" && item.Status != "Paid")
+                            {
+                                <form asp-action="Cancel" asp-route-id="@item.OrderId" method="post" class="inline" onsubmit="return confirm('Are you sure to cancel this order?');">
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">Cancel</button>
+                                </form>
+                            }
+                    </td>
+                </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+</div>

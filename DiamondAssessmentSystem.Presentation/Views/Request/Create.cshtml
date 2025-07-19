@@ -1,50 +1,51 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.RequestCreateDto
-
 @{
     ViewData["Title"] = "Create Request";
+    var serviceOptions = ViewBag.Services as List<SelectListItem>; // Service list
+    var requestTypes = new List<SelectListItem>
+    {
+        new("Normal", "Normal"),
+        new("Urgent", "Urgent"),
+        new("VIP", "VIP")
+    };
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📄 Create Request</h1>
 
-<hr />
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="bg-red-100 text-red-700 p-4 mb-4 rounded-md">
+            @ViewBag.ErrorMessage
+        </div>
+    }
 
-<div class="row">
-    <div class="col-md-4">
-        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-        {
-            <div class="alert alert-danger">
-                @ViewBag.ErrorMessage
-            </div>
-        }
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
+    <form asp-action="CreateRequest" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
+        <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
 
-            <div class="form-group">
-                <label asp-for="ServiceId" class="control-label"></label>
-                <input asp-for="ServiceId" class="form-control" />
-                <span asp-validation-for="ServiceId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RequestType" class="control-label"></label>
-                <input asp-for="RequestType" class="form-control" />
-                <span asp-validation-for="RequestType" class="text-danger"></span>
-            </div>
-            <!--What will happen after subitting-->
+        <div>
+            <label asp-for="ServiceId" class="block font-semibold text-gray-700">Service</label>
+            <select asp-for="ServiceId" asp-items="serviceOptions" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                <option value="">-- Select Service --</option>
+            </select>
+            <span asp-validation-for="ServiceId" class="text-red-500 text-sm"></span>
+        </div>
 
-            <div class="form-group">
-                <input type="submit" name="action" value="Submit" class="btn btn-primary" asp-action="CreateRequest" asp-route-action="Submit" />
-                <input type="submit" name="action" value="Save" class="btn btn-secondary" asp-action="CreateRequest" asp-route-action="Draft" />
-            </div>
-        </form>
+        <div>
+            <label asp-for="RequestType" class="block font-semibold text-gray-700">Request Type</label>
+            <select asp-for="RequestType" asp-items="requestTypes" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                <option value="">-- Select Type --</option>
+            </select>
+            <span asp-validation-for="RequestType" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between">
+            <button type="submit" name="action" value="Submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">📤 Submit</button>
+            <button type="submit" name="action" value="Draft" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400">💾 Save as Draft</button>
+        </div>
+    </form>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

@@ -1,0 +1,32 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.EmployeeDto
+
+<tr class="hover:bg-gray-50">
+    <td class="px-4 py-3">@Model.FirstName @Model.LastName</td>
+    <td class="px-4 py-3">@Model.Email</td>
+    <td class="px-4 py-3">@Model.Phone</td>
+    <td class="px-4 py-3">@Model.Gender</td>
+    <td class="px-4 py-3">@Model.Salary?.ToString("C")</td>
+    <td class="px-4 py-3">
+        @if (Model.Status == "Inactive")
+        {
+            <span class="text-red-500 font-medium">Inactive</span>
+        }
+        else
+        {
+            <span class="text-green-600 font-medium">Active</span>
+        }
+    </td>
+    <td class="px-4 py-3 space-x-3">
+        <a asp-action="EmployeeDetails" asp-route-id="@Model.UserId" class="text-blue-600 hover:underline">Details</a>
+        <a asp-action="EditEmployee" asp-route-id="@Model.UserId" class="text-yellow-600 hover:underline">Edit</a>
+
+        @if (Model.Status == "Inactive")
+        {
+            <button onclick="showActivateEmployee('@Model.UserId')" class="text-green-600 hover:underline">Activate</button>
+        }
+        else
+        {
+            <button onclick="showDeactivateEmployee('@Model.UserId')" class="text-red-600 hover:underline">Deactivate</button>
+        }
+    </td>
+</tr>

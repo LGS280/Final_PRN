@@ -1,0 +1,80 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.CustomerDto>
+@{
+    ViewData["Title"] = "Customer Management";
+}
+
+<div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Customer Management</h1>
+    </div>
+
+    <div class="overflow-x-auto bg-white shadow-md rounded-xl">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                <tr>
+                    <th class="px-4 py-3 text-left">Name</th>
+                    <th class="px-4 py-3 text-left">Email</th>
+                    <th class="px-4 py-3 text-left">Phone</th>
+                    <th class="px-4 py-3 text-left">Address</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+
+                    <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 text-gray-800">
+                @foreach (var customer in Model)
+                {
+                    @await Html.PartialAsync("Customers/_CustomerRow", customer)
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- DEACTIVATE MODAL -->
+<div id="deactivateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Deactivation</h2>
+        <p class="text-sm text-gray-600 mb-6">Are you sure you want to deactivate this customer?</p>
+        <div class="flex justify-end space-x-3">
+            <button onclick="hideDeactivate()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+            <a id="confirmDeactivateBtn" href="#" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Deactivate</a>
+        </div>
+    </div>
+</div>
+
+<!-- ACTIVATE MODAL -->
+<div id="activateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Activation</h2>
+        <p class="text-sm text-gray-600 mb-6">Do you want to activate this customer again?</p>
+        <div class="flex justify-end space-x-3">
+            <button onclick="hideActivate()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+            <a id="confirmActivateBtn" href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Activate</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDeactivate(userId) {
+        document.getElementById("deactivateModal").classList.remove("hidden");
+        document.getElementById("deactivateModal").classList.add("flex");
+        document.getElementById("confirmDeactivateBtn").href = `/Admin/DeactivateCustomer/${userId}`;
+    }
+
+    function hideDeactivate() {
+        document.getElementById("deactivateModal").classList.remove("flex");
+        document.getElementById("deactivateModal").classList.add("hidden");
+    }
+
+    function showActivate(userId) {
+        document.getElementById("activateModal").classList.remove("hidden");
+        document.getElementById("activateModal").classList.add("flex");
+        document.getElementById("confirmActivateBtn").href = `/Admin/ActivateCustomer/${userId}`;
+    }
+
+    function hideActivate() {
+        document.getElementById("activateModal").classList.remove("flex");
+        document.getElementById("activateModal").classList.add("hidden");
+    }
+</script>

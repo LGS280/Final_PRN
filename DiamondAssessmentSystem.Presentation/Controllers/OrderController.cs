@@ -1,159 +1,258 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     [Authorize]
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
         private readonly ICurrentUserService _currentUser;
+        private readonly IRequestService _requestService;
+        private readonly IServicePriceService _servicePriceService;
 
-        public OrderController(IOrderService orderService, ICurrentUserService currentUser)
+        public OrderController(
+            IOrderService orderService,
+            ICurrentUserService currentUser,
+            IRequestService requestService,
+            IServicePriceService servicePriceService)
         {
             _orderService = orderService;
             _currentUser = currentUser;
+            _requestService = requestService;
+            _servicePriceService = servicePriceService;
         }
 
-        // GET: Order
-        public async Task<IActionResult> MyOrder()   //Get all order
-        {
-
-            var userId = _currentUser.UserId;
-            if (string.IsNullOrEmpty(userId))
-            {
-                // If not authenticated, redirect to login page.
-                return RedirectToAction("Login", "Auth");
-            }
-
-            var orders = await _orderService.GetOrdersByCustomerAsync(userId); //loads with user
-            return View(orders);
-        }
-
-        // GET: Order/All
-        //[Authorize(Roles = "Admin")]//To require authentication here. - for extra code when able too-
-        public async Task<IActionResult> Index()  //Get all types to control order (To edit code and more).
+        // GET: /Order/All (Admin/Staff)
+        public async Task<IActionResult> Index()
         {
             var orders = await _orderService.GetOrdersAsync();
             return View(orders);
         }
 
-        // GET: Order/Details/{id}
-        public async Task<IActionResult> Details(int id) //View detail of each line.
+        // GET: /Order/MyOrder (User)
+        public async Task<IActionResult> MyOrder()
+        {
+            var userId = _currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Auth");
+
+            var orders = await _orderService.GetOrdersByCustomerAsync(userId);
+            return View(orders);
+        }
+
+        // GET: /Order/Details/5
+        public async Task<IActionResult> Details(int id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
-            if (order == null)
-            {
-                return NotFound();  //Test each and make to test well so it looks good
-            }
-            return View(order);  //Load
+            if (order == null) return NotFound();
 
+            return View(order);
         }
 
-        // GET: Order/Create
-        public IActionResult Create()  // To have code for a profile (page)
+        // GET: /Order/Create
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var userId = _currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Auth");
+
+            var requestWithServices = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+
+            // Build dropdown list
+            ViewBag.RequestOptions = requestWithServices.Select(r => new SelectListItem
+            {
+                Value = r.RequestId.ToString(),
+                Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
+            }).ToList();
+
+            // Build JS mapping: RequestId => { serviceId, price }
+            var serviceMap = requestWithServices.ToDictionary(
+                r => r.RequestId.ToString(),
+                r => new
+                {
+                    serviceId = r.ServiceId,
+                    price = r.Price
+                });
+
+            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
+                serviceMap,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+
+            return View(new OrderCreateCombineDto());
         }
 
+        // POST: /Order/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PaymentInfo, OrderData")] OrderCreateCombineDto order)    //Take form that will be send over with all parts of the code
+        public async Task<IActionResult> Create(OrderCreateCombineDto model)
         {
-            //Validate the Code for Login - IMPORTANT
             var userId = _currentUser.UserId;
-            //Authenticate
-            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Auth");
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                ModelState.AddModelError(string.Empty, "Authentication not found. Make sure that is not invalid");
-                return View();
-            }
-            // Validate that has every code they need
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    //Check to see if it connects
-
-                    var created = await _orderService.CreateOrderAsync(
-                       userId,
-                       order.PaymentInfo.RequestId,
-                       order.OrderData,
-                       order.PaymentInfo.PaymentType,
-                       order.PaymentInfo.PaymentRequest);
-
-                    if (!created)
-                    {
-                        //If there is, what action to prevent it and load
-                        ModelState.AddModelError(string.Empty, "Request for a new page did not fully load");
-                        return View(CreateView());
-                    }
-
-                    return RedirectToAction(nameof(Index)); //Return here
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, $"If any errors, what do you want the pages to do. \nMessage{ex.Message}");
-                    return View(ex.Message); //Return 
-                }
-            }
-            return View(order); //Test the loading, will happen if there is bad request.
-        }
-
-        // GET: Order/Edit/{id}
-        public IActionResult Edit(int Id)
-        {
-            return View();   // To do in the future.
-        }
-
-        // GET: Order/Cancel/{id}
-        [HttpPost, ActionName("Cancel")]
-        public async Task<IActionResult> CancelOrder(int id)   //Posts to canel a confirm file.
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
+            if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
+
+            if (!ModelState.IsValid)
+            {
+                await LoadRequestOptionsToViewBag(userId);
+                return View(model);
             }
+
             try
             {
-                //Get the user Id.
-                var userId = _currentUser.UserId;
-                var success = await _orderService.CancelOrderAsync(id);
-
-                if (!success)
+                // Nếu là Online → Redirect sang PaymentController
+                if (model.PaymentInfo.PaymentType == "Online")
                 {
-                    //If there is still errors to complete.
-                    ModelState.AddModelError(string.Empty, "An update with current process will not let this request validate, try to resolve this.");
-                    return View();  //What happens with cancel, goes back to start
+                    var paymentRequest = new VnPaymentRequestDto
+                    {
+                        RequestId = model.PaymentInfo.RequestId,
+                        ServiceId = model.OrderData.ServiceId,
+                        Amount = (double)model.OrderData.TotalPrice,
+                        CreatedDate = DateTime.UtcNow
+                    };
+
+                    return RedirectToAction("RedirectToVnPay", "Payment", paymentRequest);
                 }
 
-                return RedirectToAction(nameof(Index));   //Load the Home Page
+                // Nếu là Offline → Tạo luôn
+                var created = await _orderService.CreateOrderAsync(
+                    userId,
+                    model.PaymentInfo.RequestId,
+                    model.OrderData,
+                    "Offline",
+                    null // Không có paymentRequest
+                );
+
+                if (!created)
+                {
+                    ModelState.AddModelError(string.Empty, "Failed to create order.");
+                    await LoadRequestOptionsToViewBag(userId);
+                    return View(model);
+                }
+
+                return RedirectToAction(nameof(MyOrder));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Cannot validate any action. \n Error{ex}");
-                return RedirectToAction(nameof(Index));   //What is it will occur that will be the outcome.
+                ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
+                await LoadRequestOptionsToViewBag(userId);
+                return View(model);
             }
         }
 
+        //// GET: /Order/Edit/5
+        //public async Task<IActionResult> Edit(int id)
+        //{
+        //    var userId = _currentUser.UserId;
+        //    if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Auth");
 
-        public ActionResult CreateView()  //Loads Create
+        //    var order = await _orderService.GetOrderByIdAsync(id);
+        //    if (order == null || order.Status == "Completed" || order.Status == "Canceled")
+        //        return NotFound();
+
+        //    var requests = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+
+        //    ViewBag.RequestOptions = requests.Select(r => new SelectListItem
+        //    {
+        //        Value = r.RequestId.ToString(),
+        //        Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
+        //    }).ToList();
+
+        //    var serviceMap = requests.ToDictionary(
+        //        r => r.RequestId.ToString(),
+        //        r => new { serviceId = r.ServiceId, price = r.Price });
+
+        //    ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
+        //        serviceMap,
+        //        new JsonSerializerSettings
+        //        {
+        //            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //        });
+
+        //    // Ghép dữ liệu vào CombineDto
+        //    var model = new OrderCreateCombineDto
+        //    {
+        //        OrderData = new OrderCreateDto
+        //        {
+        //            OrderDate = order.OrderDate,
+        //            ServiceId = order.ServiceId,
+        //            TotalPrice = order.TotalPrice
+        //        },
+        //        PaymentInfo = new OrderPaymentDto
+        //        {
+        //            RequestId = order.RequestId,
+        //            PaymentType = "Offline" 
+        //        }
+        //    };
+
+        //    ViewBag.OrderId = order.OrderId;
+        //    return View(model);
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, OrderCreateCombineDto model)
+        //{
+        //    var userId = _currentUser.UserId;
+        //    if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Auth");
+
+        //    if (!ModelState.IsValid)
+        //    {
+        //        await LoadRequestOptionsToViewBag(userId);
+        //        return View(model);
+        //    }
+
+        //    var success = await _orderService.UpdateOrderAsync(
+        //        id, userId,
+        //        model.OrderData,
+        //        model.PaymentInfo.RequestId,
+        //        model.PaymentInfo.PaymentType
+        //    );
+
+        //    if (!success)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Failed to update order.");
+        //        await LoadRequestOptionsToViewBag(userId);
+        //        return View(model);
+        //    }
+
+        //    return RedirectToAction(nameof(MyOrder));
+        //}
+
+        // POST: /Order/Cancel/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
         {
-            return View();   //Return to code to test and make sure it loads.
+            var userId = _currentUser.UserId;
+            if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Auth");
+
+            var success = await _orderService.CancelOrderAsync(id);
+            if (!success)
+                ModelState.AddModelError(string.Empty, "Cancel failed.");
+
+            return RedirectToAction(nameof(MyOrder));
         }
 
-
-        // PUT: api/Order/payment
-        public ActionResult payment()   //Payments for code, not sure to check payment codes from API in Controller.
+        // Load lại request list nếu form có lỗi
+        private async Task LoadRequestOptionsToViewBag(string userId)
         {
-            return View();
+            var requests = await _requestService.GetDraftOrPendingRequestsAsync(userId);
+            ViewBag.RequestOptions = requests.Select(r => new SelectListItem
+            {
+                Value = r.RequestId.ToString(),
+                Text = $"Request #{r.RequestId} - {r.RequestType}"
+            }).ToList();
         }
     }
 }

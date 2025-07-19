@@ -1,0 +1,48 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.EmployeeUpdateDto
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<div class="max-w-xl mx-auto py-10">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">@ViewData["Title"]</h2>
+    ViewBag.Email = employee.Email;
+
+    <form asp-action="EditEmployee" method="post" class="bg-white p-6 rounded-xl shadow space-y-4">
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label asp-for="FirstName" class="block font-medium">First Name</label>
+                <input asp-for="FirstName" class="w-full border-gray-300 rounded-md" />
+                <span asp-validation-for="FirstName" class="text-red-500 text-sm"></span>
+            </div>
+            <div>
+                <label asp-for="LastName" class="block font-medium">Last Name</label>
+                <input asp-for="LastName" class="w-full border-gray-300 rounded-md" />
+                <span asp-validation-for="LastName" class="text-red-500 text-sm"></span>
+            </div>
+        </div>
+        <div>
+            <label class="block font-medium">Email</label>
+            <input value="@ViewBag.Email" class="w-full border-gray-300 rounded-md bg-gray-100" readonly />
+        </div>
+        <div>
+            <label asp-for="Phone" class="block font-medium">Phone</label>
+            <input asp-for="Phone" class="w-full border-gray-300 rounded-md" />
+        </div>
+        <div>
+            <label asp-for="Gender" class="block font-medium">Gender</label>
+            <select asp-for="Gender" class="w-full border-gray-300 rounded-md">
+                <option value="">-- Select --</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div>
+            <label asp-for="Salary" class="block font-medium">Salary</label>
+            <input asp-for="Salary" class="w-full border-gray-300 rounded-md" />
+        </div>
+
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
+    </form>
+</div>

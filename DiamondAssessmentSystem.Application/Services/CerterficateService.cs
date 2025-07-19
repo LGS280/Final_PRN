@@ -20,56 +20,42 @@ namespace DiamondAssessmentSystem.Application.Services
             _mapper = mapper;
         }
 
-        // GET: api/Certificate
-        public async Task<IEnumerable<CertificateDto>> GetCertificatesAsync()
+        public async Task<IEnumerable<CertificateDto>> GetCertificatesAsync() =>
+            _mapper.Map<IEnumerable<CertificateDto>>(await _certificateRepository.GetCertificatesAsync());
+
+        public async Task<IEnumerable<CertificateDto>> GetPersonalCertificates(string userId) =>
+            _mapper.Map<IEnumerable<CertificateDto>>(await _certificateRepository.GetPersonalCertificates(userId));
+
+        public async Task<CertificateDto?> GetCertificateByIdAsync(int id)
         {
-            var certificates = await _certificateRepository.GetCertificatesAsync();
-            return _mapper.Map<IEnumerable<CertificateDto>>(certificates); 
+            var cert = await _certificateRepository.GetCertificateByIdAsync(id);
+            return cert == null ? null : _mapper.Map<CertificateDto>(cert);
         }
 
-        public async Task<IEnumerable<CertificateDto>> GetPersonalCertificates(string userId)
+        public async Task<CertificateDto> CreateCertificateAsync(CertificateCreateDto dto)
         {
-            var certificates = await _certificateRepository.GetPersonalCertificates(userId);
-            return _mapper.Map<IEnumerable<CertificateDto>>(certificates);
+            var cert = _mapper.Map<Certificate>(dto);
+            var created = await _certificateRepository.CreateCertificateAsync(cert);
+            return _mapper.Map<CertificateDto>(created);
         }
 
-        public async Task<CertificateDto> GetCertificateByIdAsync(int id)
+        public async Task<bool> UpdateCertificateAsync(string userId, CertificateCreateDto dto)
         {
-            var certificate = await _certificateRepository.GetCertificateByIdAsync(id);
-            if (certificate == null)
-            {
-                return null; 
-            }
-
-            return _mapper.Map<CertificateDto>(certificate);
-        }
-
-        // POST: api/Certificate
-        public async Task<CertificateDto> CreateCertificateAsync(CertificateCreateDto certificateCreateDto)
-        {
-            var certificate = _mapper.Map<Certificate>(certificateCreateDto); 
-
-            var createdCertificate = await _certificateRepository.CreateCertificateAsync(certificate);
-            return _mapper.Map<CertificateDto>(createdCertificate); 
-        }
-
-        public async Task<bool> UpdateCertificateAsync(string userId, CertificateCreateDto certificateCreateDto)
-        {
-            var existingCertificate = await _certificateRepository.GetCertificateByIdAsync(certificateCreateDto.CertificateId);
-
-            if (existingCertificate == null)
-            {
+            var existing = await _certificateRepository.GetCertificateByIdAsync(dto.CertificateId);
+            if (existing == null || existing.Status == "Issued")
                 return false;
-            }
 
-            _mapper.Map(certificateCreateDto, existingCertificate);
+            _mapper.Map(dto, existing);
 
-            if (certificateCreateDto.Status == "Accepted")
+            if (dto.Status == "Issued")
             {
-                existingCertificate.ApprovedDate = DateTime.UtcNow;
+                if (dto.ApprovedBy == null)
+                    return false;
+
+                existing.ApprovedDate = DateTime.UtcNow;
             }
 
-            return await _certificateRepository.UpdateCertificateAsync(userId, existingCertificate); 
+            return await _certificateRepository.UpdateCertificateAsync(userId, existing);
         }
     }
 }

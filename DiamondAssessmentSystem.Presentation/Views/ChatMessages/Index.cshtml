@@ -1,0 +1,20 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel
+
+@{
+    ViewData["Title"] = $"Conversation #{Model.ConversationId}";
+}
+
+<div class="max-w-3xl mx-auto py-6">
+    <h2 class="text-2xl font-bold mb-4">💬 Conversation #@Model.ConversationId</h2>
+
+    <div class="border rounded-lg p-4 bg-white space-y-4 max-h-[70vh] overflow-y-auto">
+        @foreach (var msg in Model.Messages)
+        {
+            @await Html.PartialAsync("_ChatMessage", msg)
+        }
+    </div>
+
+    <div class="mt-6">
+        @await Html.PartialAsync("_SendMessageForm", Model.ConversationId)
+    </div>
+</div>

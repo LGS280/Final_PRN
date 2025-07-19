@@ -1,23 +1,29 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     [Authorize]  // All requires authentication
     public class RequestController : Controller
     {
         private readonly IRequestService _requestService;
         private readonly ICurrentUserService _currentUser;
+        private readonly IServicePriceService _servicePriceService;
 
-        public RequestController(IRequestService requestService, ICurrentUserService currentUser)
+        public RequestController(
+            IRequestService requestService,
+            ICurrentUserService currentUser,
+            IServicePriceService servicePriceService)
         {
             _requestService = requestService;
             _currentUser = currentUser;
+            _servicePriceService = servicePriceService;
         }
 
         // GET: Request
@@ -61,58 +67,66 @@ namespace DiamondAssessmentSystem.Controllers
         }
 
         // GET: Request/Create
-        public IActionResult Create() //Loads the data to create a profile
+        public async Task<IActionResult> Create()
         {
-            return View();  // Returns to View that allows for creating of Request
+            var activeServices = await _servicePriceService.GetByStatusAsync("Active");
+
+            ViewBag.Services = activeServices.Select(s => new SelectListItem
+            {
+                Value = s.ServiceId.ToString(),
+                Text = $"{s.ServiceType} - {s.Price:C}" // VD: "Standard - $50.00"
+            }).ToList();
+
+            return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRequest(RequestCreateDto createDto, string action)
         {
-            //Validate for Authenticity
             if (!User.Identity.IsAuthenticated)
-            {
-                //If user cannot access to page, reload login
                 return RedirectToAction("Login", "Auth");
-            }
-            //Validate the codes
+
             if (!ModelState.IsValid)
             {
-                //Model is what will show, if the model is unvalided it reloads it to fill it in more.
-                return View("Unauthorized");
+                // ⚠️ Cần load lại danh sách dịch vụ nếu có lỗi
+                var activeServices = await _servicePriceService.GetByStatusAsync("Active");
+                ViewBag.Services = activeServices.Select(s => new SelectListItem
+                {
+                    Value = s.ServiceId.ToString(),
+                    Text = $"{s.ServiceType} - {s.Price:C}"
+                }).ToList();
+
+                return View("Create", createDto);
             }
+
             try
             {
-                //Function to validate
                 var userId = _currentUser.UserId;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    ModelState.AddModelError(string.Empty, "User Cannot be blank in current state, check back and try again."); //Test
-                    return View();  //Goes back to error
+                    ModelState.AddModelError(string.Empty, "User is not valid.");
+                    return View("Create", createDto);
                 }
 
-                //What action is to be performed with this
-                string status;
-                //Creates pending or draft
-                if (action == "Submit")
-                {
-                    status = "Pending";
-                }
-                else
-                {
-                    status = "Draft"; //Creates, by default, will send it to Draft
+                string status = action == "Submit" ? "Pending" : "Draft";
 
-                }
-
-                //Make the data and create, while loading those information to be added to the function
                 var created = await _requestService.CreateRequestForCustomerAsync(userId, createDto, status);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Can’t connect to Database. Message:" + ex);
-                return View(); // return it
+                ModelState.AddModelError(string.Empty, "Can’t connect to DB: " + ex.Message);
+
+                var activeServices = await _servicePriceService.GetByStatusAsync("Active");
+                ViewBag.Services = activeServices.Select(s => new SelectListItem
+                {
+                    Value = s.ServiceId.ToString(),
+                    Text = $"{s.ServiceType} - {s.Price:C}"
+                }).ToList();
+
+                return View("Create", createDto);
             }
         }
 
@@ -149,18 +163,17 @@ namespace DiamondAssessmentSystem.Controllers
                 return View();  //Sends back code to test, it works!
             }
         }
-        // GET: Request/Edit/{id}
+
         public async Task<IActionResult> Edit(int id)
         {
-            var requests = await _requestService.GetRequestByIdAsync(id);
-
-            if (requests == null)
+            var request = await _requestService.GetRequestByIdAsync(id);
+            if (request == null)
             {
-                return NotFound(); //If not found, return error
+                return NotFound();
             }
 
             // Ngăn không cho edit nếu status là Pending
-            if (requests.Status == "Pending")
+            if (request.Status == "Pending")
             {
                 TempData["ErrorMessage"] = "Cannot edit a request that is already pending.";
                 return RedirectToAction("Details", new { id });
@@ -168,15 +181,24 @@ namespace DiamondAssessmentSystem.Controllers
 
             var requestCreateDto = new RequestCreateDto
             {
-                ServiceId = requests.ServiceId,
-                RequestType = requests.RequestType,
-                // Add other properties as needed
+                ServiceId = request.ServiceId,
+                RequestType = request.RequestType,
+                // Nếu có thêm fields thì gán vào đây
             };
 
-            ViewBag.Id = requests.RequestId; // Store the request ID in ViewBag for use in the view
+            ViewBag.Id = request.RequestId;
 
-            return View(requestCreateDto);   //Return list of what we have
+            // Load dropdown danh sách dịch vụ
+            var activeServices = await _servicePriceService.GetByStatusAsync("Active");
+            ViewBag.Services = activeServices.Select(s => new SelectListItem
+            {
+                Value = s.ServiceId.ToString(),
+                Text = $"{s.ServiceType} - {s.Price:C}"
+            }).ToList();
+
+            return View(requestCreateDto);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

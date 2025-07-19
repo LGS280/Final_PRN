@@ -1,0 +1,66 @@
+﻿@model (List<DiamondAssessmentSystem.Application.DTO.ConversationDTO> Unassigned, List<DiamondAssessmentSystem.Application.DTO.ConversationDTO> Assigned, string? Error)
+
+@{
+    ViewData["Title"] = "Consultant Dashboard";
+}
+
+<div class="consultant-dashboard">
+    <h2>🧑‍💼 Consultant Dashboard</h2>
+    <p>Quản lý các cuộc trò chuyện của khách hàng</p>
+
+    <div class="actions">
+        <form asp-action="Unassigned" method="get"><button type="submit">🔄 Refresh</button></form>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="logout-btn">🚪 Đăng xuất</button>
+        </form>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <p class="error">⚠️ @Model.Error</p>
+    }
+
+    <!-- Unassigned List -->
+    <h3>🗂️ Chưa được nhận</h3>
+    @if (!Model.Unassigned.Any())
+    {
+        <p class="status">✅ Không có cuộc trò chuyện nào chưa được nhận.</p>
+    }
+    else
+    {
+        <ul class="conversation-list">
+            @foreach (var conv in Model.Unassigned)
+            {
+                <li class="conversation-item">
+                    <div><span>🗨️ ID: @conv.ConversationId</span></div>
+                    <form asp-controller="Conversations" asp-action="Assign" method="post">
+                        <input type="hidden" name="id" value="@conv.ConversationId" />
+                        <button type="submit">✅ Assign & Chat</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+
+    <!-- Assigned List -->
+    <h3>✅ Đã nhận</h3>
+    @if (!Model.Assigned.Any())
+    {
+        <p class="status">📭 Bạn chưa nhận cuộc trò chuyện nào.</p>
+    }
+    else
+    {
+        <ul class="conversation-list">
+            @foreach (var conv in Model.Assigned)
+            {
+                <li class="conversation-item">
+                    <div><span>🗨️ ID: @conv.ConversationId</span></div>
+                    <form asp-controller="ChatMessages" asp-action="Index" method="get">
+                        <input type="hidden" name="conversationId" value="@conv.ConversationId" />
+                        <button type="submit">💬 Chat</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</div>

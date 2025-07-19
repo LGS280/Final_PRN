@@ -10,13 +10,16 @@ namespace DiamondAssessmentSystem.Application.Services
     {
         private readonly IRequestRepository _requestRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IServicePriceRepository _priceRepository;
         private readonly IMapper _mapper;
 
-        public RequestService(IRequestRepository requestRepository, ICustomerRepository customerRepository, IMapper mapper)
+        public RequestService(IRequestRepository requestRepository, 
+            ICustomerRepository customerRepository, IMapper mapper, IServicePriceRepository priceRepository)
         {
             _requestRepository = requestRepository;
             _customerRepository = customerRepository;
             _mapper = mapper;
+            _priceRepository = priceRepository;
         }
 
         public async Task<IEnumerable<RequestDto>> GetRequestsAsync()
@@ -35,6 +38,41 @@ namespace DiamondAssessmentSystem.Application.Services
         {
             var requests = await _requestRepository.GetRequestsByCustomerIdAsync(userId);
             return _mapper.Map<IEnumerable<RequestDto>>(requests);
+        }
+
+        public async Task<List<RequestDto>> GetDraftOrPendingRequestsAsync(string userId)
+        {
+            var requests = await _requestRepository.GetRequestsByCustomerAsync(userId);
+
+            var draftRequests = requests
+                .Where(r => r.Status == "Draft" || r.Status == "Pending")
+                .ToList();
+
+            return _mapper.Map<List<RequestDto>>(draftRequests);
+        }
+
+        public async Task<List<RequestWithServiceDto>> GetDraftOrPendingRequestsWithServiceAsync(string userId)
+        {
+            var requests = await _requestRepository.GetDraftOrPendingRequestsAsync(userId);
+            var result = new List<RequestWithServiceDto>();
+
+            foreach (var r in requests)
+            {
+                var service = await _priceRepository.GetByIdAsync(r.ServiceId);
+                if (service == null) continue;
+
+                result.Add(new RequestWithServiceDto
+                {
+                    RequestId = r.RequestId,
+                    RequestType = r.RequestType,
+                    RequestDate = r.RequestDate,
+                    ServiceId = service.ServiceId,
+                    ServiceType = service.ServiceType,
+                    Price = service.Price
+                });
+            }
+
+            return result;
         }
 
         /// <summary>

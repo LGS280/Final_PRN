@@ -26,4 +26,14 @@ namespace DiamondAssessmentSystem.Application.DTO
 
         public int? EmployeeId { get; set; }
     }
+
+    public class RequestWithServiceDto
+    {
+        public int RequestId { get; set; }
+        public string RequestType { get; set; }
+        public DateTime RequestDate { get; set; }
+        public int ServiceId { get; set; }
+        public string ServiceType { get; set; }
+        public decimal Price { get; set; }
+    }
 }

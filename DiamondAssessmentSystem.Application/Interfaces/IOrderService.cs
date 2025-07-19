@@ -15,7 +15,7 @@ namespace DiamondAssessmentSystem.Application.Interfaces
             OrderCreateDto orderCreateDto,
             string paymentType,
             VnPaymentResponseFromFe paymentRequest);
-        Task<bool> UpdateOrderAsync(int id, OrderCreateDto orderCreateDto);
+        //Task<bool> UpdateOrderAsync(int orderId, string userId, OrderCreateDto data, int requestId, string paymentType);
         Task<bool> CancelOrderAsync(int id);
         Task<bool> UpdatePaymentAsync(string userId, int orderId, string status);
     }

@@ -1,31 +1,25 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.ServicePriceDto
 
 @{
-    ViewData["Title"] = "Service Price Details";
+    ViewData["Title"] = "Service Details";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Service ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceId)</dd>
-        <dt class="col-sm-2">Service Type</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceType)</dd>
-        <dt class="col-sm-2">Price</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Price)</dd>
-        <dt class="col-sm-2">Description</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Description)</dd>
-        <dt class="col-sm-2">Duration</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Duration)</dd>
-        <dt class="col-sm-2">Employee ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.EmployeeId)</dd>
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.ServiceId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="max-w-3xl mx-auto p-6 bg-white shadow rounded">
+    <h1 class="text-2xl font-bold mb-4 text-blue-700">🔍 @ViewData["Title"]</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div><strong>ID:</strong> @Model.ServiceId</div>
+        <div><strong>Type:</strong> @Model.ServiceType</div>
+        <div><strong>Price:</strong> @Model.Price.ToString("C")</div>
+        <div><strong>Description:</strong> @Model.Description</div>
+        <div><strong>Duration (days):</strong> @Model.Duration</div>
+        <div><strong>Employee:</strong> @Model.EmployeeId</div>
+        <div>
+            <strong>Status:</strong>
+            <span class="@(Model.Status == "Active" ? "text-green-600" : "text-gray-500")">@Model.Status</span>
+        </div>
+    </div>
+    <div class="mt-6 flex gap-4">
+        <a asp-action="Edit" asp-route-id="@Model.ServiceId" class="text-yellow-600 hover:underline">✏️ Edit</a>
+        <a asp-action="Index" class="text-blue-600 hover:underline">⬅️ Back to List</a>
+    </div>
 </div>

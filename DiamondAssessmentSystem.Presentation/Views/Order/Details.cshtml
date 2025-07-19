@@ -1,32 +1,55 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.OrderDto
-
 @{
     ViewData["Title"] = "Order Details";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📋 @ViewData["Title"]</h1>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Order ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderId)</dd>
-        <dt class="col-sm-2">Order Date</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderDate)</dd>
-        <dt class="col-sm-2">Service Id</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceId)</dd>
-        <dt class="col-sm-2">Service Type</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceType)</dd>
-        <dt class="col-sm-2">Total Price</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.TotalPrice)</dd>
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
+    <div class="bg-white shadow rounded-xl p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <span class="font-semibold text-gray-700">Order ID:</span>
+                <div>@Model.OrderId</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Order Date:</span>
+                <div>@Model.OrderDate.ToShortDateString()</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Service ID:</span>
+                <div>@Model.ServiceId</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Service Type:</span>
+                <div>@Model.ServiceType</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Total Price:</span>
+                <div>@Model.TotalPrice.ToString("C")</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Status:</span>
+                <div>
+                    <span class="inline-block px-2 py-1 rounded text-xs font-medium @(
+                          Model.Status == "Completed" ? "bg-green-100 text-green-700" :
+                          Model.Status == "Pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-800")">
+                        @Model.Status
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        @*Test every aspect that is in the data table too
-                Check the other files for code snippets that can assist here too*@
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.OrderId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="mt-6 flex justify-between">
+        <a asp-action="Index" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+        <form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+            <button type="submit"
+                    class="text-sm text-red-600 hover:underline"
+                    @(Model.Status == "Paid" || Model.Status == "Completed" || Model.Status == "Canceled" ? "disabled class='opacity-50 cursor-not-allowed'" : "")>
+                Cancel Order
+            </button>
+        </form>
+        @* <a asp-action="Edit" asp-route-id="@Model.OrderId" class="text-sm text-yellow-600 hover:underline">Edit</a> *@
+    </div>
 </div>

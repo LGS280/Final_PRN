@@ -16,6 +16,13 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<IEnumerable<Customer>> GetAllAsync()
+        {
+            return await _context.Customers
+                .Include(c => c.User)
+                .ToListAsync();
+        }
+
         public async Task<int> GetCustomerIdAsync(string userId)
         {
             var customer = await _context.Customers
@@ -23,6 +30,13 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             return customer?.CustomerId ?? -1;
+        }
+
+        public async Task<Customer?> GetByUserIdAsync(string userId)
+        {
+            return await _context.Customers
+                .Include(c => c.Orders) 
+                .FirstOrDefaultAsync(c => c.UserId == userId);
         }
 
         public async Task<Customer?> GetCustomerByIdAsync(string userId)

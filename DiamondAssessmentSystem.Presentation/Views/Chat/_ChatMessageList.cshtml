@@ -1,0 +1,15 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel
+
+<div class="chat-box" id="chatBox">
+    @foreach (var msg in Model.Messages)
+    {
+        @await Html.PartialAsync("_ChatMessageItem", msg)
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const box = document.getElementById("chatBox");
+        if (box) box.scrollTop = box.scrollHeight;
+    </script>
+}

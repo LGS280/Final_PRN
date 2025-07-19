@@ -13,8 +13,8 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<IEnumerable<AccountDto>> GetAllUsersAsync();
         Task<AccountDto> GetUserByIdAsync(string id);
         Task<AccountDto> CreateEmployeeAsync(RegisterEmployeesDto dto, string role);
-        Task<bool> UpdateAccountAsync(string id, AccountDto accountDto);
+        Task<bool> UpdateAccountAsync(string id, AccountDto dto);
         Task<bool> DeleteAccountAsync(string id);
-
+        Task<bool> UpdateStatusAsync(string userId, string newStatus);
     }
 }

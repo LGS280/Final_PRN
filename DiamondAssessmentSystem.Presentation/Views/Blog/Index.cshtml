@@ -1,39 +1,67 @@
 ﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
-
 @{
-    ViewData["Title"] = "Blogs";
+    ViewData["Title"] = "Manage Blogs";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- Title + Create Button -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">🛠️ Manage Blogs</h1>
+        <a asp-action="Create"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            ➕ Create New
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Blog ID</th>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Image</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.BlogId)</td>
-                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.Content)</td>
-                <td>@Html.DisplayFor(modelItem => item.ImageUrl)</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.BlogId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.BlogId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.BlogId">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <!-- Table -->
+    <div class="overflow-x-auto bg-white rounded-xl shadow-lg border">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100 text-sm text-gray-700 font-semibold">
+                <tr>
+                    <th class="px-6 py-3 text-left">ID</th>
+                    <th class="px-6 py-3 text-left">Title</th>
+                    <th class="px-6 py-3 text-left">Image</th>
+                    <th class="px-6 py-3 text-left">Created</th>
+                    <th class="px-6 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">@item.BlogId</td>
+                        <td class="px-6 py-4 font-medium text-gray-800">@item.Title</td>
+                        <td class="px-6 py-4">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="blog image"
+                                     class="h-12 w-12 rounded object-cover border" />
+                            }
+                            else
+                            {
+                                <span class="text-gray-400 italic">No Image</span>
+                            }
+                        </td>
+                        <td class="px-6 py-4 text-gray-500">@item.CreatedDate.ToString("dd MMM yyyy")</td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-2">
+                                <a asp-action="Details" asp-route-id="@item.BlogId"
+                                   class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition">
+                                    🔍 View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.BlogId"
+                                   class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition">
+                                    ✏️ Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.BlogId"
+                                   class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition">
+                                    🗑️ Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

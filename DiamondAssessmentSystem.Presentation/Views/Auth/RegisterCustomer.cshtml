@@ -1,39 +1,50 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.RegisterDto
-
 @{
-    ViewData["Title"] = "Register Customer";
+    ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+    <div class="w-full max-w-4xl bg-white shadow-lg rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        <!-- Left: Image -->
+        <div class="hidden md:block">
+            <img src="https://cdn.pixabay.com/photo/2018/02/27/13/31/diamond-3185447_1280.jpg?auto=format&fit=crop&w=720&q=80"
+                 alt="Register visual" class="h-full w-full object-cover" />
+        </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="RegisterCustomer" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Username" class="control-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Register" class="btn btn-primary" />
-            </div>
-        </form>
+        <!-- Right: Form -->
+        <div class="p-10 space-y-6">
+            <h2 class="text-3xl font-bold text-gray-800 text-center">Create Account 📝</h2>
+
+            <form asp-action="RegisterCustomer" method="post" class="space-y-5">
+                <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+                <div>
+                    <label asp-for="Username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input asp-for="Username" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Username" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input asp-for="Email" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input asp-for="Password" type="password" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition">
+                    ✅ Register
+                </button>
+            </form>
+
+            <p class="text-center text-sm text-gray-600">
+                Already have an account?
+                <a asp-action="Login" class="text-blue-600 hover:underline font-medium">Login</a>
+            </p>
+        </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
