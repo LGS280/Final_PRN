@@ -46,6 +46,20 @@ namespace DiamondAssessmentSystem.Presentation
                 options.LogoutPath = "/Account/Logout";
             });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AllUsersPolicy", policy =>
+                {
+                    policy.RequireRole("User","Admin");
+                    policy.RequireRole("User", "Employee");
+                    policy.RequireRole("User", "Customer");
+                    policy.RequireRole("User", "Consultant");
+                });
+                //options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
+                //options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
+                //options.AddPolicy("ConsultantOnly", policy => policy.RequireRole("Consultant"));
+            });
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                   .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                   {

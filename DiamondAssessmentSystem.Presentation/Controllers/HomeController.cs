@@ -15,6 +15,21 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         public IActionResult Index()
         {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            else if (User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Blog");
+            }
+            else if (User.IsInRole("Customer"))
+            {
+                return RedirectToAction("Me", "Customer");
+            } else if (User.IsInRole("Consultant"))
+            {
+                return RedirectToAction("Index", "Result");
+            }
             return View();
         }
 
