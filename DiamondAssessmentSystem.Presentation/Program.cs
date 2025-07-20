@@ -5,6 +5,7 @@ using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
 using DiamondAssessmentSystem.Infrastructure.Repository;
 using DiamondAssessmentSystem.Infrastructure.SeedData;
+using DiamondAssessmentSystem.Presentation.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -39,7 +40,6 @@ namespace DiamondAssessmentSystem.Presentation
                 .AddEntityFrameworkStores<DiamondAssessmentDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Optional cookie paths (good for future UI)
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/Account/Login";
@@ -61,13 +61,12 @@ namespace DiamondAssessmentSystem.Presentation
             });
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                  .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                  {
-                      options.Cookie.Name = "CookieAuth"; //Important for code with authentication!
-                      options.LoginPath = "/Auth/Login";  // Specify the login path
-                      //options.AccessDeniedPath = "/Auth/AccessDenied"; // Specify where to redirect for unauthorized access
-                      options.LogoutPath = "/Auth/Logout";
-                  });
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    options.Cookie.Name = "CookieAuth";
+                    options.LoginPath = "/Auth/Login";
+                    options.LogoutPath = "/Auth/Logout";
+                });
 
             // ==================== Application Services ====================
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();
@@ -99,6 +98,18 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IChatLogRepository, ChatLogRepository>();
+
+            // ==================== CORS ====================
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", policy =>
+                {
+                    policy.AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .SetIsOriginAllowed(_ => true)
+                          .AllowCredentials();
+                });
+            });
 
             // ==================== SignalR ====================
             builder.Services.AddSignalR();
@@ -149,13 +160,11 @@ namespace DiamondAssessmentSystem.Presentation
 
             builder.Services.AddAuthorization();
 
-
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            // ==================== Database seeding ====================
+            // ==================== Database Seeding ====================
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -168,12 +177,10 @@ namespace DiamondAssessmentSystem.Presentation
                 await DataSeeder.SeedSampleDataAsync(services, context);
             }
 
-
-            // Configure the HTTP request pipeline.
+            // ==================== Middleware Pipeline ====================
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -182,13 +189,16 @@ namespace DiamondAssessmentSystem.Presentation
 
             app.UseRouting();
 
-            app.UseAuthentication();
+            app.UseCors("AllowSpecificOrigin"); 
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapHub<ChatHub>("/hub/chat").RequireCors("AllowSpecificOrigin");
 
             app.Run();
         }

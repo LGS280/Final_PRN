@@ -3,6 +3,7 @@ using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Presentation.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Diagnostics;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
@@ -11,15 +12,18 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         private readonly IChatMessageService _chatMessageService;
         private readonly IWebHostEnvironment _env;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly ILogger<ChatMessagesController> _logger;
 
         public ChatMessagesController(
             IChatMessageService chatMessageService,
             IWebHostEnvironment env,
-            IHubContext<ChatHub> hubContext)
+            IHubContext<ChatHub> hubContext,
+            ILogger<ChatMessagesController> logger)
         {
             _chatMessageService = chatMessageService;
             _env = env;
             _hubContext = hubContext;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -48,29 +52,81 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             var chatLog = await _chatMessageService.SendMessageAsync(conversationId, dto);
 
-            await _hubContext
-                .Clients
-                .Group(conversationId.ToString())
-                .SendAsync("ReceiveMessage", chatLog);
+            var messageDto = new MessageResponseDTO
+            {
+                ChatId = chatLog.ChatId,
+                ConversationId = chatLog.ConversationId,
+                SenderId = chatLog.SenderId,
+                SenderName = chatLog.SenderName,
+                SenderRole = chatLog.SenderRole?.ToLowerInvariant(),
+                MessageType = chatLog.MessageType,
+                Message = chatLog.Message,
+                FilePath = chatLog.FilePath,
+                FileName = chatLog.FileName,
+                FileSize = chatLog.FileSize,
+                SentAt = chatLog.SentAt
+            };
 
-            return RedirectToAction(nameof(Index), new { conversationId });
+            await _hubContext.Clients
+                .Group(conversationId.ToString())
+                .SendAsync("ReceiveMessage", messageDto);
+
+            return Ok();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadFile(int conversationId, IFormFile file)
         {
+            Debug.WriteLine($"UploadFile invoked. conversationId={conversationId}");
+
+            if (file == null)
+            {
+                Debug.WriteLine("File is null.");
+            }
+            else
+            {
+                Debug.WriteLine($"File info: Name={file.FileName}, Length={file.Length}");
+            }
+
             if (file == null || file.Length == 0)
+            {
+                Debug.WriteLine("File is missing or empty.");
                 return BadRequest("File is required.");
+            }
 
-            var chatLog = await _chatMessageService.UploadFileAsync(conversationId, file, _env.WebRootPath);
+            try
+            {
+                var chatLog = await _chatMessageService.UploadFileAsync(conversationId, file, _env.WebRootPath);
 
-            await _hubContext
-                .Clients
-                .Group(conversationId.ToString())
-                .SendAsync("ReceiveMessage", chatLog);
+                var messageDto = new MessageResponseDTO
+                {
+                    ChatId = chatLog.ChatId,
+                    ConversationId = chatLog.ConversationId,
+                    SenderId = chatLog.SenderId,
+                    SenderName = chatLog.SenderName,
+                    SenderRole = chatLog.SenderRole,
+                    MessageType = chatLog.MessageType,
+                    Message = chatLog.Message,
+                    FilePath = chatLog.FilePath,
+                    FileName = chatLog.FileName,
+                    FileSize = chatLog.FileSize,
+                    SentAt = chatLog.SentAt
+                };
 
-            return RedirectToAction(nameof(Index), new { conversationId });
+                Debug.WriteLine("File uploaded and chat log saved successfully.");
+
+                await _hubContext.Clients
+                    .Group(conversationId.ToString())
+                    .SendAsync("ReceiveMessage", messageDto);
+
+                return Ok(messageDto);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex, "Error during file upload.");
+                return StatusCode(500, "Internal error.");
+            }
         }
 
         [HttpGet]

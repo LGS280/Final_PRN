@@ -1,20 +1,22 @@
-﻿@model DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel
+﻿@using DiamondAssessmentSystem.Application.Interfaces
+@model DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel
+@inject IBlogService BlogService
+@inject ICurrentUserService CurrentUser
 
 @{
-    ViewData["Title"] = $"Conversation #{Model.ConversationId}";
+    var blogs = await BlogService.GetBlogs();
+    var currentUserId = User?.FindFirst("sub")?.Value;
+    var currentUserRole = (CurrentUser.Role ?? "").ToLower();
 }
 
-<div class="max-w-3xl mx-auto py-6">
-    <h2 class="text-2xl font-bold mb-4">💬 Conversation #@Model.ConversationId</h2>
-
-    <div class="border rounded-lg p-4 bg-white space-y-4 max-h-[70vh] overflow-y-auto">
-        @foreach (var msg in Model.Messages)
-        {
-            @await Html.PartialAsync("_ChatMessage", msg)
-        }
-    </div>
-
-    <div class="mt-6">
-        @await Html.PartialAsync("_SendMessageForm", Model.ConversationId)
-    </div>
+<div class="h-full w-full grid grid-cols-12 gap-4 px-4 py-4 bg-gradient-to-tr from-blue-100 via-white to-indigo-100">
+    @await Html.PartialAsync("_ChatSidebar", blogs)
+    @await Html.PartialAsync("_ChatMain", (Model, currentUserRole))
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ChatSignalRScript", (Model.ConversationId, currentUserRole))
+    <script src="/js/sendMessage.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emoji-button@4.6.4/dist/index.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-button@4.6.4/dist/index.min.css" />
+}

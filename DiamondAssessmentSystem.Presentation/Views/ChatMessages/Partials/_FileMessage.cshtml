@@ -1,0 +1,15 @@
+﻿@model (DiamondAssessmentSystem.Application.DTO.ChatLogDTO, string)
+
+@{
+    var chat = Model.Item1;
+    var fileColor = Model.Item2;
+}
+
+<a href="@Url.Action("Download", "ChatMessages", new {
+    conversationId = chat.ConversationId,
+    chatId = chat.ChatId,
+    savedFileName = chat.FilePath
+})"
+   class="inline-flex items-center gap-1 text-sm @fileColor hover:underline">
+    📎 <span class="underline">@chat.FileName</span>
+</a>

@@ -1,0 +1,20 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ChatLogDTO
+
+<div class="relative inline-block group">
+    <video src="@Model.FilePath" controls class="rounded-lg max-w-xs border"></video>
+    <a href="@Url.Action("Download", "ChatMessages", new {
+        conversationId = Model.ConversationId,
+        chatId = Model.ChatId,
+        savedFileName = Model.FilePath
+    })"
+       class="absolute top-1 right-1
+              bg-gray-800 hover:bg-gray-900
+              text-white text-xl
+              rounded-full p-2
+              shadow-md z-10
+              opacity-0 group-hover:opacity-100
+              transition duration-200"
+       title="Download">
+        ↓
+    </a>
+</div>

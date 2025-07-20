@@ -1,6 +1,0 @@
-@DiamondAssessmentSystem_HostAddress = http://localhost:5284
-
-GET {{DiamondAssessmentSystem_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
