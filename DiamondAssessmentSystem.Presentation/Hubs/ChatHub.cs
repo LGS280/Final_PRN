@@ -8,9 +8,7 @@ namespace DiamondAssessmentSystem.Presentation.Hubs
     {
         public override async Task OnConnectedAsync()
         {
-            var httpContext = Context.GetHttpContext();
-            var conversationId = httpContext?.Request.Query["conversationId"];
-
+            var conversationId = Context.GetHttpContext()?.Request.Query["conversationId"];
             if (!string.IsNullOrEmpty(conversationId))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, conversationId);

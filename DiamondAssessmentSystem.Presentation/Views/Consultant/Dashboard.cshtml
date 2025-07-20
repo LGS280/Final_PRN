@@ -4,63 +4,115 @@
     ViewData["Title"] = "Consultant Dashboard";
 }
 
-<div class="consultant-dashboard">
-    <h2>🧑‍💼 Consultant Dashboard</h2>
-    <p>Quản lý các cuộc trò chuyện của khách hàng</p>
+<div class="h-screen w-full flex overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-xl border-r border-gray-200 flex flex-col justify-between">
+        <div class="p-6 space-y-6">
+            <div class="flex items-center gap-3">
+                <img src="/images/logo.jpg" alt="Logo" class="w-10 h-10 rounded-full shadow" />
+                <div>
+                    <h1 class="text-lg font-extrabold text-blue-700 tracking-wide">Consultant</h1>
+                    <p class="text-sm text-gray-500">Dashboard</p>
+                </div>
+            </div>
 
-    <div class="actions">
-        <form asp-action="Unassigned" method="get"><button type="submit">🔄 Refresh</button></form>
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="logout-btn">🚪 Đăng xuất</button>
-        </form>
-    </div>
+            <nav class="space-y-3">
+                <form asp-action="Unassigned" method="get">
+                    <button type="submit"
+                            class="w-full text-left text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg transition">
+                        🔄 Làm mới
+                    </button>
+                </form>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit"
+                            class="w-full text-left text-sm font-medium text-red-600 bg-red-100 hover:bg-red-200 px-4 py-2 rounded-lg transition">
+                        🚪 Đăng xuất
+                    </button>
+                </form>
+            </nav>
+        </div>
+        <div class="text-center text-xs text-gray-400 pb-4">
+            © Diamond Assessment
+        </div>
+    </aside>
 
-    @if (!string.IsNullOrEmpty(Model.Error))
-    {
-        <p class="error">⚠️ @Model.Error</p>
-    }
-
-    <!-- Unassigned List -->
-    <h3>🗂️ Chưa được nhận</h3>
-    @if (!Model.Unassigned.Any())
-    {
-        <p class="status">✅ Không có cuộc trò chuyện nào chưa được nhận.</p>
-    }
-    else
-    {
-        <ul class="conversation-list">
-            @foreach (var conv in Model.Unassigned)
+    <!-- Main content -->
+    <main class="flex-1 overflow-y-auto p-8 space-y-8">
+        <!-- Header -->
+        <header class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">🧑‍💼 Consultant Dashboard</h2>
+                <p class="text-sm text-gray-600 mt-1">Quản lý và xử lý cuộc trò chuyện với khách hàng</p>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Error))
             {
-                <li class="conversation-item">
-                    <div><span>🗨️ ID: @conv.ConversationId</span></div>
-                    <form asp-controller="Conversations" asp-action="Assign" method="post">
-                        <input type="hidden" name="id" value="@conv.ConversationId" />
-                        <button type="submit">✅ Assign & Chat</button>
-                    </form>
-                </li>
+                <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg shadow text-sm">
+                    ⚠️ @Model.Error
+                </div>
             }
-        </ul>
-    }
+        </header>
 
-    <!-- Assigned List -->
-    <h3>✅ Đã nhận</h3>
-    @if (!Model.Assigned.Any())
-    {
-        <p class="status">📭 Bạn chưa nhận cuộc trò chuyện nào.</p>
-    }
-    else
-    {
-        <ul class="conversation-list">
-            @foreach (var conv in Model.Assigned)
-            {
-                <li class="conversation-item">
-                    <div><span>🗨️ ID: @conv.ConversationId</span></div>
-                    <form asp-controller="ChatMessages" asp-action="Index" method="get">
-                        <input type="hidden" name="conversationId" value="@conv.ConversationId" />
-                        <button type="submit">💬 Chat</button>
-                    </form>
-                </li>
-            }
-        </ul>
-    }
+        <!-- Conversation Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Unassigned -->
+            <section class="bg-white rounded-xl shadow border border-blue-200 p-6">
+                <h3 class="text-lg font-semibold text-blue-700 mb-4 flex items-center gap-2">
+                    🗂️ Chưa được nhận
+                </h3>
+
+                @if (!Model.Unassigned.Any())
+                {
+                    <p class="text-sm text-gray-500">✅ Không có cuộc trò chuyện nào chưa được nhận.</p>
+                }
+                else
+                {
+                    <ul class="space-y-3">
+                        @foreach (var conv in Model.Unassigned)
+                        {
+                            <li class="flex items-center justify-between bg-blue-50 hover:bg-blue-100 p-4 rounded-lg transition shadow-sm border">
+                                <span class="text-sm font-medium text-gray-700">🗨️ ID: @conv.ConversationId</span>
+                                <form asp-controller="Conversations" asp-action="Assign" method="post">
+                                    <input type="hidden" name="id" value="@conv.ConversationId" />
+                                    <button type="submit"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm transition">
+                                        ✅ Nhận & Chat
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+
+            <!-- Assigned -->
+            <section class="bg-white rounded-xl shadow border border-green-200 p-6">
+                <h3 class="text-lg font-semibold text-green-700 mb-4 flex items-center gap-2">
+                    ✅ Đã nhận
+                </h3>
+
+                @if (!Model.Assigned.Any())
+                {
+                    <p class="text-sm text-gray-500">📭 Bạn chưa nhận cuộc trò chuyện nào.</p>
+                }
+                else
+                {
+                    <ul class="space-y-3">
+                        @foreach (var conv in Model.Assigned)
+                        {
+                            <li class="flex items-center justify-between bg-green-50 hover:bg-green-100 p-4 rounded-lg transition shadow-sm border">
+                                <span class="text-sm font-medium text-gray-700">🗨️ ID: @conv.ConversationId</span>
+                                <form asp-controller="ChatMessages" asp-action="Index" method="get">
+                                    <input type="hidden" name="conversationId" value="@conv.ConversationId" />
+                                    <button type="submit"
+                                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full text-sm transition">
+                                        💬 Vào chat
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+            </section>
+        </div>
+    </main>
 </div>

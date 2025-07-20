@@ -1,9 +1,4 @@
 ﻿using DiamondAssessmentSystem.Infrastructure.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Application.DTO
 {
@@ -13,7 +8,7 @@ namespace DiamondAssessmentSystem.Application.DTO
         public int ConversationId { get; set; }
         public int SenderId { get; set; }
         public string? SenderName { get; set; }
-        public string? SenderRole { get; set; }
+        public string? SenderRole { get; set; } 
         public MessageType MessageType { get; set; }
         public string? Message { get; set; }
         public string? FilePath { get; set; }

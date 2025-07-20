@@ -1,33 +1,55 @@
-﻿@using DiamondAssessmentSystem.Infrastructure.Enums
-@model DiamondAssessmentSystem.Application.DTO.ChatLogDTO
+﻿@model (DiamondAssessmentSystem.Application.DTO.ChatLogDTO Message, string CurrentUserRole)
 
 @{
-    var isFile = Model.MessageType == MessageType.Image || Model.MessageType == MessageType.File;
-    var isPending = Model.IsRead == false;
-    var timestamp = Model.SentAt.ToLocalTime().ToString("g");
+    var chat = Model.Message;
+    var currentUserRole = Model.CurrentUserRole?.ToLower();
+    var isMine = chat.SenderRole?.ToLower() == currentUserRole;
+    var timestamp = chat.SentAt.ToLocalTime().ToString("g");
+
+    var avatarUrl = chat.SenderRole?.ToLower() switch
+    {
+        "consultant" => "https://i.pravatar.cc/40?img=12",
+        "customer" => "https://i.pravatar.cc/40?img=47",
+        _ => "https://i.pravatar.cc/40"
+    };
+
+    var alignment = isMine ? "justify-end" : "justify-start";
+    var bubbleStyle = isMine ? "bg-blue-100 text-gray-800 ml-auto" : "bg-gray-100 text-gray-900 mr-auto";
+    var textAlign = isMine ? "text-right text-gray-600" : "text-left text-gray-500";
+    var fileColor = isMine ? "text-blue-700" : "text-blue-600";
 }
 
-<div class="p-3 rounded-md border shadow-sm @(isPending ? "bg-gray-100 opacity-75" : "bg-white")">
-    <div class="flex items-start space-x-2">
-        <strong class="text-blue-600">@Model.SenderName (@Model.SenderRole)</strong>
-        <div class="text-sm text-gray-800">
-            @if (!isFile)
-            {
-                <span>@Model.Message</span>
-            }
-            else if (!string.IsNullOrEmpty(Model.FilePath))
-            {
-                <a href="@Model.FilePath" target="_blank" class="text-blue-500 underline">
-                    📎 @Model.FileName
-                </a>
-            }
+<div class="flex items-end @alignment gap-2">
+    @if (!isMine)
+    {
+        <img src="@avatarUrl" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-300 shadow-sm" />
+    }
+
+    <div class="max-w-[70%] px-5 py-3 rounded-2xl shadow @bubbleStyle space-y-1 transition-all duration-300 ease-in-out">
+        <div class="text-xs @textAlign">
+            <div class="font-semibold">@chat.SenderName</div>
+            <div class="text-[11px]">@chat.SenderRole – @timestamp</div>
         </div>
-    </div>
-    <div class="text-xs text-gray-500 mt-1">
-        @timestamp
-        @if (isPending)
+
+        @switch (chat.MessageType)
         {
-            <span class="ml-2 text-yellow-600">⏳ Pending</span>
+            case DiamondAssessmentSystem.Infrastructure.Enums.MessageType.Text:
+                @await Html.PartialAsync("Partials/_TextMessage", chat)
+                break;
+            case DiamondAssessmentSystem.Infrastructure.Enums.MessageType.Image:
+                @await Html.PartialAsync("Partials/_ImageMessage", chat)
+                break;
+            case DiamondAssessmentSystem.Infrastructure.Enums.MessageType.Video:
+                @await Html.PartialAsync("Partials/_VideoMessage", chat)
+                break;
+            case DiamondAssessmentSystem.Infrastructure.Enums.MessageType.File:
+                @await Html.PartialAsync("Partials/_FileMessage", (chat, fileColor))
+                break;
         }
     </div>
+
+    @if (isMine)
+    {
+        <img src="@avatarUrl" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-300 shadow-sm" />
+    }
 </div>

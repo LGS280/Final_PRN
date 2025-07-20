@@ -1,0 +1,113 @@
+﻿@model (int ConversationId, string CurrentUserRole)
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+    const chatMessages = document.getElementById("chat-messages");
+    const currentUserRole = '@Model.CurrentUserRole'.toLowerCase();
+    const conversationId = '@Model.ConversationId';
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl(`/hub/chat?conversationId=${conversationId}`)
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("ReceiveMessage", function (message) {
+        const isMine = message.senderRole?.toLowerCase() === currentUserRole;
+        const wrapper = document.createElement("div");
+        wrapper.className = `flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"}`;
+
+        const avatar = document.createElement("img");
+        avatar.src = message.senderRole === "consultant"
+            ? "https://i.pravatar.cc/40?img=12"
+            : "https://i.pravatar.cc/40?img=47";
+        avatar.className = "w-8 h-8 rounded-full border shadow-sm";
+
+        const bubble = document.createElement("div");
+        bubble.className = `
+            max-w-[75%] px-5 py-3 rounded-2xl shadow
+            ${isMine ? "bg-blue-100 text-gray-800 ml-auto" : "bg-gray-100 text-gray-900 mr-auto"}
+            space-y-1
+        `;
+
+        const header = document.createElement("div");
+        header.className = `text-xs ${isMine ? "text-right text-gray-600" : "text-left text-gray-500"}`;
+        header.innerHTML = `
+            <div class="font-semibold">${message.senderName}</div>
+            <div class="text-[11px]">${message.senderRole} – ${new Date(message.sentAt).toLocaleString()}</div>
+        `;
+
+        const body = document.createElement("div");
+        body.className = "text-sm whitespace-pre-wrap break-words";
+
+        switch (message.messageType) {
+            case 0: // Text
+                body.textContent = message.message;
+                break;
+
+            case 1: // Image
+                const imgWrapper = document.createElement("div");
+                imgWrapper.className = "relative inline-block group";
+
+                const img = document.createElement("img");
+                img.src = message.filePath;
+                img.className = "rounded max-w-xs border";
+
+                const imgBtn = document.createElement("a");
+                imgBtn.href = `/ChatMessages/Download?conversationId=${message.conversationId}&chatId=${message.chatId}&savedFileName=${encodeURIComponent(message.filePath)}`;
+                imgBtn.title = "Download";
+                imgBtn.innerText = "↓";
+                imgBtn.className = "absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition";
+
+                imgWrapper.appendChild(img);
+                imgWrapper.appendChild(imgBtn);
+                body.appendChild(imgWrapper);
+                break;
+
+            case 2: // Video
+                const vidWrapper = document.createElement("div");
+                vidWrapper.className = "relative inline-block group";
+
+                const video = document.createElement("video");
+                video.controls = true;
+                video.src = message.filePath;
+                video.className = "rounded max-w-xs";
+
+                const vidBtn = document.createElement("a");
+                vidBtn.href = `/ChatMessages/Download?conversationId=${message.conversationId}&chatId=${message.chatId}&savedFileName=${encodeURIComponent(message.filePath)}`;
+                vidBtn.title = "Download";
+                vidBtn.innerText = "↓";
+                vidBtn.className = "absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition";
+
+                vidWrapper.appendChild(video);
+                vidWrapper.appendChild(vidBtn);
+                body.appendChild(vidWrapper);
+                break;
+
+            case 3: // File
+                const fileLink = document.createElement("a");
+                fileLink.href = `/ChatMessages/Download?conversationId=${message.conversationId}&chatId=${message.chatId}&savedFileName=${encodeURIComponent(message.filePath)}`;
+                fileLink.className = `inline-flex items-center gap-1 ${isMine ? "text-blue-700" : "text-blue-600"} hover:underline`;
+                fileLink.innerHTML = `📎 <span class="underline">${message.fileName}</span>`;
+                body.appendChild(fileLink);
+                break;
+        }
+
+        bubble.appendChild(header);
+        bubble.appendChild(body);
+
+        if (isMine) {
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(avatar);
+        } else {
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(bubble);
+        }
+
+        chatMessages.appendChild(wrapper);
+        setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 0);
+    });
+
+    connection.start().then(() => {
+        setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 0);
+    }).catch(console.error);
+</script>

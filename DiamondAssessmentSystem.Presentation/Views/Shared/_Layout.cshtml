@@ -8,9 +8,8 @@
     <title>@ViewData["Title"] - Diamond Assessment</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/chat.css" />
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="h-screen flex flex-col">
 
     <!-- Header/Navbar -->
     <header class="bg-white shadow sticky top-0 z-50">
@@ -95,7 +94,7 @@
     </header>
 
     <!-- Main content -->
-    <main class="max-w-7xl mx-auto px-4 py-10 min-h-[75vh]">
+    <main class="flex-1 overflow-y-auto">
         @RenderBody()
     </main>
 
@@ -118,7 +117,5 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-    <script src="@Html.Raw("https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js")"></script>
 </body>
 </html>

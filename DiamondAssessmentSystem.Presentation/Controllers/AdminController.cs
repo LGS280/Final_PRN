@@ -174,7 +174,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             try
             {
-                var created = await _accountService.CreateEmployeeAsync(dto, RoleEnum.Staff.ToString());
+                var created = await _accountService.CreateEmployeeAsync(dto, dto.Role);
                 return RedirectToAction(nameof(Employees));
             }
             catch (Exception ex)

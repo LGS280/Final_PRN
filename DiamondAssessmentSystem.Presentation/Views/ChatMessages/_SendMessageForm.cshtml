@@ -1,14 +1,30 @@
-﻿@model int 
+﻿@model int
 
-<form asp-controller="ChatMessages" asp-action="SendMessage" asp-route-conversationId="@Model" method="post" class="flex items-center space-x-2" enctype="multipart/form-data">
-    <input type="text" name="Message" placeholder="Type a message..." class="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+<div class="shrink-0 px-6 py-4 border-t bg-white">
+    <form id="sendMessageForm" method="post" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="conversationId" value="@Model" />
 
-    <input type="file" name="File" accept="image/*,application/pdf" class="hidden" id="file-upload" />
-    <label for="file-upload" class="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 cursor-pointer">
-        📎
-    </label>
+        <input type="text" name="Message" id="text-message"
+               class="flex-1 p-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Type a message..." autocomplete="off" />
 
-    <button type="submit" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-        Send
-    </button>
-</form>
+        <label for="file-upload"
+               class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-full transition">
+            📎
+            <input type="file" name="file" id="file-upload" class="hidden" />
+        </label>
+
+        <button type="submit"
+                class="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition">
+            Send
+        </button>
+    </form>
+
+    <progress id="upload-progress"
+              value="0"
+              max="100"
+              class="w-full mt-2 h-2 hidden bg-gray-200 rounded overflow-hidden"></progress>
+
+    <div id="emoji-picker" class="mt-2"></div>
+</div>

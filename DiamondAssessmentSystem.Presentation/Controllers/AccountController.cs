@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    //[Authorize(Roles = "Admin")]  // Uncomment after setup authentication
-    public class AccountController : Controller  // Inherit from Controller
+    //[Authorize(Roles = "Admin")]  
+    public class AccountController : Controller  
     {
         private readonly IAccountService _accountService;
 
