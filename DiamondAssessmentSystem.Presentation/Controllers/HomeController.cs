@@ -20,23 +20,19 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         public async Task<IActionResult> Index()
         {
             var blogs = await _blogService.GetBlogs();
+            //if (User.IsInRole("Admin"))
+            //{
+            //    return RedirectToAction("Index", "Admin", new { Area = "Admin" });
+            //}
+            //else if (User.IsInRole("Employee"))
+            //{
+            //    return RedirectToAction("Index", "Blog");
+            //}
+            //else if (User.IsInRole("Consultant"))
+            //{
+            //    return RedirectToAction("Index", "Result");
+            //}
             return View(blogs);
-            if (User.IsInRole("Admin"))
-            {
-                return RedirectToAction("Index", "Account");
-            }
-            else if (User.IsInRole("Employee"))
-            {
-                return RedirectToAction("Index", "Blog");
-            }
-            else if (User.IsInRole("Customer"))
-            {
-                return RedirectToAction("Me", "Customer");
-            } else if (User.IsInRole("Consultant"))
-            {
-                return RedirectToAction("Index", "Result");
-            }
-            return View();
         }
 
         public IActionResult Privacy()
