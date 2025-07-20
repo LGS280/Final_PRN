@@ -49,11 +49,27 @@ namespace DiamondAssessmentSystem.Application.DTO
         [StringLength(20)]
         [RegularExpression(@"^\d{10,15}$", ErrorMessage = "Tax Code must be 10–15 digits.")]
         public string? TaxCode { get; set; }
+        public string? Email { get; set; }
+
     }
 
     public class CustomerUpdateDto
     {
         public string UserId { get; set; }
         public CustomerCreateDto Customer { get; set; }
+    }
+
+    public class CustomerUpdateDtoVer1
+    {
+        public string UserId { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Gender { get; set; }
+        public string? Phone { get; set; }
+        public string? IdCard { get; set; }
+        public string? Address { get; set; }
+        public string? UnitName { get; set; }
+        public string? TaxCode { get; set; }
+        public string? Email { get; set; }
     }
 }
