@@ -22,6 +22,12 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                                  .ToListAsync();
         }
 
+        public async Task<Certificate?> GetByResultIdAsync(int resultId)
+        {
+            return await _context.Certificates
+                .FirstOrDefaultAsync(c => c.ResultId == resultId);
+        }
+
         public async Task<IEnumerable<Certificate>> GetPersonalCertificates(string userId)
         {
             var customerId = await GetCustomerId(userId);

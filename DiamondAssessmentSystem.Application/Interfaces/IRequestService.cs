@@ -8,6 +8,8 @@ namespace DiamondAssessmentSystem.Application.Interfaces
     {
         Task<IEnumerable<RequestDto>> GetRequestsAsync();
         Task<RequestDto?> GetRequestByIdAsync(int id);
+        Task<List<RequestDto>> GetDraftOrPendingRequestsAsync(string userId);
+        Task<List<RequestWithServiceDto>> GetDraftOrPendingRequestsWithServiceAsync(string userId);
         Task<IEnumerable<RequestDto>> GetRequestsByCustomerIdAsync(string userId);
         Task<RequestDto?> CreateRequestForCustomerAsync(string userId, RequestCreateDto dto, string status);
         Task<bool> CancelRequestAsync(string userId, int requestId);

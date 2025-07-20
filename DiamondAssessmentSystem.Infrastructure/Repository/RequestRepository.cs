@@ -36,6 +36,32 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .FirstOrDefaultAsync(r => r.RequestId == id);
         }
 
+        public async Task<IEnumerable<Request>> GetRequestsByCustomerAsync(string userId)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (customer == null)
+            {
+                return Enumerable.Empty<Request>();
+            }
+
+            return await _context.Requests.Include(r => r.Service)
+                .Where(r => r.CustomerId == customer.CustomerId)
+                .ToListAsync();
+        }
+
+        public async Task<List<Request>> GetDraftOrPendingRequestsAsync(string userId)
+        {
+            return await _context.Requests
+                .Include(r => r.Customer)
+                .Where(r =>
+                    r.Customer != null &&
+                    r.Customer.UserId == userId &&
+                    (r.Status == "Draft" || r.Status == "Pending"))
+                .ToListAsync();
+        }
+
         public async Task<bool> CreateDraftRequest(string userId, Request request)
         {
             var customerId = await GetCustomerId(userId);

@@ -1,42 +1,46 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.RequestDto
-
 @{
     ViewData["Title"] = "Request Details";
 }
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📑 Request Details</h1>
 
-<h1>@ViewData["Title"]</h1>
-
-<div>
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="bg-red-100 text-red-700 p-4 mb-4 rounded-md">
             @TempData["ErrorMessage"]
         </div>
     }
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Request ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestId)</dd>
-        <dt class="col-sm-2">Form Type</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.FormType)</dd>
-        <dt class="col-sm-2">Request Date</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestDate)</dd>
-        <dt class="col-sm-2">CustomerID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.CustomerId)</dd>
-        <dt class="col-sm-2">ServiceID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.ServiceId)</dd>
-        <dt class="col-sm-2">Request Type</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.RequestType)</dd>
-        <dt class="col-sm-2">Employee ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.EmployeeId)</dd>
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
-    </dl>
+
+    <div class="bg-white p-6 rounded-xl border shadow-sm space-y-4 text-sm text-gray-700">
+        <div><strong>ID:</strong> @Model.RequestId</div>
+        <div><strong>Form Type:</strong> @Model.FormType</div>
+        <div><strong>Request Date:</strong> @Model.RequestDate.ToString("dd MMM yyyy")</div>
+        <div><strong>Customer ID:</strong> @Model.CustomerId</div>
+        <div><strong>Service ID:</strong> @Model.ServiceId</div>
+        <div><strong>Request Type:</strong> @Model.RequestType</div>
+        <div><strong>Employee ID:</strong> @Model.EmployeeId</div>
+        <div><strong>Status:</strong> <span class="font-medium @GetStatusClass(Model.Status)">@Model.Status</span></div>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+        @if (Model.Status != "Pending")
+        {
+            <a asp-action="Edit" asp-route-id="@Model.RequestId" class="text-yellow-600 hover:underline">✏️ Edit</a>
+        }
+        <a asp-action="Index" class="text-blue-600 hover:underline">← Back to List</a>
+    </div>
 </div>
-<div>
-    @if (Model.Status != "Pending")
+
+@functions {
+    string GetStatusClass(string? status)
     {
-    <a asp-action="Edit" asp-route-id="@Model.RequestId">Edit |</a>
+        return status switch
+        {
+            "Draft" => "text-yellow-600",
+            "Pending" => "text-blue-600",
+            "Completed" => "text-green-600",
+            _ => "text-gray-500"
+        };
     }
-    <a asp-action="Index">Back to List</a>
-</div>
+}

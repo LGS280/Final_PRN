@@ -8,61 +8,6 @@ namespace DiamondAssessmentSystem.Application.Map
     {
         public MapProfile()
         {
-            //// Ánh xạ giữa Account và AccountDto
-            //CreateMap<Account, AccountDto>()
-            //    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AccId))
-            //    .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role ?? 0)); // Handle nullable Role
-
-            //// Ánh xạ Customer với CustomerDto
-            //CreateMap<Customer, CustomerDto>()
-            //    .ForMember(dest => dest.Acc, opt => opt.MapFrom(src => src.Acc));
-
-            //// Ánh xạ Staff với StaffDto
-            //CreateMap<Employee, EmployeeDto>()
-            //    .ForMember(dest => dest.Acc, opt => opt.MapFrom(src => src.Acc));
-
-            //// Ánh xạ giữa Form và FormDto
-            //CreateMap<Request, RequestDto>()
-            //   .ForMember(dest => dest.BookingCommitments, opt => opt.MapFrom(src => src.BookingCommitments))
-            //   .ForMember(dest => dest.BookingReceipts, opt => opt.MapFrom(src => src.BookingReceipts))
-            //   .ForMember(dest => dest.BookingSealings, opt => opt.MapFrom(src => src.BookingSealings));
-
-            //// Ánh xạ giữa FormCreateDto và Form
-            //CreateMap<RequestCreateDto, Request>().ReverseMap();
-
-            //// Ánh xạ giữa Order (trước đây là Booking) và OrderDto (trước đây là BookingDto)
-            //CreateMap<Order, OrderDto>()
-            //    .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
-            //    .ForMember(dest => dest.Commitment, opt => opt.MapFrom(src => src.Commitment))
-            //    .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
-            //    .ForMember(dest => dest.Receipt, opt => opt.MapFrom(src => src.Receipt))
-            //    .ForMember(dest => dest.Sealing, opt => opt.MapFrom(src => src.Sealing));
-
-            //CreateMap<OrderCreateDto, Order>();
-
-            //// Ánh xạ giữa CustomerCreateDto và Customer
-            //CreateMap<CustomerCreateDto, Customer>();
-
-            //// Ánh xạ giữa Certificate và CertificateDto
-            //CreateMap<Certificate, CertificateDto>()
-            //    .ForMember(dest => dest.Results, opt => opt.MapFrom(src => src.Results));
-
-            //// Ánh xạ giữa CertificateCreateDto và Certificate
-            //CreateMap<CertificateCreateDto, Certificate>();
-
-            //// Ánh xạ giữa Result và ResultDto
-            //CreateMap<Result, ResultDto>();
-
-            //CreateMap<OrderDetail, OrderDetailDto>()
-            //    .ForMember(dest => dest.ServicePrice, opt => opt.MapFrom(src => src.Service))
-            //    .ForMember(dest => dest.Result, opt => opt.MapFrom(src => src.Result));
-
-
-            //CreateMap<OrderDetailCreateDto, OrderDetail>();
-
-            //CreateMap<ServicePrice, ServicePriceDto>();
-
-            //CreateMap<ServicePrice, ServicePriceCreateDto>().ReverseMap();
             CreateMap<RegisterDto, User>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username));
 
@@ -106,20 +51,20 @@ namespace DiamondAssessmentSystem.Application.Map
                 .ForMember(dest => dest.IdCard, opt => opt.MapFrom(src => src.Idcard.ToString()))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
-                .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
+                .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode))
+                .ForMember(dest => dest.Acc, opt => opt.MapFrom(src => src.User));
 
-            //CreateMap<Employee, EmployeeDto>()
-            //    .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-            //    .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-            //    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-            //    .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
-            //    .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender));
+            CreateMap<User, AccountDto>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
             CreateMap<Employee, EmployeeDto>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender));
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
+                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.User.Status));
 
             CreateMap<EmployeeDto, Employee>()
                 .ForMember(dest => dest.User, opt => opt.Ignore());

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace DiamondAssessmentSystem.Hubs
+namespace DiamondAssessmentSystem.Presentation.Hubs
 {
     public class ChatHub : Hub
     {
@@ -30,7 +30,6 @@ namespace DiamondAssessmentSystem.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        // Gọi từ Client để gửi tin nhắn → phát ra cho group
         public async Task SendToConversation(string conversationId, MessageResponseDTO message)
         {
             await Clients.Group(conversationId).SendAsync("ReceiveMessage", message);

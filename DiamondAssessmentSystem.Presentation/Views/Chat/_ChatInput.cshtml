@@ -1,0 +1,50 @@
+﻿@model int  
+
+<form asp-action="SendMessage" asp-controller="ChatMessages" method="post" enctype="multipart/form-data" id="chatpage-form">
+    <input type="hidden" name="conversationId" value="@Model" />
+
+    <div class="chat-input-row-wrapper">
+        <div class="chat-input-row">
+            <textarea name="Message" id="chatpage-message" class="chat-input" placeholder="Nhập tin nhắn..." rows="1" maxlength="500"></textarea>
+
+            <button type="button" class="chat-emoji-btn" id="chatpage-emoji-btn">😊</button>
+
+            <button type="submit" class="chat-send-btn">Gửi</button>
+
+            <label class="chat-file-btn">
+                Gửi file
+                <input type="file" name="file" onchange="handleChatPageFile(@Model, this)" />
+            </label>
+        </div>
+
+        <div id="chatpage-emoji-picker" class="emoji-picker-container" style="display: none;"></div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    const emojiTrigger = document.getElementById('chatpage-emoji-btn');
+    const emojiInput = document.getElementById('chatpage-message');
+    const emojiPickerContainer = document.getElementById('chatpage-emoji-picker');
+
+    const emojiPicker = new EmojiButton({
+        rootElement: emojiPickerContainer,
+        position: 'top-end',
+        theme: 'light'
+    });
+
+    emojiPicker.on('emoji', emoji => {
+        emojiInput.value += emoji;
+    });
+
+    emojiTrigger.addEventListener('click', () => {
+        emojiPicker.togglePicker(emojiTrigger);
+    });
+
+    function handleChatPageFile(conversationId, inputFile) {
+        const form = document.getElementById('chatpage-form');
+        form.action = `/ChatMessages/UploadFile?conversationId=${conversationId}`;
+        form.submit();
+    }
+</script>
+}

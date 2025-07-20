@@ -15,6 +15,13 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        {
+            return await _context.Employees
+                .Include(e => e.User)
+                .ToListAsync();
+        }
+
         public async Task<Employee?> GetEmployeeByIdAsync(string userId)
         {
             return await _context.Employees
@@ -24,7 +31,22 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
 
         public async Task<bool> UpdateEmployeeAsync(Employee employee)
         {
-            _context.Entry(employee).State = EntityState.Modified;
+            var existingEmployee = await _context.Employees
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(e => e.UserId == employee.UserId);
+
+            if (existingEmployee == null) return false;
+
+            existingEmployee.Salary = employee.Salary;
+
+            if (employee.User != null)
+            {
+                existingEmployee.User.FirstName = employee.User.FirstName;
+                existingEmployee.User.LastName = employee.User.LastName;
+                existingEmployee.User.PhoneNumber = employee.User.PhoneNumber;
+                existingEmployee.User.Gender = employee.User.Gender;
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -32,7 +54,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await EmployeeExistsAsync(employee.EmployeeId))
+                if (!await EmployeeExistsAsync(existingEmployee.EmployeeId))
                     return false;
 
                 throw;

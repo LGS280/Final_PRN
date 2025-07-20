@@ -1,0 +1,32 @@
+﻿@model List<DiamondAssessmentSystem.Application.DTO.ConversationDTO>
+
+@{
+    ViewData["Title"] = "Assigned Conversations";
+}
+
+<div class="consultant-dashboard">
+    <h2>✅ Đã nhận</h2>
+    <p>Danh sách cuộc trò chuyện bạn đã nhận</p>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p class="status">📭 Bạn chưa nhận cuộc trò chuyện nào.</p>
+    }
+    else
+    {
+        <ul class="conversation-list">
+            @foreach (var conv in Model)
+            {
+                <li class="conversation-item">
+                    <div>
+                        <span>🗨️ ID: @conv.ConversationId</span>
+                    </div>
+                    <form asp-controller="ChatMessages" asp-action="Index" method="get">
+                        <input type="hidden" name="conversationId" value="@conv.ConversationId" />
+                        <button type="submit">💬 Chat</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</div>

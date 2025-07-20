@@ -1,4 +1,6 @@
-﻿namespace DiamondAssessmentSystem.Application.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DiamondAssessmentSystem.Application.DTO
 {
     public class RegisterDto
     {
@@ -18,5 +20,8 @@
         public string? LastName { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Role { get; set; }
+
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        public string? ConfirmPassword { get; set; }
     }
 }

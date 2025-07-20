@@ -21,7 +21,6 @@ namespace DiamondAssessmentSystem.Application.Services
             _mapper = mapper;
         }
 
-        // Get all accounts (users)
         public async Task<IEnumerable<AccountDto>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllUsersAsync();
@@ -42,7 +41,6 @@ namespace DiamondAssessmentSystem.Application.Services
             return result;
         }
 
-        // Get account by user ID
         public async Task<AccountDto> GetUserByIdAsync(string id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
@@ -61,7 +59,6 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<AccountDto> CreateEmployeeAsync(RegisterEmployeesDto dto, string role)
         {
             var newUser = _mapper.Map<User>(dto);
-
             newUser.UserType = "Employee";
             newUser.Status = "Active";
 
@@ -73,37 +70,43 @@ namespace DiamondAssessmentSystem.Application.Services
             }
 
             var roles = await _userRepository.GetUserRolesAsync(newUser);
-
             return new AccountDto
             {
                 UserId = newUser.Id,
                 Username = newUser.UserName,
+                Email = newUser.Email,
                 Role = roles.FirstOrDefault() ?? role
             };
         }
 
-        // Update an existing user
-        public async Task<bool> UpdateAccountAsync(string id, AccountDto accountDto)
+        public async Task<bool> UpdateAccountAsync(string id, AccountDto dto)
         {
-            if (id != accountDto.UserId)
+            if (id != dto.UserId)
                 throw new ArgumentException("User ID mismatch.");
 
             var user = await _userRepository.GetUserByIdAsync(id);
             if (user == null) return false;
 
-            user.UserName = accountDto.Username;
-            user.Email = accountDto.Email;
-
+            user.UserName = dto.Username;
+            user.Email = dto.Email;
             return await _userRepository.UpdateUserAsync(user);
         }
 
-        // Delete an account by ID
         public async Task<bool> DeleteAccountAsync(string id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
             if (user == null) return false;
 
             return await _userRepository.DeleteUserAsync(id);
+        }
+
+        public async Task<bool> UpdateStatusAsync(string userId, string newStatus)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) return false;
+
+            user.Status = newStatus;
+            return await _userRepository.UpdateUserAsync(user);
         }
     }
 }

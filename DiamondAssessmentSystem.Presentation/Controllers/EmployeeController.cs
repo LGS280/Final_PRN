@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     [Authorize] //To ensure that people login before performing actions.
     public class EmployeeController : Controller
@@ -56,64 +56,56 @@ namespace DiamondAssessmentSystem.Controllers
 
         // GET: Employee/EditMe
         [HttpGet]
-        public async Task<IActionResult> Edit()  //Prepares the View before Posting
+        public async Task<IActionResult> Edit()
         {
-            //Require login.
             if (!User.Identity.IsAuthenticated)
-            {
-                // Log errors
                 return RedirectToAction("Login", "Auth");
-            }
 
-            //Get data to then call
             var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId)) return View("Unauthorized");
 
-
             var employee = await _employeeService.GetEmployees(userId);
             if (employee == null) return NotFound();
-            return View(employee);
+
+            var dto = new EmployeeUpdateDto
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Phone = employee.Phone,
+                Gender = employee.Gender,
+                Salary = employee.Salary
+            };
+
+            return View(dto);
         }
 
         // POST: Employee/EditMe
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditMe(EmployeeDto employeeDto)   //Posts the value in.
+        public async Task<IActionResult> EditMe(EmployeeUpdateDto dto)
         {
-            //Requires login
-            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Auth");
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Auth");
 
             var userId = _currentUser.UserId;
-            if (userId == null)
+            if (string.IsNullOrEmpty(userId))
             {
-                ModelState.AddModelError(string.Empty, "Cannot have empty field");
-                return View("Edit", employeeDto);
+                ModelState.AddModelError(string.Empty, "Invalid user.");
+                return View("Edit", dto);
             }
 
-            //Validation and test that all code passes.
             if (!ModelState.IsValid)
-            {
-                return View(employeeDto); //Recreate the page if there are problems.
-            }
+                return View("Edit", dto);
 
             try
             {
-                //Test and run as test!
-                var updated = await _employeeService.UpdateEmployee(userId, employeeDto);
-
-                if (!updated)
-                {
-                    return View("NotFound");  //This may not be needed.
-
-                }
-
-                return RedirectToAction("Me");
+                var updated = await _employeeService.UpdateEmployee(userId, dto);
+                return updated ? RedirectToAction("Me") : NotFound();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //Log with log code
-                ModelState.AddModelError(string.Empty, $"Details not validated");
-                return View("Edit", employeeDto);
+                ModelState.AddModelError(string.Empty, "An error occurred while updating.");
+                return View("Edit", dto);
             }
         }
 

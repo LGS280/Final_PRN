@@ -12,36 +12,54 @@ namespace DiamondAssessmentSystem.Application.Services
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper)
+        public CustomerService(ICustomerRepository customerRepository, IUserRepository userRepository, IMapper mapper)
         {
             _customerRepository = customerRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<CustomerDto>> GetAllCustomersAsync()
+        {
+            var customers = await _customerRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<CustomerDto>>(customers);
         }
 
         public async Task<CustomerDto> GetCustomerByIdAsync(string userId)
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(userId);
-            if (customer == null)
-            {
-                return null;
-            }
-
-            return _mapper.Map<CustomerDto>(customer); 
+            return customer == null ? null : _mapper.Map<CustomerDto>(customer);
         }
 
-        public async Task<bool> UpdateCustomerAsync(string userId, CustomerCreateDto customerCreateDto)
+        public async Task<bool> UpdateCustomerAsync(string userId, CustomerCreateDto dto)
         {
-            var existingCustomer = await _customerRepository.GetCustomerByIdAsync(userId);
-            if (existingCustomer == null)
-            {
-                return false;  
-            }
+            var customer = await _customerRepository.GetCustomerByIdAsync(userId);
+            if (customer == null) return false;
 
-            _mapper.Map(customerCreateDto, existingCustomer);  
+            // Cập nhật thông tin user
+            customer.User.FirstName = dto.FirstName;
+            customer.User.LastName = dto.LastName;
+            customer.User.PhoneNumber = dto.Phone;
+            customer.User.Gender = dto.Gender;
 
-            return await _customerRepository.UpdateCustomerAsync(existingCustomer); 
+            customer.Address = dto.Address;
+            customer.Idcard = string.IsNullOrEmpty(dto.IdCard) ? null : decimal.Parse(dto.IdCard);
+            customer.UnitName = dto.UnitName;
+            customer.TaxCode = dto.TaxCode;
+
+            return await _customerRepository.UpdateCustomerAsync(customer);
+        }
+
+        public async Task<bool> DeleteCustomerAsync(string userId)
+        {
+            var customer = await _customerRepository.GetCustomerByIdAsync(userId);
+            if (customer == null) return false;
+
+            await _userRepository.DeleteUserAsync(userId);
+            return true;
         }
     }
 }

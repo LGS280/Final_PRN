@@ -126,7 +126,6 @@ namespace DiamondAssessmentSystem.Presentation
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
 
-                // 👇 VERY IMPORTANT for SignalR with JWT
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>

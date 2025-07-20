@@ -9,7 +9,9 @@ namespace DiamondAssessmentSystem.Application.Interfaces
 {
     public interface ICustomerService
     {
+        Task<IEnumerable<CustomerDto>> GetAllCustomersAsync();
         Task<CustomerDto> GetCustomerByIdAsync(string userId);
-        Task<bool> UpdateCustomerAsync(string userId, CustomerCreateDto customerCreateDto);
+        Task<bool> UpdateCustomerAsync(string userId, CustomerCreateDto dto);
+        Task<bool> DeleteCustomerAsync(string userId);
     }
 }

@@ -1,21 +1,41 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using DiamondAssessmentSystem.Application.Services;
+using DiamondAssessmentSystem.Infrastructure.Models;
 using Microsoft.AspNetCore.Authorization; // Required
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     //[Authorize]   Requires authentication
     public class CustomerController : Controller // MVC controller
     {
         private readonly ICustomerService _customerService;
         private readonly ICurrentUserService _currentUser;
+        private readonly IConversationService _conversationService;
 
-        public CustomerController(ICustomerService customerService, ICurrentUserService currentUser)
+        public CustomerController(ICustomerService customerService, ICurrentUserService currentUser, IConversationService conversationService)
         {
             _customerService = customerService;
             _currentUser = currentUser;
+            _conversationService = conversationService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Home()
+        {
+            var username = User.Identity?.Name ?? "Guest";
+            var conversation = await _conversationService.StartOrGetConversationAsync();
+
+            var model = (
+                Username: username,
+                Loading: false,
+                Error: (string?)null,
+                ConversationId: conversation.ConversationId
+            );
+
+            return View(model);
         }
 
         // GET: Customer/Me
@@ -46,63 +66,38 @@ namespace DiamondAssessmentSystem.Controllers
             return View(customer); // View for customer
         }
 
-        // GET: Customer/Edit
-        [HttpGet]
-        public async Task<IActionResult> Edit()  //Load Edit Account
+        public async Task<IActionResult> EditCustomer(string id)
         {
-            var userIdClaim = _currentUser.UserId;
+            var customer = await _customerService.GetCustomerByIdAsync(id);
+            if (customer == null) return NotFound();
 
-            if (!User.Identity.IsAuthenticated)
+            var model = new CustomerUpdateDto
             {
-                //Return to login if they are not.
-                return RedirectToAction("Login", "Auth");
-            }
+                UserId = customer.Acc.UserId,
+                Customer = new CustomerCreateDto
+                {
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    Phone = customer.Phone,
+                    Address = customer.Address,
+                    Gender = customer.Gender,
+                    IdCard = customer.IdCard,
+                    UnitName = customer.UnitName,
+                    TaxCode = customer.TaxCode
+                }
+            };
 
-            if (userIdClaim == null)
-            {
-                return View("UnAuthorized");  //Loads a new page.
-            }
-
-            var customer = await _customerService.GetCustomerByIdAsync(userIdClaim);
-
-            return View(customer); //Load edit user info
+            return View("Customers/Edit", model);
         }
 
-        // POST: Customer/EditPost
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CustomerCreateDto customerCreateDto)
+        [HttpPost]
+        public async Task<IActionResult> EditCustomer(CustomerUpdateDto model)
         {
-            //This method checks for authorization and for correct Id to transfer over
-            var userId = _currentUser.UserId;
-            if (userId == null)
-            {
-                return View("UnAuthorized"); //Load user, if not found
-            }
+            if (!ModelState.IsValid)
+                return View("Customers/Edit", model);
 
-            //check if they can log in again.
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    //Attempt
-                    var updated = await _customerService.UpdateCustomerAsync(userId, customerCreateDto);
-                    if (!updated)
-                    {
-                        //return if there is no action possible.
-                        return NotFound();
-                    }
-                    return RedirectToAction(nameof(Me)); //return if successful
-                }
-
-                //Error message that shows if an exception occurs.
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, $"An error with code {ex}");
-                    return View(customerCreateDto);
-                }
-            }
-            return View(); //If the id wasn't there and can load the current data
+            var updated = await _customerService.UpdateCustomerAsync(model.UserId, model.Customer);
+            return updated ? RedirectToAction("Customers") : NotFound();
         }
     }
 }

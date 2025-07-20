@@ -75,18 +75,18 @@ namespace DiamondAssessmentSystem.Controllers
         }
 
         // PUT: api/order/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(int id, [FromBody] OrderCreateDto orderDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateOrder(int id, [FromBody] OrderCreateDto orderDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var updated = await _orderService.UpdateOrderAsync(id, orderDto);
-            if (!updated)
-                return NotFound();
+        //    var updated = await _orderService.UpdateOrderAsync(id, orderDto);
+        //    if (!updated)
+        //        return NotFound();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // DELETE: api/order/{id}
         [HttpDelete("{id}")]

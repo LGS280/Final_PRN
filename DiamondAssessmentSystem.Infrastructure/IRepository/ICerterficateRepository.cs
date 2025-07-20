@@ -8,6 +8,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
     {
         Task<IEnumerable<Certificate>> GetCertificatesAsync();
         Task<IEnumerable<Certificate>> GetPersonalCertificates(string userId);
+        Task<Certificate?> GetByResultIdAsync(int resultId);
         Task<Certificate?> GetCertificateByIdAsync(int id);
         Task<Certificate?> GetPersonalCertificateById(string userId);
         Task<Certificate> CreateCertificateAsync(Certificate certificate);

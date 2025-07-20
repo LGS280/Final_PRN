@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     //[Authorize(Roles = "Admin")]  // Uncomment after setup authentication
     public class AccountController : Controller  // Inherit from Controller

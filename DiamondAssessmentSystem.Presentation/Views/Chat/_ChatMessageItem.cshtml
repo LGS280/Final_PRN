@@ -1,0 +1,48 @@
+﻿@using DiamondAssessmentSystem.Infrastructure.Enums
+@model DiamondAssessmentSystem.Application.DTO.ChatLogDTO
+
+@{
+    var isMe = Model.SenderRole?.ToLower() == User?.FindFirst("role")?.Value?.ToLower();
+    var downloadUrl = Url.Action("Download", "ChatMessages", new
+    {
+        conversationId = Model.ConversationId,
+        chatId = Model.ChatId
+    });
+}
+
+<div class="chat-message @(isMe ? "me" : "other")">
+    <div class="@(Model.MessageType == MessageType.Text ? "chat-bubble" : "chat-media-container")">
+        <div class="chat-meta">
+            <span class="chat-sender">@Model.SenderName</span>
+            <span class="chat-time">@Model.SentAt.ToLocalTime().ToString("g")</span>
+        </div>
+
+        @if (Model.MessageType == MessageType.Text)
+        {
+            <div class="chat-text">@Model.Message</div>
+        }
+        else if (Model.MessageType == MessageType.Image)
+        {
+            <div class="media-wrapper">
+                <img src="@Model.FilePath" alt="@Model.FileName" class="chat-image" />
+                <a href="@downloadUrl" target="_blank" class="media-download-btn" title="Tải xuống">⭳</a>
+            </div>
+        }
+        else if (Model.MessageType == MessageType.Video)
+        {
+            <div class="media-wrapper">
+                <video controls class="chat-video">
+                    <source src="@Model.FilePath" />
+                    Trình duyệt không hỗ trợ video.
+                </video>
+                <a href="@downloadUrl" target="_blank" class="media-download-btn" title="Tải xuống">⭳</a>
+            </div>
+        }
+        else
+        {
+            <div class="chat-file">
+                <a href="@downloadUrl" class="file-link">@Model.FileName</a>
+            </div>
+        }
+    </div>
+</div>

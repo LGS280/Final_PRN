@@ -1,3 +1,4 @@
+using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Presentation.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -7,14 +8,19 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IBlogService _blogService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IBlogService blogService)
         {
             _logger = logger;
+            _blogService = blogService;
+
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var blogs = await _blogService.GetBlogs();
+            return View(blogs);
             if (User.IsInRole("Admin"))
             {
                 return RedirectToAction("Index", "Account");

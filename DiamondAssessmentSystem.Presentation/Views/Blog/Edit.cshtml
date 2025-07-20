@@ -1,46 +1,64 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.BlogDto
-
 @{
     ViewData["Title"] = "Edit Blog";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BlogId" />
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control"></textarea>
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <textarea asp-for="CreatedDate" class="form-control"></textarea>
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">✏️ Edit Blog Post</h1>
+        <p class="text-gray-600 text-sm">Update the blog's content, title, or image. Make your post shine.</p>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <!-- Form -->
+    <form asp-action="Edit" class="bg-white rounded-2xl shadow-xl p-8 space-y-8 border border-gray-200">
+        <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+        <input type="hidden" asp-for="BlogId" />
+
+        <!-- Title -->
+        <div>
+            <label asp-for="Title" class="block font-semibold text-gray-700 mb-1">Title</label>
+            <input asp-for="Title" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" />
+            <span asp-validation-for="Title" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- ImageUrl -->
+        <div>
+            <label asp-for="ImageUrl" class="block font-semibold text-gray-700 mb-1">Image URL</label>
+            <input asp-for="ImageUrl" id="imageUrl" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" />
+            <span asp-validation-for="ImageUrl" class="text-red-500 text-sm"></span>
+
+            <div class="mt-4">
+                <label class="block text-gray-600 text-sm mb-1">Preview:</label>
+                <img id="imagePreview" src="@Model.ImageUrl" alt="Image preview" class="rounded-lg shadow-sm max-h-64 w-full object-cover border border-gray-100" />
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div>
+            <label asp-for="Content" class="block font-semibold text-gray-700 mb-1">Content</label>
+            <textarea asp-for="Content" rows="8" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"></textarea>
+            <span asp-validation-for="Content" class="text-red-500 text-sm"></span>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition font-semibold">💾 Save Changes</button>
+            <a asp-action="Index" class="text-gray-500 hover:text-blue-600 text-sm">← Back to List</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        const imgInput = document.getElementById('imageUrl');
+        const preview = document.getElementById('imagePreview');
+        imgInput.addEventListener('input', () => {
+            preview.src = imgInput.value;
+        });
+    </script>
 }

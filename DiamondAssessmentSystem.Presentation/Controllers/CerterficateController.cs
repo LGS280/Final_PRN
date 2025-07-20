@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
-namespace DiamondAssessmentSystem.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-
     public class CertificateController : Controller
     {
         private readonly ICerterficateService _certificateService;
@@ -20,127 +19,59 @@ namespace DiamondAssessmentSystem.Controllers
             _currentUser = currentUser;
         }
 
-        // GET: Certificate/Management
-        public async Task<IActionResult> Management() // Changed from GetCertificates
+        public async Task<IActionResult> Management()
         {
-            //You must be authorized to acess this.
             var certificates = await _certificateService.GetCertificatesAsync();
-            return View(certificates);  // Returns results.
-        }
-
-        // GET: Certificate
-        public async Task<IActionResult> Personal() // Changed from GetPersonalCertificates
-        {
-            //Require user to check it exists otherwise
-            if (!User.Identity.IsAuthenticated)
-            {
-                //Return to login if they don't have a valid login
-                return RedirectToAction("Login", "Auth");
-            }
-
-            var userId = _currentUser.UserId;
-
-            if (userId == null)
-            {
-                return View("Unauthorized");
-            }
-            var certificates = await _certificateService.GetPersonalCertificates(userId);
-
             return View(certificates);
         }
 
-        // GET: Certificate/Details/{id}
+        public async Task<IActionResult> Personal()
+        {
+            var userId = _currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Auth");
+
+            var certs = await _certificateService.GetPersonalCertificates(userId);
+            return View(certs);
+        }
+
         public async Task<IActionResult> Details(int id)
         {
-            var certificate = await _certificateService.GetCertificateByIdAsync(id);
-            if (certificate == null)
-            {
-                return NotFound();
-            }
-
-            return View(certificate); // Return the view if the certificate is valid
+            var cert = await _certificateService.GetCertificateByIdAsync(id);
+            return cert == null ? NotFound() : View(cert);
         }
 
-        // GET: Certificate/Create
         [HttpGet]
-        public IActionResult Create() //Loads the page
-        {
-            return View();  // Returns to View that allows for creating of a certificate
-        }
+        public IActionResult Create() => View();
 
-        // POST: Certificate/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]  //For Protection
-        public async Task<IActionResult> Create(CertificateCreateDto certificateCreateDto)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    //Log activity that will cause a change to databases to prevent errors
-                    var createdCertificate = await _certificateService.CreateCertificateAsync(certificateCreateDto);
-                    return RedirectToAction(nameof(Management));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, "An error with information occured.");
-                    return View(); //Return error message
-                }
-
-            }
-
-            return View();   //Validate to the best it can
-        }
-
-        // GET: Certificate/Edit
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)  //Find Id to be editted, returns to Edit if exist
-        {
-            var certificate = await _certificateService.GetCertificateByIdAsync(id);
-            if (certificate == null) return NotFound(); // if not existing, return error
-
-            return View(certificate); //If there does it returns.
-        }
-
-        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(CertificateCreateDto certificateCreateDto)
-        { //Check to the best it is able to validate and Edit
-          //Validate Code here.
+        public async Task<IActionResult> Create(CertificateCreateDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
 
-            if (!User.Identity.IsAuthenticated)
-            {
-                //Return to login if they are not.
-                return RedirectToAction("Login", "Auth");
-            }
-            try
-            {
-                var userId = _currentUser.UserId;
+            await _certificateService.CreateCertificateAsync(dto);
+            return RedirectToAction(nameof(Management));
+        }
 
-                //Validation of new update
-                if (userId == null)
-                {
-                    ModelState.AddModelError(string.Empty, "User is empty");
-                    return View();
-                }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var cert = await _certificateService.GetCertificateByIdAsync(id);
+            return cert == null ? NotFound() : View(cert);
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(CertificateCreateDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
 
-                //Validate the codes and functions
-                var updated = await _certificateService.UpdateCertificateAsync(userId, certificateCreateDto);
+            var userId = _currentUser.UserId;
+            var updated = await _certificateService.UpdateCertificateAsync(userId, dto);
+            if (!updated) return NotFound();
 
-                if (!updated)
-                {
-                    return NotFound(); //If unable to work
-                }
-
-                return RedirectToAction(nameof(Management)); //returns for next function to process!
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "There are no function, will do nothing");
-                return View();   //will only return to the page as no change.
-            }
-            return View();   //Returns as this check is last
+            return RedirectToAction(nameof(Management));
         }
     }
 }
