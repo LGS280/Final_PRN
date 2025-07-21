@@ -100,14 +100,11 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Auth");
-                 {
-                     RedirectUri = "/Auth/Login"  // Redirect url to login after
-                 });
 
         }
 

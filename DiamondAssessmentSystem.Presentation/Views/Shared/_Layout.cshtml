@@ -6,10 +6,6 @@
     var username = HttpContextAccessor.HttpContext?.User?.Identity?.Name;
     var isAuthenticated = User.Identity.IsAuthenticated;
 }
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
-
-@inject IAuthorizationService AuthorizationService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,76 +17,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Navigation.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/chat.css" />
 </head>
 <body class="h-screen flex flex-col">
 
     <!-- Header/Navbar -->
     <header class="bg-white shadow sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <!-- Logo -->
             <a href="/" class="text-2xl font-extrabold text-blue-600 tracking-tight hover:opacity-90">
                 💎 DiamondSys
             </a>
 
-
             <!-- Desktop Nav -->
-            <nav class="desktop-nav">
-                <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
-                @{
-                    var authResult = await AuthorizationService.AuthorizeAsync(User, "AllUsersPolicy");
-                    if (!User.Identity.IsAuthenticated)
-                    {
-                        <ul class="nav-list">
-                            <li class="nav-item">
-                                <!-- Already have Home link above -->
-                            </li>
-                        </ul>
-                    }
-                    else if (User.IsInRole("Admin"))
-                    {
-                        <ul class="nav-list admin-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Customers">Manage Customers</a>
-                                <a class="nav-link" asp-controller="Admin" asp-action="Employees">Manage Employees</a>
-                                <a class="nav-link" asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
-                            </li>
-                        </ul>
-                    }
-                    else if (User.IsInRole("Employee"))
-                    {
-                        <ul class="nav-list employee-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Employee" asp-action="Me">My Profile</a>
-                                <a class="nav-link" asp-controller="Certificate" asp-action="Management">Certificate</a>
-                                <a class="nav-link" asp-controller="ServicePrice" asp-action="Index">Service</a>
-                            </li>
-                        </ul>
-                    }
-                    else if (User.IsInRole("Customer"))
-                    {
-                        <ul class="nav-list customer-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Certificate" asp-action="Personal">Certificate</a>
-                                <a class="nav-link" asp-controller="Request" asp-action="My">Request</a>
-                                <a class="nav-link" asp-controller="Order" asp-action="MyOrder">Order</a>
-                                <a class="nav-link" asp-controller="Customer" asp-action="Me">My Profile</a>
-                                <a class="nav-link" asp-controller="Customer" asp-action="Home">💬 Chat (Customer)</a>
-                            </li>
-                        </ul>
-                    }
-                    else if (User.IsInRole("Consultant"))
-                    {
-                        <ul class="nav-list consultant-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Result" asp-action="Index">Result</a>
-                                <a class="nav-link" asp-controller="Customer" asp-action="Me">My Profile</a>
-                                <a class="nav-link" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
-                            </li>
-                        </ul>
-                    }
-                }
             <nav class="hidden md:flex space-x-4 text-sm font-medium">
                 @if (role == "admin")
                 {
@@ -101,23 +39,23 @@
                 else if (role == "consultant")
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
                 }
                 else if (role == "staff")
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">📝 Blog Management</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">📋 View Requests</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 View Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
                 }
                 else if (role == "customer")
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Customer</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">Employee</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Personal">Certificate</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">My Profile</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="My">📋 My Requests</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="MyOrder">📦 My Orders</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Conversations" asp-action="CustomerHome">💬 Chat</a>
                 }
 
@@ -179,7 +117,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t py-2 text-sm text-gray-500">
+    <footer class="bg-white border-t py-5 text-sm text-gray-500">
         <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <p>&copy; 2025 Diamond Assessment System</p>
             <a asp-controller="Home" asp-action="Privacy" class="hover:text-blue-600">Privacy</a>
