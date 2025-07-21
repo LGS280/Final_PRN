@@ -32,6 +32,18 @@ namespace DiamondAssessmentSystem.Application.Map
                     string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
+                //.ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
+
+            CreateMap<CustomerUpdateDtoVer1, CustomerCreateDto>().ReverseMap();
+
+
+            CreateMap<CustomerUpdateDtoVer1, Customer>()
+                .ForMember(dest => dest.Idcard, opt => opt.MapFrom(src =>
+                    string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
+                .ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
 
             CreateMap<CustomerCreateDto, User>()
@@ -92,6 +104,14 @@ namespace DiamondAssessmentSystem.Application.Map
 
             CreateMap<Order, OrderDto>()
                 .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.Service.ServiceType));
+
+            CreateMap<(string CustomerName, int RequestCount), ReportTopCustomerDto>()
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerName))
+            .ForMember(dest => dest.RequestCount, opt => opt.MapFrom(src => src.RequestCount));
+
+            CreateMap<(string Status, int RequestCount), ReportRequestStatusDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.RequestCount, opt => opt.MapFrom(src => src.RequestCount));
         }
     }
 }

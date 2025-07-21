@@ -28,6 +28,14 @@
 
     <div class="mt-6 flex justify-between">
         <a asp-action="Edit" asp-route-id="@Model.CertificateId" class="text-yellow-600 hover:underline text-sm">✏️ Edit</a>
-        <a asp-action="Management" class="text-blue-600 hover:underline text-sm">← Back to List</a>
+        @if (User.IsInRole("Customer"))
+        {
+            <a asp-action="Personal" class="text-blue-600 hover:underline text-sm">← Back to List</a>
+
+        }
+        else
+        {
+            <a asp-action="Management" class="text-blue-600 hover:underline text-sm">← Back to List</a>
+        }
     </div>
 </div>

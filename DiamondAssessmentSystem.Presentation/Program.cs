@@ -46,6 +46,20 @@ namespace DiamondAssessmentSystem.Presentation
                 options.LogoutPath = "/Account/Logout";
             });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AllUsersPolicy", policy =>
+                {
+                    policy.RequireRole("User","Admin");
+                    policy.RequireRole("User", "Employee");
+                    policy.RequireRole("User", "Customer");
+                    policy.RequireRole("User", "Consultant");
+                });
+                //options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
+                //options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
+                //options.AddPolicy("ConsultantOnly", policy => policy.RequireRole("Consultant"));
+            });
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
@@ -67,6 +81,7 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IConversationService, ConversationService>();
             builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
 
@@ -84,6 +99,15 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IChatLogRepository, ChatLogRepository>();
+
+
+            // Đăng ký Session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             // ==================== CORS ====================
             builder.Services.AddCors(options =>
@@ -127,10 +151,10 @@ namespace DiamondAssessmentSystem.Presentation
                 {
                     OnMessageReceived = context =>
                     {
-                        var tokenFromCookie = context.Request.Cookies["access_token"];
-                        if (!string.IsNullOrEmpty(tokenFromCookie))
+                        var tokenFromSession = context.HttpContext.Session.GetString("access_token");
+                        if (!string.IsNullOrEmpty(tokenFromSession))
                         {
-                            context.Token = tokenFromCookie;
+                            context.Token = tokenFromSession;
                         }
 
                         var accessToken = context.Request.Query["access_token"];
@@ -164,6 +188,8 @@ namespace DiamondAssessmentSystem.Presentation
             }
 
             // ==================== Middleware Pipeline ====================
+            builder.Services.AddDistributedMemoryCache();
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -175,7 +201,9 @@ namespace DiamondAssessmentSystem.Presentation
 
             app.UseRouting();
 
-            app.UseCors("AllowSpecificOrigin"); 
+            app.UseCors("AllowSpecificOrigin");
+
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();

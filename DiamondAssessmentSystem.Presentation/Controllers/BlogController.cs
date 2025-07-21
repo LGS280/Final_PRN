@@ -104,6 +104,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     //Attempt to Update the code for the User
 
                     //Use try/catch or similar methods to validate
+                    blogDto.UpdatedDate = DateTime.UtcNow; // Set the updated date to now
                     var updated = await _blogService.UpdateBlog(userId, blogDto);
 
                     if (!updated)

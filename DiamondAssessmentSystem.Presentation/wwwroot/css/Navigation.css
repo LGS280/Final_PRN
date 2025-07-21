@@ -1,0 +1,111 @@
+﻿/* Navigation Styles */
+.desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@media (min-width: 768px) {
+    .desktop-nav {
+        display: flex;
+    }
+}
+
+.nav-list {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.nav-link {
+    display: inline-block;
+    padding: 8px 16px;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-weight: 500;
+    position: relative;
+}
+
+    .nav-link:hover {
+        color: #2563eb;
+        background-color: #eff6ff;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .nav-link:active {
+        transform: translateY(0);
+    }
+
+    /* Special styling for chat links */
+    .nav-link[href*="Chat"],
+    .nav-link[href*="Consultant"] {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+
+        .nav-link[href*="Chat"]:hover,
+        .nav-link[href*="Consultant"]:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: white;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+
+/* Role-based styling */
+.admin-nav .nav-link {
+    border-left: 3px solid transparent;
+}
+
+    .admin-nav .nav-link:hover {
+        border-left-color: #dc2626;
+        background-color: #fef2f2;
+        color: #dc2626;
+    }
+
+.employee-nav .nav-link:hover {
+    border-left-color: #059669;
+    background-color: #f0fdf4;
+    color: #059669;
+}
+
+.customer-nav .nav-link:hover {
+    border-left-color: #7c3aed;
+    background-color: #faf5ff;
+    color: #7c3aed;
+}
+
+.consultant-nav .nav-link:hover {
+    border-left-color: #ea580c;
+    background-color: #fff7ed;
+    color: #ea580c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .nav-link {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+}

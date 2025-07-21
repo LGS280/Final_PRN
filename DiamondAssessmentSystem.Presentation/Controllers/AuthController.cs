@@ -40,13 +40,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             {
                 var loginResponse = await _authService.LoginAsync(loginDto);
 
-                Response.Cookies.Append("access_token", loginResponse.Token, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddHours(1)
-                });
+                HttpContext.Session.SetString("access_token", loginResponse.Token);
+
 
                 //After authenticating, will be to redirect page
                 return RedirectToAction("Index", "Home");
@@ -107,9 +102,14 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("access_token");
-
+            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Auth");
+                 {
+                     RedirectUri = "/Auth/Login"  // Redirect url to login after
+                 });
+
         }
+
     }
 }

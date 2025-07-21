@@ -20,7 +20,14 @@
         }
 
         <div class="flex justify-between items-center mt-4">
-            <a asp-action="Management" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            @if (User.IsInRole("Customer"))
+            {
+                <a asp-action="Personal" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            }
+            else
+            {
+                <a asp-action="Management" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            }
             <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Save</button>
         </div>
     </form>
