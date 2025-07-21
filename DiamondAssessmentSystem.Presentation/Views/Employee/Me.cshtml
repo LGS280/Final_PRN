@@ -4,40 +4,58 @@
     ViewData["Title"] = "My Employee Profile";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h2 class="mb-4 text-center">@ViewData["Title"]</h2>
 
-@*To test or debug if loading the information, use code, and remove, DO NOT SKIP*
-   if this display the information, then data is correctly set up
-    If there is an error, it's one step at a time and inspect again.
-@Html.DisplayFor(model => model.EmployeeId)
+<div class="container my-5">
+    <div class="d-flex justify-content-center">
+        <div class="card shadow rounded-4 p-4" style="width: 100%; max-width: 800px;">
+            <div class="row g-4 align-items-center">
+                <!-- Avatar & Basic Info -->
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-person-badge-fill text-secondary" style="font-size: 100px;"></i>
+                    <h5 class="mt-3">@($"{Model.FirstName} {Model.LastName}")</h5>
+                    <p class="text-muted mb-1"><i class="bi bi-envelope-fill me-1"></i> @Model.Email</p>
+                    <p class="text-muted"><i class="bi bi-telephone-fill me-1"></i> @Model.Phone</p>
+                </div>
 
-<hr />
+                <!-- Details -->
+                <div class="col-md-8">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="border rounded-3 p-3 bg-light h-100">
+                                <div class="fw-bold mb-1 text-secondary">
+                                    <i class="bi bi-hash me-1"></i>Employee ID
+                                </div>
+                                <div>@Model.EmployeeId</div>
+                            </div>
+                        </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Employee ID:</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.EmployeeId)</dd>
-           @*This is to test the code, for each property. if it work then all the properties are set. This can be removed after*@
-<!-- Display the more info using dt-->
+                        <div class="col-sm-6">
+                            <div class="border rounded-3 p-3 bg-light h-100">
+                                <div class="fw-bold mb-1 text-secondary">
+                                    <i class="bi bi-gender-ambiguous me-1"></i>Gender
+                                </div>
+                                <div>@(string.IsNullOrWhiteSpace(Model.Gender) ? "Not updated yet" : Model.Gender)</div>
+                            </div>
+                        </div>
 
-<dt class="col-sm-2">First Name: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.FirstName)</dd>
-<dt class="col-sm-2">Lst Name: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.LastName)</dd>
-<dt class="col-sm-2">Email: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.Email)</dd>
-<dt class="col-sm-2">Phone: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.Phone)</dd>
-<dt class="col-sm-2">Gender: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.Gender)</dd>
-<dt class="col-sm-2">Salary: </dt>
-<dd class="col-sm-2">@Html.DisplayFor(model => model.Salary)</dd>
+                        <div class="col-sm-6">
+                            <div class="border rounded-3 p-3 bg-light h-100">
+                                <div class="fw-bold mb-1 text-secondary">
+                                    <i class="bi bi-cash-coin me-1"></i>Salary
+                                </div>
+                                <div>@(Model.Salary.HasValue ? $"{Model.Salary.Value:N0} VND" : "Not updated yet")</div>
+                            </div>
+                        </div>
 
-</dl>
-</div>
+                        <!-- More fields if needed -->
+                    </div>
+                </div>
+            </div>
 
-<div>
-    @*After validating and running properly, remove all this and implement what design you plan.*@
-    <a asp-action="Edit">Edit Profile</a> |
-    @*Check all the routing and model and make sure the routes are all set correctly, otherwise things will not load.*@
+            <div class="text-end mt-4">
+                <a asp-action="Edit" class="btn btn-primary">Edit Profile</a>
+            </div>
+        </div>
+    </div>
 </div>
