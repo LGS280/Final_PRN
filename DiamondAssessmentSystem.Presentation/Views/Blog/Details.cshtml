@@ -1,5 +1,5 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.BlogDto
-
+@inject DiamondAssessmentSystem.Application.Interfaces.ICurrentUserService CurrentUser
 @{
     ViewData["Title"] = Model.Title;
 }
@@ -7,8 +7,16 @@
 <div class="max-w-4xl mx-auto px-4 py-12">
     <!-- Breadcrumb -->
     <div class="mb-6 text-sm text-gray-500">
-        <a asp-action="Index" class="hover:text-blue-600">← Back to Blog List</a>
+        @if (CurrentUser.Role?.ToLower() == "customer")
+        {
+            <a asp-controller="Home" asp-action="Index" class="hover:text-blue-600">← Back to Home</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="hover:text-blue-600">← Back to Blogs</a>
+        }
     </div>
+
 
     <!-- Title -->
     <h1 class="text-4xl font-bold text-gray-900 mb-4">@Model.Title</h1>
@@ -50,14 +58,27 @@
     <!-- Actions -->
     <div class="mt-12 flex justify-between items-center text-sm text-gray-500">
         <div>
-            <a asp-action="Edit" asp-route-id="@Model.BlogId"
-               class="text-blue-600 hover:text-blue-800 font-medium">
-                ✏️ Edit
-            </a>
+            @if (CurrentUser.Role?.ToLower() != "customer")
+            {
+                <a asp-action="Edit" asp-route-id="@Model.BlogId"
+                   class="text-blue-600 hover:text-blue-800 font-medium">
+                    ✏️ Edit
+                </a>
+            }
         </div>
-        <a asp-action="Index"
-           class="text-gray-600 hover:text-gray-900 font-medium">
-            ← Back to List
-        </a>
+        @if (CurrentUser.Role?.ToLower() == "customer")
+        {
+            <a asp-controller="Home" asp-action="Index"
+               class="text-gray-600 hover:text-gray-900 font-medium">
+                ← Back to Home
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index"
+               class="text-gray-600 hover:text-gray-900 font-medium">
+                ← Back to Blogs
+            </a>
+        }
     </div>
 </div>
