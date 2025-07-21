@@ -7,6 +7,7 @@ namespace DiamondAssessmentSystem.Application.DTO
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Email { get; set; }
+        public string? UserName { get; set; }
         public string? Gender { get; set; }
         public int? Point { get; set; }
         public string? Note { get; set; }
@@ -49,7 +50,8 @@ namespace DiamondAssessmentSystem.Application.DTO
         [StringLength(20)]
         [RegularExpression(@"^\d{10,15}$", ErrorMessage = "Tax Code must be 10–15 digits.")]
         public string? TaxCode { get; set; }
-        public string? Email { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
 
     }
 
@@ -71,5 +73,8 @@ namespace DiamondAssessmentSystem.Application.DTO
         public string? UnitName { get; set; }
         public string? TaxCode { get; set; }
         public string? Email { get; set; }
+
+        [Required]
+        public string UserName { get; set; }
     }
 }

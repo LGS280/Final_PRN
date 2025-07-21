@@ -134,7 +134,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 Address = customer.Address,
                 UnitName = customer.UnitName,
                 TaxCode = customer.TaxCode,
-                Email = customer.Email
+                Email = customer.Email,
+                UserName = customer.UserName
             };
 
             return View("EditCustomerVer1", model);
@@ -156,7 +157,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 Address = model.Address,
                 UnitName = model.UnitName,
                 TaxCode = model.TaxCode,
-                Email = model.Email
+                UserName = model.UserName
             };
 
             var updated = await _customerService.UpdateCustomerAsync(model.UserId, customerDto);

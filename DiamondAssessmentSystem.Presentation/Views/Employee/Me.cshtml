@@ -13,22 +13,23 @@
                 <!-- Avatar & Basic Info -->
                 <div class="col-md-4 text-center">
                     <i class="bi bi-person-badge-fill text-secondary" style="font-size: 100px;"></i>
-                    <h5 class="mt-3">@($"{Model.FirstName} {Model.LastName}")</h5>
+                    @* <h5 class="mt-3">@($"{Model.FirstName} {Model.LastName}")</h5> *@
+                    <h5 class="mt-3"> @Model.UserName</h5>
                     <p class="text-muted mb-1"><i class="bi bi-envelope-fill me-1"></i> @Model.Email</p>
-                    <p class="text-muted"><i class="bi bi-telephone-fill me-1"></i> @Model.Phone</p>
+                    @* <p class="text-muted"><i class="bi bi-telephone-fill me-1"></i> @Model.Phone</p> *@
                 </div>
 
                 <!-- Details -->
                 <div class="col-md-8">
                     <div class="row g-3">
-                        <div class="col-sm-6">
+                        @* <div class="col-sm-6">
                             <div class="border rounded-3 p-3 bg-light h-100">
                                 <div class="fw-bold mb-1 text-secondary">
                                     <i class="bi bi-hash me-1"></i>Employee ID
                                 </div>
                                 <div>@Model.EmployeeId</div>
                             </div>
-                        </div>
+                        </div> *@
 
                         <div class="col-sm-6">
                             <div class="border rounded-3 p-3 bg-light h-100">
@@ -42,13 +43,11 @@
                         <div class="col-sm-6">
                             <div class="border rounded-3 p-3 bg-light h-100">
                                 <div class="fw-bold mb-1 text-secondary">
-                                    <i class="bi bi-cash-coin me-1"></i>Salary
+                                    <i class="bi bi-telephone-fill me-1"></i>PhoneNumber
                                 </div>
-                                <div>@(Model.Salary.HasValue ? $"{Model.Salary.Value:N0} VND" : "Not updated yet")</div>
+                                <div>@(!string.IsNullOrWhiteSpace(Model.Gender) ? $"{Model.Phone} " : "Not updated yet")</div>
                             </div>
                         </div>
-
-                        <!-- More fields if needed -->
                     </div>
                 </div>
             </div>

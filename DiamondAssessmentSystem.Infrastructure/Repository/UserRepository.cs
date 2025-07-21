@@ -111,10 +111,14 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             return await _userManager.FindByNameAsync(username) != null;
         }
 
-        public async Task<IdentityResult> RegisterCustomerAsync(User user, string password)
+        public async Task<IdentityResult> RegisterCustomerAsync(User user, string password, string email)
         {
-            user.UserType = "Customer";
-            user.Status = "Active";
+            if (await _userManager.FindByEmailAsync(email) != null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Email is already in use." });
+            }
+
+            user.Email = email;
 
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded)
@@ -130,7 +134,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             var customer = new Customer
             {
                 UserId = user.Id,
-                UnitName = "Chưa cập nhật"
+                UnitName = "Null"
             };
 
             _context.Customers.Add(customer);
@@ -139,9 +143,9 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             return IdentityResult.Success;
         }
 
-        public async Task<User?> ValidateUserCredentialsAsync(string username, string password)
+        public async Task<User?> ValidateUserCredentialsAsync(string email, string password)
         {
-            var user = await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user != null && await _userManager.CheckPasswordAsync(user, password))
             {
                 return user;
