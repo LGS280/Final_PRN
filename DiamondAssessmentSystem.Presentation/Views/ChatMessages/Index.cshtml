@@ -16,7 +16,5 @@
 
 @section Scripts {
     @await Html.PartialAsync("_ChatSignalRScript", (Model.ConversationId, currentUserRole))
-    <script src="/js/sendMessage.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/emoji-button@4.6.4/dist/index.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-button@4.6.4/dist/index.min.css" />
+    <script src="/js/sendMessage.js" asp-append-version="true"></script>
 }

@@ -4,10 +4,10 @@
 }
 
 <div class="max-w-3xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">📋 @ViewData["Title"]</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📋 Order Details</h1>
 
     <div class="bg-white shadow rounded-xl p-6 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
                 <span class="font-semibold text-gray-700">Order ID:</span>
                 <div>@Model.OrderId</div>
@@ -42,14 +42,20 @@
     </div>
 
     <div class="mt-6 flex justify-between">
-        <a asp-action="Index" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
-        <form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-            <button type="submit"
-                    class="text-sm text-red-600 hover:underline"
-                    @(Model.Status == "Paid" || Model.Status == "Completed" || Model.Status == "Canceled" ? "disabled class='opacity-50 cursor-not-allowed'" : "")>
-                Cancel Order
-            </button>
-        </form>
-        @* <a asp-action="Edit" asp-route-id="@Model.OrderId" class="text-sm text-yellow-600 hover:underline">Edit</a> *@
+        @if (!User.IsInRole("Staff"))
+        {
+            <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+        }
+
+        @if (!User.IsInRole("Staff"))
+        {
+            <form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                <button type="submit"
+                        class="text-sm text-red-600 hover:underline"
+                        @(Model.Status == "Paid" || Model.Status == "Completed" || Model.Status == "Canceled" ? "disabled class='opacity-50 cursor-not-allowed'" : "")>
+                    Cancel Order
+                </button>
+            </form>
+        }
     </div>
 </div>

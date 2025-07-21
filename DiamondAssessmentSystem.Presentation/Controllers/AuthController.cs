@@ -103,15 +103,11 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Logout()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
         {
-            await HttpContext.SignOutAsync(
-                 CookieAuthenticationDefaults.AuthenticationScheme,
-                 new AuthenticationProperties
-                 {
-                     RedirectUri = "/Auth/Login"  // Redirect url to login after
-                 });
+            Response.Cookies.Delete("access_token");
 
             return RedirectToAction("Login", "Auth");
         }

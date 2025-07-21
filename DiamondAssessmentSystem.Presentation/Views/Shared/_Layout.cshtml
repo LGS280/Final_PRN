@@ -1,4 +1,11 @@
-﻿@inject IHttpContextAccessor HttpContextAccessor
+﻿@using DiamondAssessmentSystem.Application.Interfaces
+@inject IHttpContextAccessor HttpContextAccessor
+@inject ICurrentUserService CurrentUser
+@{
+    var role = (CurrentUser.Role ?? "").ToLower();
+    var username = HttpContextAccessor.HttpContext?.User?.Identity?.Name;
+    var isAuthenticated = User.Identity.IsAuthenticated;
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,46 +28,53 @@
 
             <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-4 text-sm font-medium">
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">Blog</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Customer</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">Employee</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Request</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">Order</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+                @if (role == "admin")
+                {
+                    <a asp-controller="Admin" asp-action="Customers">Manage Customers</a>
+                    <a asp-controller="Admin" asp-action="Employees">Manage Employees</a>
+                    <a asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
+                }
+                else if (role == "consultant")
+                {
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
+                }
+                else if (role == "staff")
+                {
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">📝 Blog Management</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">📋 View Requests</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 View Orders</a>
+                }
+                else if (role == "customer")
+                {
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Customer</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">Employee</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="My">📋 My Requests</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="MyOrder">📦 My Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Conversations" asp-action="CustomerHome">💬 Chat</a>
+                }
 
-                <!-- ✅ Chat access -->
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Home">💬 Chat (Customer)</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
-
-                <!-- Auth & Admin -->
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Customers">Manage Customers</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Employees">Manage Employees</a>
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
+                @if (!isAuthenticated)
+                {
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
+                }
             </nav>
 
-            @inject IHttpContextAccessor HttpContextAccessor
-            @{
-                var username = HttpContextAccessor.HttpContext?.User?.Identity?.Name;
-            }
 
             <!-- Right: Logged in user -->
-            @if (User.Identity.IsAuthenticated)
+            @if (isAuthenticated)
             {
                 <div class="flex items-center space-x-2">
                     <img src="https://i.pravatar.cc/32?u=@username" class="w-8 h-8 rounded-full border" />
                     <span class="text-sm font-medium text-gray-700">@username</span>
-                    <a asp-controller="Auth" asp-action="Logout"
-                       class="text-red-600 hover:underline text-sm ml-2">Logout</a>
+                    <form method="post" asp-controller="Auth" asp-action="Logout" class="ml-2">
+                        <button type="submit" class="text-red-600 hover:underline text-sm">Logout</button>
+                    </form>
                 </div>
-            }
-            else
-            {
-                <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
             }
 
             <!-- Mobile Nav Toggle -->
@@ -87,8 +101,11 @@
                 <a class="block text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
                 <a class="block text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
                 <a class="block text-gray-700 hover:text-blue-600" asp-controller="Account" asp-action="Index">Account</a>
-                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
-                <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
+                @if (!isAuthenticated)
+                {
+                    <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
+                    <a class="block text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
+                }
             </div>
         </div>
     </header>
@@ -106,7 +123,7 @@
         </div>
     </footer>
 
-    <!-- Tailwind & Script -->
+    <!-- Script -->
     <script>
         const btn = document.getElementById("mobile-menu-btn");
         const menu = document.getElementById("mobile-menu");
@@ -116,6 +133,5 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

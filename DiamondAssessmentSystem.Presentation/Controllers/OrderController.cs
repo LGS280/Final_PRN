@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Staff,Customer")]
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
@@ -64,14 +64,12 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             var requestWithServices = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
 
-            // Build dropdown list
             ViewBag.RequestOptions = requestWithServices.Select(r => new SelectListItem
             {
                 Value = r.RequestId.ToString(),
                 Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
             }).ToList();
 
-            // Build JS mapping: RequestId => { serviceId, price }
             var serviceMap = requestWithServices.ToDictionary(
                 r => r.RequestId.ToString(),
                 r => new
@@ -108,7 +106,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             try
             {
-                // Nếu là Online → Redirect sang PaymentController
+                // ONLINE: redirect to VNPay
                 if (model.PaymentInfo.PaymentType == "Online")
                 {
                     var paymentRequest = new VnPaymentRequestDto
@@ -122,13 +120,13 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return RedirectToAction("RedirectToVnPay", "Payment", paymentRequest);
                 }
 
-                // Nếu là Offline → Tạo luôn
+                // OFFLINE: create order
                 var created = await _orderService.CreateOrderAsync(
                     userId,
                     model.PaymentInfo.RequestId,
                     model.OrderData,
                     "Offline",
-                    null // Không có paymentRequest
+                    null
                 );
 
                 if (!created)
@@ -138,7 +136,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return View(model);
                 }
 
-                return RedirectToAction(nameof(MyOrder));
+                // ✅ Redirect based on role
+                return _currentUser.Role?.ToLower() == "customer"
+                    ? RedirectToAction(nameof(MyOrder))
+                    : RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
@@ -147,6 +148,35 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return View(model);
             }
         }
+
+        // Helper: Load dropdown and JSON map
+        private async Task LoadRequestOptionsToViewBag(string userId)
+        {
+            var requestWithServices = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+
+            ViewBag.RequestOptions = requestWithServices.Select(r => new SelectListItem
+            {
+                Value = r.RequestId.ToString(),
+                Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
+            }).ToList();
+
+            var serviceMap = requestWithServices.ToDictionary(
+                r => r.RequestId.ToString(),
+                r => new
+                {
+                    serviceId = r.ServiceId,
+                    price = r.Price
+                });
+
+            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
+                serviceMap,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+        }
+    
 
         //// GET: /Order/Edit/5
         //public async Task<IActionResult> Edit(int id)
@@ -242,17 +272,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 ModelState.AddModelError(string.Empty, "Cancel failed.");
 
             return RedirectToAction(nameof(MyOrder));
-        }
-
-        // Load lại request list nếu form có lỗi
-        private async Task LoadRequestOptionsToViewBag(string userId)
-        {
-            var requests = await _requestService.GetDraftOrPendingRequestsAsync(userId);
-            ViewBag.RequestOptions = requests.Select(r => new SelectListItem
-            {
-                Value = r.RequestId.ToString(),
-                Text = $"Request #{r.RequestId} - {r.RequestType}"
-            }).ToList();
         }
     }
 }

@@ -1,17 +1,19 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.RequestCreateDto
 @{
     ViewData["Title"] = "Edit Request";
+    var services = ViewBag.Services as List<SelectListItem>;
 }
+
 <div class="max-w-xl mx-auto py-10 px-4">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">📝 Edit Request</h1>
 
-    <form asp-action="Edit" asp-route-id="@ViewBag.Id" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
-        <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+    <form asp-action="Edit" asp-route-id="@ViewBag.Id" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
+        <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
 
         <div>
             <label asp-for="ServiceId" class="block font-semibold text-gray-700">Service</label>
-            <select asp-for="ServiceId" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" asp-items="@(ViewBag.Services as List<SelectListItem>)">
-                <option value="">-- Select a Service --</option>
+            <select asp-for="ServiceId" asp-items="services" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                <option value="">-- Select Service --</option>
             </select>
             <span asp-validation-for="ServiceId" class="text-red-500 text-sm"></span>
         </div>
@@ -24,7 +26,7 @@
 
         <div class="flex justify-between">
             <button type="submit" class="bg-yellow-500 text-white px-5 py-2 rounded-lg hover:bg-yellow-600">✔️ Update</button>
-            <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            <a asp-action="My" class="text-sm text-blue-600 hover:underline">← Back to My Requests</a>
         </div>
     </form>
 </div>

@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Request Details";
 }
+
 <div class="max-w-3xl mx-auto py-10 px-4">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">📑 Request Details</h1>
 
@@ -24,11 +25,15 @@
     </div>
 
     <div class="mt-6 flex justify-between">
-        @if (Model.Status != "Pending")
+        @if (!User.IsInRole("Staff") && Model.Status != "Pending")
         {
             <a asp-action="Edit" asp-route-id="@Model.RequestId" class="text-yellow-600 hover:underline">✏️ Edit</a>
         }
-        <a asp-action="Index" class="text-blue-600 hover:underline">← Back to List</a>
+
+        @if (!User.IsInRole("Staff"))
+        {
+            <a asp-action="My" class="text-blue-600 hover:underline">← Back to My Requests</a>
+        }
     </div>
 </div>
 

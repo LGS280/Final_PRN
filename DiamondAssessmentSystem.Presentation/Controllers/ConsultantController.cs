@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    //[Authorize(Roles = "Consultant")]
+    [Authorize(Roles = "Consultant")]
     public class ConsultantController : Controller
     {
         private readonly IConversationService _conversationService;

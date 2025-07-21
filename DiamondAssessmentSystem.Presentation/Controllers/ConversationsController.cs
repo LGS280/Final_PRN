@@ -40,5 +40,21 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             var conversation = await _conversationService.StartOrGetConversationAsync();
             return RedirectToAction("Index", "ChatMessages", new { conversationId = conversation.ConversationId });
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> CustomerHome()
+        {
+            try
+            {
+                var conversation = await _conversationService.StartOrGetConversationAsync();
+                return RedirectToAction("Index", "ChatMessages", new { conversationId = conversation.ConversationId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Unable to start chat: " + ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
+        }
     }
 }
