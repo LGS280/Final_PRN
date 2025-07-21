@@ -35,6 +35,15 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(blogs);
         }
 
+        public IActionResult GetStarted()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Auth");
+
+            return RedirectToAction("My", "Request");
+        }
+
+
         public IActionResult Privacy()
         {
             return View();

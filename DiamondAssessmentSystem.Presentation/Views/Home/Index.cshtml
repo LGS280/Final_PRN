@@ -1,55 +1,58 @@
 ﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
-
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <h1 class="text-5xl font-extrabold text-center mb-16 text-gray-900 tracking-tight">
-        📝 Featured Blog Posts
-    </h1>
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-indigo-900 via-indigo-700 to-blue-800 text-white py-5 position-relative">
+    <div class="container py-5 text-center position-relative z-1">
+        <h1 class="display-4 fw-bold mb-3">Build Your Insight Dashboard</h1>
+        <p class="lead mb-4">Explore expert insights & unlock your potential with <strong>DiamondSys</strong></p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a asp-controller="Home" asp-action="GetStarted" class="btn btn-success btn-lg px-4 rounded-pill">Get Started</a>
+            <a href="#" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                <i class="bi bi-play-circle-fill me-2"></i> Watch Video
+            </a>
+        </div>
+    </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+    <!-- Optional: Background SVG or pattern -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-opacity-25" style="background-image: url('https://via.placeholder.com/1600x600'); background-size: cover; z-index: 0;"></div>
+</section>
+
+<!-- Blog Grid Section -->
+<section class="container py-5">
+    <h2 class="text-center fw-bold mb-5 text-primary display-6">Latest Articles</h2>
+    <div class="row g-4">
         @foreach (var blog in Model)
         {
-            <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl border border-gray-200 transition-all duration-300">
-                <!-- Image with overlay -->
-                <div class="relative h-56 overflow-hidden">
-                    <img src="@blog.ImageUrl" alt="Blog image"
-                         class="w-full h-full object-cover transform group-hover:scale-105 transition duration-300" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="card h-100 shadow border-0 rounded-4 overflow-hidden">
+                    <div class="ratio ratio-4x3">
+                        <img src="@blog.ImageUrl"
+                             class="card-img-top object-fit-cover"
+                             alt="@blog.Title"
+                             style="object-fit: cover;" />
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        @if (!string.IsNullOrEmpty(blog.BlogType))
+                        {
+                            <span class="badge bg-primary rounded-pill mb-2 text-uppercase">@blog.BlogType</span>
+                        }
 
-                <!-- Content -->
-                <div class="p-6 space-y-3">
-                    @if (!string.IsNullOrEmpty(blog.BlogType))
-                    {
-                        <span class="inline-block px-3 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full uppercase tracking-wide shadow">
-                            @blog.BlogType
-                        </span>
-                    }
+                        <h5 class="card-title text-dark">@blog.Title</h5>
+                        <p class="card-text text-muted flex-grow-1">@blog.Description?.Substring(0, Math.Min(100, blog.Description.Length))...</p>
 
-                    <h2 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition duration-200 line-clamp-2">
-                        @blog.Title
-                    </h2>
-
-                    <p class="text-gray-600 text-sm line-clamp-3">
-                        @blog.Description
-                    </p>
-
-                    <div class="flex items-center justify-between pt-4 text-sm text-gray-400">
-                        <div class="flex items-center gap-2">
-                            <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-full w-6 h-6" />
-                            <span>@blog.CreatedDate.ToString("dd MMM yyyy")</span>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-circle" alt="avatar" />
+                                <small class="text-muted">@blog.CreatedDate.ToString("dd MMM yyyy")</small>
+                            </div>
+                            <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })" class="btn btn-sm btn-outline-primary rounded-pill">Read More</a>
                         </div>
-
-                        <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })"
-                           class="bg-blue-100 text-blue-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition">
-                            Read More
-                        </a>
                     </div>
                 </div>
             </div>
         }
     </div>
-</div>
+</section>
