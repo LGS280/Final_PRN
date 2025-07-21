@@ -13,7 +13,6 @@
         <input type="hidden" name="id" value="@orderId" />
         <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
 
-        <!-- Request Dropdown -->
         <div>
             <label asp-for="PaymentInfo.RequestId" class="block font-semibold text-gray-700">Select Request</label>
             <select asp-for="PaymentInfo.RequestId" id="PaymentInfo_RequestId"
@@ -29,23 +28,20 @@
             <span asp-validation-for="PaymentInfo.RequestId" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Service ID (readonly) -->
         <div>
             <label asp-for="OrderData.ServiceId" class="block font-semibold text-gray-700">Service ID</label>
             <input asp-for="OrderData.ServiceId" id="OrderData_ServiceId"
-                   class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+                   class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
             <span asp-validation-for="OrderData.ServiceId" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Total Price (readonly) -->
         <div>
             <label asp-for="OrderData.TotalPrice" class="block font-semibold text-gray-700">Total Price</label>
             <input asp-for="OrderData.TotalPrice" id="OrderData_TotalPrice"
-                   class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+                   class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
             <span asp-validation-for="OrderData.TotalPrice" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Payment Type -->
         <div>
             <label asp-for="PaymentInfo.PaymentType" class="block font-semibold text-gray-700">Payment Type</label>
             <select asp-for="PaymentInfo.PaymentType" id="PaymentInfo_PaymentType"
@@ -57,10 +53,8 @@
             <span asp-validation-for="PaymentInfo.PaymentType" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Submit -->
         <div class="flex justify-between">
-            <button type="submit"
-                    class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition">
+            <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition">
                 💾 Save Changes
             </button>
             <a asp-action="MyOrder" class="text-sm text-blue-600 hover:underline">← Cancel</a>
@@ -75,19 +69,13 @@
         function onRequestChange() {
             const selectedId = document.getElementById("PaymentInfo_RequestId").value;
             const service = serviceMap[selectedId];
-
-            if (service) {
-                document.getElementById("OrderData_ServiceId").value = service.serviceId;
-                document.getElementById("OrderData_TotalPrice").value = service.price;
-            } else {
-                document.getElementById("OrderData_ServiceId").value = "";
-                document.getElementById("OrderData_TotalPrice").value = "";
-            }
+            document.getElementById("OrderData_ServiceId").value = service?.serviceId || "";
+            document.getElementById("OrderData_TotalPrice").value = service?.price || "";
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("PaymentInfo_RequestId").addEventListener("change", onRequestChange);
-            onRequestChange(); // Populate initial values
+            onRequestChange();
         });
     </script>
 }

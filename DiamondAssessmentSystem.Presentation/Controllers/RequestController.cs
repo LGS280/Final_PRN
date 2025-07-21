@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [Authorize]  // All requires authentication
+    [Authorize(Roles = "Staff,Customer")]
     public class RequestController : Controller
     {
         private readonly IRequestService _requestService;
@@ -83,7 +83,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateRequest(RequestCreateDto createDto, string action)
+        public async Task<IActionResult> Create(RequestCreateDto createDto, string action)
         {
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Auth");
@@ -113,7 +113,9 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 string status = action == "Submit" ? "Pending" : "Draft";
 
                 var created = await _requestService.CreateRequestForCustomerAsync(userId, createDto, status);
-                return RedirectToAction(nameof(Index));
+                return _currentUser.Role == "Customer"
+                    ? RedirectToAction(nameof(My))
+                    : RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {

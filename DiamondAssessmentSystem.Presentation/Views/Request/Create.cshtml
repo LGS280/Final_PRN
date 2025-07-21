@@ -1,7 +1,7 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.RequestCreateDto
 @{
     ViewData["Title"] = "Create Request";
-    var serviceOptions = ViewBag.Services as List<SelectListItem>; // Service list
+    var serviceOptions = ViewBag.Services as List<SelectListItem>;
     var requestTypes = new List<SelectListItem>
     {
         new("Normal", "Normal"),
@@ -9,7 +9,6 @@
         new("VIP", "VIP")
     };
 }
-
 <div class="max-w-xl mx-auto py-10 px-4">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">📄 Create Request</h1>
 
@@ -20,12 +19,12 @@
         </div>
     }
 
-    <form asp-action="CreateRequest" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
+    <form asp-action="Create" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
         <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
 
         <div>
             <label asp-for="ServiceId" class="block font-semibold text-gray-700">Service</label>
-            <select asp-for="ServiceId" asp-items="serviceOptions" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+            <select asp-for="ServiceId" asp-items="serviceOptions" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 <option value="">-- Select Service --</option>
             </select>
             <span asp-validation-for="ServiceId" class="text-red-500 text-sm"></span>
@@ -33,7 +32,7 @@
 
         <div>
             <label asp-for="RequestType" class="block font-semibold text-gray-700">Request Type</label>
-            <select asp-for="RequestType" asp-items="requestTypes" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+            <select asp-for="RequestType" asp-items="requestTypes" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 <option value="">-- Select Type --</option>
             </select>
             <span asp-validation-for="RequestType" class="text-red-500 text-sm"></span>
@@ -45,16 +44,7 @@
         </div>
     </form>
 
-    @if (User.IsInRole("Customer"))
-    {
-        <div class="mt-4">
-            <a asp-action="My" class="text-sm text-blue-600 hover:underline">← Back to List</a>
-        </div>
-    }
-    else
-    {
-        <div class="mt-4">
-            <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
-        </div>
-    }
+    <div class="mt-4">
+        <a asp-action="My" class="text-sm text-blue-600 hover:underline">← Back to My Requests</a>
+    </div>
 </div>

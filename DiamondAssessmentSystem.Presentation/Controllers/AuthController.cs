@@ -98,7 +98,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();

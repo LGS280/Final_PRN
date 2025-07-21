@@ -1,5 +1,6 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    //[Route("[controller]")] // Removed route attribute
+    [Authorize(Roles = "Staff,Customer")]
     public class BlogController : Controller  // Inherit from Controller
     {
         private readonly IBlogService _blogService;

@@ -8,10 +8,9 @@
 <div class="max-w-2xl mx-auto py-12 px-4">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">🧾 Create Order</h1>
 
-    <form id="orderForm" asp-action="Create" method="post" class="space-y-6 bg-white p-6 shadow-md rounded-xl border">
+    <form asp-action="Create" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
         <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
 
-        <!-- Request Dropdown -->
         <div>
             <label asp-for="PaymentInfo.RequestId" class="block font-semibold text-gray-700">Select Request</label>
             <select asp-for="PaymentInfo.RequestId" id="PaymentInfo_RequestId"
@@ -25,23 +24,18 @@
             <span asp-validation-for="PaymentInfo.RequestId" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- ServiceId (readonly) -->
         <div>
             <label asp-for="OrderData.ServiceId" class="block font-semibold text-gray-700">Service ID</label>
-            <input asp-for="OrderData.ServiceId" id="OrderData_ServiceId"
-                   class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+            <input asp-for="OrderData.ServiceId" id="OrderData_ServiceId" class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
             <span asp-validation-for="OrderData.ServiceId" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- TotalPrice (readonly) -->
         <div>
-            <label asp-for="OrderData.TotalPrice" class="block font-semibold text-gray-700">Total Price (VND)</label>
-            <input asp-for="OrderData.TotalPrice" id="OrderData_TotalPrice"
-                   class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+            <label asp-for="OrderData.TotalPrice" class="block font-semibold text-gray-700">Total Price</label>
+            <input asp-for="OrderData.TotalPrice" id="OrderData_TotalPrice" class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
             <span asp-validation-for="OrderData.TotalPrice" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Payment Type -->
         <div>
             <label asp-for="PaymentInfo.PaymentType" class="block font-semibold text-gray-700">Payment Type</label>
             <select asp-for="PaymentInfo.PaymentType" id="PaymentInfo_PaymentType"
@@ -53,20 +47,9 @@
             <span asp-validation-for="PaymentInfo.PaymentType" class="text-red-500 text-sm"></span>
         </div>
 
-        <!-- Submit -->
         <div class="flex justify-between">
-            <button type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                💳 Create Order
-            </button>
-            @if (User.IsInRole("Customer"))
-            {
-                <a asp-action="MyOrder" class="text-sm text-blue-600 hover:underline">← Back to List</a>
-            }
-            else
-            {
-                <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a> 
-            }
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">💳 Create Order</button>
+            <a asp-action="MyOrder" class="text-sm text-blue-600 hover:underline">← Back</a>
         </div>
     </form>
 </div>
@@ -78,17 +61,11 @@
         function onRequestChange() {
             const selectedId = document.getElementById("PaymentInfo_RequestId").value;
             const service = serviceMap[selectedId];
-
-            if (service) {
-                document.getElementById("OrderData_ServiceId").value = service.serviceId;
-                document.getElementById("OrderData_TotalPrice").value = service.price;
-            } else {
-                document.getElementById("OrderData_ServiceId").value = "";
-                document.getElementById("OrderData_TotalPrice").value = "";
-            }
+            document.getElementById("OrderData_ServiceId").value = service?.serviceId || "";
+            document.getElementById("OrderData_TotalPrice").value = service?.price || "";
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("PaymentInfo_RequestId").addEventListener("change", onRequestChange);
         });
     </script>

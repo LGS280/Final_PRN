@@ -1,12 +1,14 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
