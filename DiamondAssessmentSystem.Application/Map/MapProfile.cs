@@ -32,6 +32,18 @@ namespace DiamondAssessmentSystem.Application.Map
                     string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
+                //.ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
+
+            CreateMap<CustomerUpdateDtoVer1, CustomerCreateDto>().ReverseMap();
+
+
+            CreateMap<CustomerUpdateDtoVer1, Customer>()
+                .ForMember(dest => dest.Idcard, opt => opt.MapFrom(src =>
+                    string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
+                .ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
 
             CreateMap<CustomerCreateDto, User>()

@@ -66,9 +66,18 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(customer); // View for customer
         }
 
-        public async Task<IActionResult> EditCustomer(string id)
+        public async Task<IActionResult> EditCustomer()
         {
-            var customer = await _customerService.GetCustomerByIdAsync(id);
+            var userIdClaim = _currentUser.UserId;
+
+            if (userIdClaim == null)
+            {
+
+                ModelState.AddModelError(string.Empty, "There no connection");
+                return View();
+            }
+
+            var customer = await _customerService.GetCustomerByIdAsync(userIdClaim);
             if (customer == null) return NotFound();
 
             var model = new CustomerUpdateDto
@@ -78,26 +87,87 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 {
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
-                    Phone = customer.Phone,
-                    Address = customer.Address,
                     Gender = customer.Gender,
+                    Phone = customer.Phone,
                     IdCard = customer.IdCard,
+                    Address = customer.Address,
                     UnitName = customer.UnitName,
-                    TaxCode = customer.TaxCode
+                    TaxCode = customer.TaxCode,
+                    Email = customer.Email
                 }
             };
 
-            return View("Customers/Edit", model);
+            return View("EditCustomer", model);
         }
 
         [HttpPost]
         public async Task<IActionResult> EditCustomer(CustomerUpdateDto model)
         {
             if (!ModelState.IsValid)
-                return View("Customers/Edit", model);
+                return View("EditCustomer", model);
 
             var updated = await _customerService.UpdateCustomerAsync(model.UserId, model.Customer);
             return updated ? RedirectToAction("Customers") : NotFound();
         }
+
+        public async Task<IActionResult> EditCustomerVer1()
+        {
+            var userIdClaim = _currentUser.UserId;
+
+            if (userIdClaim == null)
+            {
+                ModelState.AddModelError(string.Empty, "There is no connection");
+                return View("EditCustomerVer1", new CustomerUpdateDtoVer1());
+            }
+
+            var customer = await _customerService.GetCustomerByIdAsync(userIdClaim);
+            if (customer == null) return NotFound();
+
+            var model = new CustomerUpdateDtoVer1
+            {
+                UserId = customer.Acc.UserId,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Gender = customer.Gender,
+                Phone = customer.Phone,
+                IdCard = customer.IdCard,
+                Address = customer.Address,
+                UnitName = customer.UnitName,
+                TaxCode = customer.TaxCode,
+                Email = customer.Email
+            };
+
+            return View("EditCustomerVer1", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCustomerVer1(CustomerUpdateDtoVer1 model)
+        {
+            if (!ModelState.IsValid)
+                return View("EditCustomerVer1", model);
+
+            var customerDto = new CustomerCreateDto
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                Phone = model.Phone,
+                IdCard = model.IdCard,
+                Address = model.Address,
+                UnitName = model.UnitName,
+                TaxCode = model.TaxCode,
+                Email = model.Email
+            };
+
+            var updated = await _customerService.UpdateCustomerAsync(model.UserId, customerDto);
+            if (!updated)
+            {
+                ModelState.AddModelError(string.Empty, "Cập nhật thất bại!");
+                return View("EditCustomerVer1", model);
+            }
+
+            return RedirectToAction("Me");
+        }
+
     }
 }
