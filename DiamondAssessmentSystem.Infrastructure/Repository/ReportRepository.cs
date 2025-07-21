@@ -9,60 +9,88 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Infrastructure.Repository
 {
-        public class ReportRepository : IReportRepository
+    public class ReportRepository : IReportRepository
+    {
+        private readonly DiamondAssessmentDbContext _context;
+
+        public ReportRepository(DiamondAssessmentDbContext context)
         {
-            private readonly DiamondAssessmentDbContext _context;
+            _context = context;
+        }
 
-            public ReportRepository(DiamondAssessmentDbContext context)
-            {
-                _context = context;
-            }
+        public async Task<int> GetTotalUsersByRoleAsync(string role)
+        {
+            return await (from user in _context.Users
+                          join userRole in _context.UserRoles on user.Id equals userRole.UserId
+                          join roleEntity in _context.Roles on userRole.RoleId equals roleEntity.Id
+                          where roleEntity.Name == role
+                          select user).CountAsync();
+        }
 
-            public async Task<int> GetTotalUsersByRoleAsync(string role)
-            {
-                return await (from user in _context.Users
-                              join userRole in _context.UserRoles on user.Id equals userRole.UserId
-                              join roleEntity in _context.Roles on userRole.RoleId equals roleEntity.Id
-                              where roleEntity.Name == role
-                              select user).CountAsync();
-            }
+        public async Task<int> GetTotalRequestsAsync()
+        {
+            return await _context.Requests.CountAsync();
+        }
 
-            public async Task<int> GetTotalRequestsAsync()
-            {
-                return await _context.Requests.CountAsync();
-            }
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _context.Requests
+                .Where(r => r.Status == "Completed")
+                .Include(r => r.Service)
+                .SumAsync(r => (decimal?)r.Service.Price) ?? 0;
+        }
 
-  
-            public async Task<decimal> GetTotalRevenueAsync()
+        public async Task<IEnumerable<(string CustomerName, int RequestCount)>> GetTopCustomersAsync(int top)
+        {
+            var result = await _context.Requests
+                .GroupBy(r => r.CustomerId)
+                .OrderByDescending(g => g.Count())
+                .Take(top)
+                .Select(g => new
                 {
-                    return await _context.Requests
-                        .Where(r => r.Status == "Done")
-                        .Include(r => r.Service)
-                        .SumAsync(r => (decimal?)r.Service.Price) ?? 0;
-                }
+                    CustomerName = g.First().Customer.UnitName,
+                    RequestCount = g.Count()
+                })
+                .ToListAsync();
 
-            public async Task<IEnumerable<(string CustomerName, int RequestCount)>> GetTopCustomersAsync(int top)
-            {
-                var result = await _context.Requests
-                    .GroupBy(r => r.CustomerId)
-                    .OrderByDescending(g => g.Count())
-                    .Take(top)
-                    .Select(g => new
-                    {
-                        CustomerName = g.First().Customer.UnitName,
-                        RequestCount = g.Count()
-                    })
-                    .ToListAsync();
+            return result
+                .Select(x => (x.CustomerName, x.RequestCount))
+                .ToList();
+        }
 
-                return result
-                    .Select(x => (x.CustomerName, x.RequestCount))
-                    .ToList();
-            }
+        public async Task<int> GetTotalEmployeesAsync()
+        {
+            return await GetTotalUsersByRoleAsync("Employee");
+        }
+
+        public async Task<int> GetTotalProcessingRequestsAsync()
+        {
+            return await _context.Requests.CountAsync(r => r.Status == "Processing");
+        }
+
+        public async Task<int> GetTotalCertificatesIssuedAsync()
+        {
+            return await _context.Certificates.CountAsync();
+        }
+
+        public async Task<int> GetTotalCustomerCountAsync()
+        {
+            return await _context.Customers.CountAsync();
+        }
 
 
-            public async Task<int> GetTotalEmployeesAsync()
-                {
-                    return await GetTotalUsersByRoleAsync("Employee");
-                }
+        public async Task<List<(string Status, int RequestCount)>> GetRequestCountsByStatusAsync()
+        {
+            var data = await _context.Requests
+                .GroupBy(r => r.Status)
+                .Select(g => new { Status = g.Key, RequestCount = g.Count() })
+                .OrderByDescending(g => g.RequestCount)
+                .ToListAsync(); // EF async tới đây
+
+            // Sau đó chuyển sang tuple trong bộ nhớ
+            return data
+                .Select(g => (g.Status, g.RequestCount))
+                .ToList();
+        }
     }
 }

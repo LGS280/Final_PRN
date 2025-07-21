@@ -104,6 +104,14 @@ namespace DiamondAssessmentSystem.Application.Map
 
             CreateMap<Order, OrderDto>()
                 .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.Service.ServiceType));
+
+            CreateMap<(string CustomerName, int RequestCount), ReportTopCustomerDto>()
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerName))
+            .ForMember(dest => dest.RequestCount, opt => opt.MapFrom(src => src.RequestCount));
+
+            CreateMap<(string Status, int RequestCount), ReportRequestStatusDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.RequestCount, opt => opt.MapFrom(src => src.RequestCount));
         }
     }
 }
