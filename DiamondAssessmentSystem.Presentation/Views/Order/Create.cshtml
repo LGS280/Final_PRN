@@ -59,7 +59,14 @@
                     class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                 💳 Create Order
             </button>
-            <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            @if (User.IsInRole("Customer"))
+            {
+                <a asp-action="MyOrder" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a> 
+            }
         </div>
     </form>
 </div>

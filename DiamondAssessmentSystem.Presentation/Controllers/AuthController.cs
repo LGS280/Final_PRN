@@ -103,7 +103,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         {
             HttpContext.Session.Clear();
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Auth");
 
         }
 

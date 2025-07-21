@@ -42,7 +42,15 @@
     </div>
 
     <div class="mt-6 flex justify-between">
-        <a asp-action="Index" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+        @if (User.IsInRole("Customer"))
+        {
+            <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+
+        }
         <form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
             <button type="submit"
                     class="text-sm text-red-600 hover:underline"

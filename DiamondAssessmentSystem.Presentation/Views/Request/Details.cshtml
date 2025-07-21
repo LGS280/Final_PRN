@@ -28,7 +28,15 @@
         {
             <a asp-action="Edit" asp-route-id="@Model.RequestId" class="text-yellow-600 hover:underline">✏️ Edit</a>
         }
-        <a asp-action="Index" class="text-blue-600 hover:underline">← Back to List</a>
+
+        @if (User.IsInRole("Customer"))
+        {
+            <a asp-action="My" class="text-blue-600 hover:underline">← Back to List</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="text-blue-600 hover:underline">← Back to List</a>
+        }
     </div>
 </div>
 

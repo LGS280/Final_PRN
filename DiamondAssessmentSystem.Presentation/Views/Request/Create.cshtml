@@ -45,7 +45,16 @@
         </div>
     </form>
 
-    <div class="mt-4">
-        <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
-    </div>
+    @if (User.IsInRole("Customer"))
+    {
+        <div class="mt-4">
+            <a asp-action="My" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+        </div>
+    }
 </div>
