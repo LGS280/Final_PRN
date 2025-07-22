@@ -19,6 +19,8 @@ namespace DiamondAssessmentSystem.Infrastructure.Models
 
         public int? Point { get; set; }
 
+        public DateTime? DateCreated { get; set; }
+
         public string? Note { get; set; }
 
         public string? Status { get; set; }

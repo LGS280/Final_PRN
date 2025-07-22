@@ -33,6 +33,8 @@ public partial class Result
 
     public string? Fluorescence { get; set; }
 
+    public DateTime? ModifiedDate { get; set; }
+
     public string Status { get; set; } = null!;
 
     public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();

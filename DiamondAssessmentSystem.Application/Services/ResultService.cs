@@ -53,6 +53,7 @@ namespace DiamondAssessmentSystem.Application.Services
                 return false;
 
             var result = _mapper.Map<Result>(dto);
+            result.ModifiedDate = DateTime.Now;
             return await _resultRepository.CreateResultAsync(result) != null;
         }
 
@@ -79,7 +80,7 @@ namespace DiamondAssessmentSystem.Application.Services
                 };
                 await _certificateRepository.CreateCertificateAsync(newCert);
             }
-
+            existingResult.ModifiedDate = DateTime.Now;
             return await _resultRepository.UpdateResultAsync(existingResult);
         }
 

@@ -9,9 +9,13 @@ public partial class ServicePrice
 
     public string ServiceType { get; set; } = null!;
 
+    public string? Description { get; set; }
+
     public decimal Price { get; set; }
 
     public int Duration { get; set; }
+
+    public DateTime? DateCreated { get; set; }
 
     public int EmployeeId { get; set; }
 
