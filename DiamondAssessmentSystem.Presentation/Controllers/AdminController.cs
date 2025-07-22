@@ -133,7 +133,16 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             }
 
             var updated = await _employeeService.UpdateEmployee(id, dto);
-            return updated ? RedirectToAction(nameof(Employees)) : NotFound();
+            if (updated)
+            {
+                TempData["Success"] = "Employee updated successfully.";
+                return RedirectToAction(nameof(Employees));
+            }
+            else
+            {
+                TempData["Error"] = "Failed to update employee.";
+                return RedirectToAction(nameof(EditEmployee), new { id });
+            }
         }
 
         public async Task<IActionResult> DeleteEmployee(string id)
@@ -177,13 +186,15 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             try
             {
                 var created = await _accountService.CreateEmployeeAsync(dto, dto.Role);
-                return RedirectToAction(nameof(Employees));
+                TempData["Success"] = "Employee account created successfully.";
+                return RedirectToAction(nameof(Employees)); 
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["Error"] = ex.Message;
                 return View("Accounts/Create", dto);
             }
         }
+
     }
 }

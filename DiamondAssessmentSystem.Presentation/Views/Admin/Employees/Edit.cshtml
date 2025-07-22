@@ -4,45 +4,86 @@
 }
 
 <div class="max-w-xl mx-auto py-10">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">@ViewData["Title"]</h2>
-    ViewBag.Email = employee.Email;
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">@ViewData["Title"]</h2>
 
-    <form asp-action="EditEmployee" method="post" class="bg-white p-6 rounded-xl shadow space-y-4">
+    <!-- Modal Notification -->
+    <div class="modal fade" id="popupModal" tabindex="-1" aria-labelledby="popupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-xl shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="popupModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body text-center text-gray-700">
+                    @TempData["Success"] @TempData["Error"]
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a href="@Url.Action("Employees", "Admin")" class="btn btn-success">Go to Employee List</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="grid grid-cols-2 gap-4">
+    <!-- Edit Form -->
+    <form asp-action="EditEmployee" asp-route-id="@ViewBag.UserId" method="post" class="bg-white p-8 rounded-2xl shadow-xl space-y-6 border">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label asp-for="FirstName" class="block font-medium">First Name</label>
-                <input asp-for="FirstName" class="w-full border-gray-300 rounded-md" />
+                <label asp-for="FirstName" class="block font-medium text-sm text-gray-700 mb-1">First Name</label>
+                <input asp-for="FirstName" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
                 <span asp-validation-for="FirstName" class="text-red-500 text-sm"></span>
             </div>
             <div>
-                <label asp-for="LastName" class="block font-medium">Last Name</label>
-                <input asp-for="LastName" class="w-full border-gray-300 rounded-md" />
+                <label asp-for="LastName" class="block font-medium text-sm text-gray-700 mb-1">Last Name</label>
+                <input asp-for="LastName" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
                 <span asp-validation-for="LastName" class="text-red-500 text-sm"></span>
             </div>
         </div>
+
         <div>
-            <label class="block font-medium">Email</label>
-            <input value="@ViewBag.Email" class="w-full border-gray-300 rounded-md bg-gray-100" readonly />
+            <label class="block font-medium text-sm text-gray-700 mb-1">Email</label>
+            <input value="@ViewBag.Email" class="w-full border border-gray-300 rounded-md bg-gray-100 px-3 py-2" readonly />
         </div>
+
         <div>
-            <label asp-for="Phone" class="block font-medium">Phone</label>
-            <input asp-for="Phone" class="w-full border-gray-300 rounded-md" />
+            <label asp-for="Phone" class="block font-medium text-sm text-gray-700 mb-1">Phone</label>
+            <input asp-for="Phone" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="Phone" class="text-red-500 text-sm"></span>
         </div>
+
         <div>
-            <label asp-for="Gender" class="block font-medium">Gender</label>
-            <select asp-for="Gender" class="w-full border-gray-300 rounded-md">
+            <label asp-for="Gender" class="block font-medium text-sm text-gray-700 mb-1">Gender</label>
+            <select asp-for="Gender" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:ring focus:ring-blue-300">
                 <option value="">-- Select --</option>
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
             </select>
-        </div>
-        <div>
-            <label asp-for="Salary" class="block font-medium">Salary</label>
-            <input asp-for="Salary" class="w-full border-gray-300 rounded-md" />
+            <span asp-validation-for="Gender" class="text-red-500 text-sm"></span>
         </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
+        <div>
+            <label asp-for="Salary" class="block font-medium text-sm text-gray-700 mb-1">Salary</label>
+            <input asp-for="Salary" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+            <span asp-validation-for="Salary" class="text-red-500 text-sm"></span>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+            Save Changes
+        </button>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @if (TempData["Success"] != null || TempData["Error"] != null)
+    {
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const modal = new bootstrap.Modal(document.getElementById('popupModal'));
+                modal.show();
+            });
+        </script>
+    }
+}

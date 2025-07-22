@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     //  [Route("[controller]")] // Removed route attribute
-    public class AuthController : Controller // Inherit from Controller instead of ControllerBase
+    public class AuthController : Controller 
     {
         private readonly IAuthService _authService;
 
@@ -23,15 +23,15 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         // GET: Auth/Login
         [HttpGet]
-        public IActionResult Login() //Method to load current login and authenticate
+        public IActionResult Login() 
         {
-            return View(); //Return view, after all
+            return View(); 
         }
 
         // POST: Auth/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginDto loginDto) // Pass LoginDto as a parameter
+        public async Task<IActionResult> Login(LoginDto loginDto) 
         {
             if (!ModelState.IsValid)
                 return View(loginDto);
@@ -42,27 +42,25 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
                 HttpContext.Session.SetString("access_token", loginResponse.Token);
 
-
-                //After authenticating, will be to redirect page
                 return RedirectToAction("Index", "Home");
 
             }
             catch (UnauthorizedAccessException ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message); //Show Error if cannot authenticate
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(loginDto);
 
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging
                 ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 return View(loginDto);
             }
         }
+
         // GET: Auth/Register
         [HttpGet]
-        public IActionResult RegisterCustomer() //Get register page to create user accounts
+        public IActionResult RegisterCustomer() 
         {
             return View();
         }
@@ -70,33 +68,29 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         // POST: Auth/RegisterCustomer
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterCustomer(RegisterDto registerDto)  // Take user from account
+        public async Task<IActionResult> RegisterCustomer(RegisterDto registerDto)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     var message = await _authService.RegisterCustomerAsync(registerDto);
-                    return RedirectToAction("Login", "Auth");  // If register success, you be sent back to the login page
+                    TempData["Success"] = "Registration successful. Please log in.";
+                    return RedirectToAction("Login", "Auth");
                 }
                 catch (ArgumentException ex)
                 {
-                    ModelState.AddModelError(string.Empty, ex.Message);
-                    return View(registerDto);
-
+                    TempData["Error"] = ex.Message;
                 }
                 catch (Exception ex)
                 {
-                    //Log errors
-                    ModelState.AddModelError(string.Empty, $"{ex.Message}");
-                    return View(registerDto);
-
+                    TempData["Error"] = ex.Message;
                 }
             }
 
             return View(registerDto);
-
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

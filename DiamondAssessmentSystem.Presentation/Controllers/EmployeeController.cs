@@ -70,7 +70,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 LastName = employee.LastName,
                 Phone = employee.Phone,
                 Gender = employee.Gender,
-                UserName = employee.UserName
+                //UserName = employee.UserName
             };
 
             return View(dto);
