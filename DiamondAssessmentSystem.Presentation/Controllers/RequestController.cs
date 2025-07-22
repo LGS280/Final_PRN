@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [Authorize(Roles = "Staff,Customer")]
+    [Authorize(Roles = "Staff,Customer,Assessor")]
     public class RequestController : Controller
     {
         private readonly IRequestService _requestService;

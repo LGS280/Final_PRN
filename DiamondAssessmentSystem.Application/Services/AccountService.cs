@@ -61,6 +61,7 @@ namespace DiamondAssessmentSystem.Application.Services
             var newUser = _mapper.Map<User>(dto);
             newUser.UserType = "Employee";
             newUser.Status = "Active";
+            newUser.DateCreated = DateTime.Now;
 
             var result = await _userRepository.CreateEmployeeWithRoleAsync(newUser, dto.Password, role);
             if (!result.Succeeded)

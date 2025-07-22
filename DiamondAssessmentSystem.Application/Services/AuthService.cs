@@ -37,6 +37,7 @@ namespace DiamondAssessmentSystem.Application.Services
 
             newUser.UserType = "Customer";
             newUser.Status = "Active";
+            newUser.DateCreated = DateTime.Now;
 
             var result = await _userRepository.RegisterCustomerAsync(newUser, registerDto.Password, registerDto.Email);
             if (!result.Succeeded)
