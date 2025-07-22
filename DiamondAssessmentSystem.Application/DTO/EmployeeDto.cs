@@ -15,6 +15,7 @@ namespace DiamondAssessmentSystem.Application.DTO
 
         [EmailAddress]
         public string? Email { get; set; }
+        public string? UserName { get; set; }
 
         [Phone]
         public string? Phone { get; set; }
@@ -39,5 +40,7 @@ namespace DiamondAssessmentSystem.Application.DTO
         public string? Gender { get; set; }
 
         public decimal? Salary { get; set; }
+        [Required]
+        public string UserName { get; set; }
     }
 }

@@ -32,7 +32,6 @@ namespace DiamondAssessmentSystem.Application.Map
                     string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
-                //.ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
 
             CreateMap<CustomerUpdateDtoVer1, CustomerCreateDto>().ReverseMap();
@@ -43,19 +42,22 @@ namespace DiamondAssessmentSystem.Application.Map
                     string.IsNullOrEmpty(src.IdCard) ? (decimal?)null : decimal.Parse(src.IdCard)))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName))
-                .ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
+                .ForPath(dest => dest.User.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.TaxCode, opt => opt.MapFrom(src => src.TaxCode));
 
             CreateMap<CustomerCreateDto, User>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Phone))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender));
 
             CreateMap<Customer, CustomerDto>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
                 .ForMember(dest => dest.Point, opt => opt.MapFrom(src => src.User.Point))
@@ -74,12 +76,16 @@ namespace DiamondAssessmentSystem.Application.Map
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
                  .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.User.Status));
 
             CreateMap<EmployeeDto, Employee>()
                 .ForMember(dest => dest.User, opt => opt.Ignore());
+
+            CreateMap<EmployeeUpdateDto, EmployeeDto>().ReverseMap();
+
 
             CreateMap<Certificate, CertificateDto>().ReverseMap();
             CreateMap<Certificate, CertificateCreateDto>().ReverseMap();

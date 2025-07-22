@@ -16,7 +16,13 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        a {
+            text-decoration: none;
+        }
+     </style>
 </head>
 <body class="h-screen flex flex-col">
 
@@ -24,7 +30,7 @@
     <header class="bg-white shadow sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <!-- Logo -->
-            <a href="/" class="text-2xl font-extrabold text-blue-600 tracking-tight hover:opacity-90">
+            <a class="text-2xl font-extrabold text-blue-600 tracking-tight hover:opacity-90">
                 💎 DiamondSys
             </a>
 
@@ -53,14 +59,17 @@
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Personal">Certificate</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">My Profile</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="My">📋 My Requests</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="MyOrder">📦 My Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Profile</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="My">Requests</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="MyOrder">Orders</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Conversations" asp-action="CustomerHome">💬 Chat</a>
                 }
 
                 @if (!isAuthenticated)
                 {
+                    <div class="flex justify-center w-full">
+                        <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+                    </div>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
                 }
@@ -117,7 +126,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t py-5 text-sm text-gray-500">
+    <footer class="bg-white border-t py-3 text-sm text-gray-500">
         <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <p>&copy; 2025 Diamond Assessment System</p>
             <a asp-controller="Home" asp-action="Privacy" class="hover:text-blue-600">Privacy</a>

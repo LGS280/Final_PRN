@@ -88,7 +88,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 catch (Exception ex)
                 {
                     //Log errors
-                    ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                    ModelState.AddModelError(string.Empty, $"{ex.Message}");
                     return View(registerDto);
 
                 }

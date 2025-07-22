@@ -38,7 +38,7 @@ namespace DiamondAssessmentSystem.Application.Services
             newUser.UserType = "Customer";
             newUser.Status = "Active";
 
-            var result = await _userRepository.RegisterCustomerAsync(newUser, registerDto.Password);
+            var result = await _userRepository.RegisterCustomerAsync(newUser, registerDto.Password, registerDto.Email);
             if (!result.Succeeded)
             {
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
@@ -52,9 +52,9 @@ namespace DiamondAssessmentSystem.Application.Services
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
-            var user = await _userRepository.ValidateUserCredentialsAsync(loginDto.Username, loginDto.Password);
+            var user = await _userRepository.ValidateUserCredentialsAsync(loginDto.Email, loginDto.Password);
             if (user == null)
-                throw new UnauthorizedAccessException("Incorrect username or password.");
+                throw new UnauthorizedAccessException("Incorrect email or password.");
 
             var roles = await _userRepository.GetUserRolesAsync(user);
             var token = GenerateJwtToken(user, roles);

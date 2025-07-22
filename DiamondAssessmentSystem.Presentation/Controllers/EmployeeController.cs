@@ -24,9 +24,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         // GET: Employee/Me
         [HttpGet]
-        public async Task<IActionResult> Me() // Changed from GetMyEmployee
+        public async Task<IActionResult> Me() 
         {
-            //Authorization, to ensure access
             if (!User.Identity.IsAuthenticated)
             {
                 _logger.LogWarning("Unauthorized attempt to access Employee profile.");
@@ -45,13 +44,11 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             var employee = await _employeeService.GetEmployees(userId);
             if (employee == null)
             {
-                //Log with messages if unable to find it.
                 ModelState.AddModelError(string.Empty, "Cannot Find Data.");
-                return View(); // If not found, return the same message
+                return View(); 
             }
 
-            //Returns to show results and view
-            return View(employee);  //Load, View is required or it would say that there are no value to load.
+            return View(employee);
         }
 
         // GET: Employee/EditMe
@@ -73,7 +70,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 LastName = employee.LastName,
                 Phone = employee.Phone,
                 Gender = employee.Gender,
-                Salary = employee.Salary
+                UserName = employee.UserName
             };
 
             return View(dto);
@@ -100,18 +97,26 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             try
             {
                 var updated = await _employeeService.UpdateEmployee(userId, dto);
-                return updated ? RedirectToAction("Me") : NotFound();
+                if (updated)
+                {
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("Me");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Failed to update profile.");
+                    return View("Edit", dto);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "An error occurred while updating.");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View("Edit", dto);
             }
         }
 
-        // GET: Employee/Edit/{userId}
-        //Needs more function to make to edit it
-        public IActionResult Unauthorized()    //Function to have when they login
+
+        public IActionResult Unauthorized()   
         {
             return View();
         }
