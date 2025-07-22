@@ -17,4 +17,6 @@
 @section Scripts {
     @await Html.PartialAsync("_ChatSignalRScript", (Model.ConversationId, currentUserRole))
     <script src="/js/sendMessage.js" asp-append-version="true"></script>
+    <script src="/js/geminiHandler.js" asp-append-version="true"></script>
+    <script src="/js/mentionHandler.js" asp-append-version="true"></script>
 }

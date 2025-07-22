@@ -84,6 +84,7 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IConversationService, ConversationService>();
             builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
+            builder.Services.AddScoped<IAIService, GeminiAIService>();
 
             // ==================== Repositories ====================
             builder.Services.AddScoped<IUserRepository, UserRepository>();

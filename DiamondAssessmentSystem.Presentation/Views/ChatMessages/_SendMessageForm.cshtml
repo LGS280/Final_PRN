@@ -5,9 +5,21 @@
         @Html.AntiForgeryToken()
         <input type="hidden" name="conversationId" value="@Model" />
 
-        <input type="text" name="Message" id="text-message"
-               class="flex-1 p-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-               placeholder="Type a message..." autocomplete="off" />
+        <div class="relative w-full flex-1">
+            <input type="text" name="Message" id="text-message"
+                   class="w-full p-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Type a message..." autocomplete="off" />
+
+            <!-- Mention box -->
+            <div id="mention-box"
+                 class="absolute left-4 bottom-14 z-50 bg-white border border-gray-300 shadow-lg rounded-md hidden">
+                <button type="button"
+                        id="mention-gemini"
+                        class="block w-full text-left px-4 py-2 hover:bg-blue-100 text-sm">
+                    Gemini
+                </button>
+            </div>
+        </div>
 
         <!-- Emoji Button + Panel -->
         <div id="emoji-picker-wrapper" class="relative">

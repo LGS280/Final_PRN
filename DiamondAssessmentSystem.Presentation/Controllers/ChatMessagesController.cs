@@ -1,5 +1,6 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Infrastructure.Enums;
 using DiamondAssessmentSystem.Presentation.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -140,6 +141,41 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             var (filePath, fileName) = result.Value;
             return PhysicalFile(filePath, "application/octet-stream", fileName);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendGeminiMessage(int conversationId, [FromBody] string message)
+        {
+            if (string.IsNullOrWhiteSpace(message) || conversationId <= 0)
+                return BadRequest("Invalid input");
+
+            var dto = new CreateMessageDTO
+            {
+                SenderRole = "consultant",
+                SenderName = "Gemini",
+                MessageType = MessageType.Text,
+                Message = message
+            };
+
+            var chatLog = await _chatMessageService.SendMessageAsync(conversationId, dto);
+
+            var messageDto = new MessageResponseDTO
+            {
+                ChatId = chatLog.ChatId,
+                ConversationId = chatLog.ConversationId,
+                SenderId = chatLog.SenderId,
+                SenderName = chatLog.SenderName,
+                SenderRole = chatLog.SenderRole,
+                MessageType = chatLog.MessageType,
+                Message = chatLog.Message,
+                FilePath = chatLog.FilePath,
+                FileName = chatLog.FileName,
+                FileSize = chatLog.FileSize,
+                SentAt = chatLog.SentAt
+            };
+
+            return Ok(messageDto);
         }
     }
 }
