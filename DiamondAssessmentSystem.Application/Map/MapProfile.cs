@@ -18,7 +18,18 @@ namespace DiamondAssessmentSystem.Application.Map
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.UserName));
 
-            CreateMap<Request, RequestDto>().ReverseMap();
+            CreateMap<Request, RequestDto>()
+                .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.Service.ServiceType))
+                .ForMember(dest => dest.ServicePrice, opt => opt.MapFrom(src => src.Service.Price))
+                .ForMember(dest => dest.ServiceDuration, opt => opt.MapFrom(src => src.Service.Duration))
+                .ForMember(dest => dest.ServiceDescription, opt => opt.MapFrom(src => src.Service.Description))
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src =>
+                    src.Employee != null && src.Employee.User != null
+                        ? src.Employee.User.FirstName + " " + src.Employee.User.LastName
+                        : null));
+
+            CreateMap<RequestDto, Request>();
+
             CreateMap<Request, RequestCreateDto>().ReverseMap();
 
             CreateMap<ServicePrice, ServicePriceCreateDto>().ReverseMap();

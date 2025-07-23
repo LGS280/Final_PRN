@@ -17,21 +17,23 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(string? search, string? blogType)
         {
             var blogs = await _blogService.GetBlogs();
-            //if (User.IsInRole("Admin"))
-            //{
-            //    return RedirectToAction("Index", "Admin", new { Area = "Admin" });
-            //}
-            //else if (User.IsInRole("Employee"))
-            //{
-            //    return RedirectToAction("Index", "Blog");
-            //}
-            //else if (User.IsInRole("Consultant"))
-            //{
-            //    return RedirectToAction("Index", "Result");
-            //}
+
+            blogs = blogs.Where(b => b.Status == "Published");
+
+            if (!string.IsNullOrWhiteSpace(search))
+                blogs = blogs.Where(b => b.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(blogType))
+                blogs = blogs.Where(b => b.BlogType == blogType);
+
+            ViewBag.Search = search;
+            ViewBag.BlogType = blogType;
+            ViewBag.BlogTypeOptions = blogs.Select(b => b.BlogType).Where(t => !string.IsNullOrEmpty(t)).Distinct().ToList();
+
             return View(blogs);
         }
 

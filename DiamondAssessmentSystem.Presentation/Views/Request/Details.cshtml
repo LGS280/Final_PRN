@@ -17,22 +17,37 @@
         <div><strong>ID:</strong> @Model.RequestId</div>
         <div><strong>Form Type:</strong> @Model.FormType</div>
         <div><strong>Request Date:</strong> @Model.RequestDate.ToString("dd MMM yyyy")</div>
-        <div><strong>Customer ID:</strong> @Model.CustomerId</div>
-        <div><strong>Service ID:</strong> @Model.ServiceId</div>
+        <div class="mt-6 border-t pt-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Service Information</h2>
+            <div><strong>Service ID:</strong> @Model.ServiceId</div>
+            <div><strong>Type:</strong> @Model.ServiceType</div>
+            <div><strong>Price:</strong> @Model.ServicePrice?.ToString("C")</div>
+            <div><strong>Duration:</strong> @Model.ServiceDuration mins</div>
+            <div><strong>Description:</strong> @Model.ServiceDescription</div>
+        </div>
         <div><strong>Request Type:</strong> @Model.RequestType</div>
-        <div><strong>Employee ID:</strong> @Model.EmployeeId</div>
+        @if (!string.IsNullOrEmpty(Model.EmployeeName))
+        {
+            <div><strong>Assigned To:</strong> @Model.EmployeeName</div>
+        }
         <div><strong>Status:</strong> <span class="font-medium @GetStatusClass(Model.Status)">@Model.Status</span></div>
     </div>
 
     <div class="mt-6 flex justify-between">
-        @if (!User.IsInRole("Staff") && Model.Status != "Pending")
+        @if (!User.IsInRole("Consultant") && Model.Status != "Pending" && Model.Status != "Ordered")
         {
             <a asp-action="Edit" asp-route-id="@Model.RequestId" class="text-yellow-600 hover:underline">✏️ Edit</a>
         }
 
-        @if (!User.IsInRole("Staff"))
+        @if (!User.IsInRole("Consultant"))
         {
             <a asp-action="My" class="text-blue-600 hover:underline">← Back to My Requests</a>
+        }
+
+        @if (!User.IsInRole("Consultant") && Model.Status == "Pending")
+        {
+            <a asp-controller="Order" asp-action="Create" asp-route-requestId="@Model.RequestId"
+               class="inline-block text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md">💳 Pay Now</a>
         }
     </div>
 </div>

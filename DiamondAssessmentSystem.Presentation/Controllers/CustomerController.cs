@@ -157,18 +157,19 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 Address = model.Address,
                 UnitName = model.UnitName,
                 TaxCode = model.TaxCode,
+                Email = model.Email,
                 UserName = model.UserName
             };
 
             var updated = await _customerService.UpdateCustomerAsync(model.UserId, customerDto);
             if (!updated)
             {
-                ModelState.AddModelError(string.Empty, "Cập nhật thất bại!");
+                ModelState.AddModelError(string.Empty, "Cập nhật thất bại. Vui lòng kiểm tra lại dữ liệu hoặc thử lại sau.");
                 return View("EditCustomerVer1", model);
             }
 
-            return RedirectToAction("Me");
+            TempData["UpdateSuccess"] = true;
+            return RedirectToAction("EditCustomerVer1");
         }
-
     }
 }

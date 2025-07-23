@@ -18,7 +18,7 @@
                     <th class="px-4 py-3 text-left">Form Type</th>
                     <th class="px-4 py-3 text-left">Request Date</th>
                     <th class="px-4 py-3 text-left">Customer ID</th>
-                    <th class="px-4 py-3 text-left">Service ID</th>
+                    <th class="px-4 py-3 text-left">Service</th>
                     <th class="px-4 py-3 text-left">Type</th>
                     <th class="px-4 py-3 text-left">Employee</th>
                     <th class="px-4 py-3 text-left">Status</th>
@@ -32,10 +32,13 @@
                         <td class="px-4 py-3 font-mono">@item.RequestId</td>
                         <td class="px-4 py-3">@item.FormType</td>
                         <td class="px-4 py-3">@item.RequestDate.ToString("dd MMM yyyy")</td>
-                        <td class="px-4 py-3">@item.CustomerId</td>
-                        <td class="px-4 py-3">@item.ServiceId</td>
+                        @* <td class="px-4 py-3">@item.CustomerId</td> *@
+                        <td class="px-4 py-3">
+                            <div class="font-medium">@item.ServiceType</div>
+                            <div class="text-sm text-gray-500">@item.ServicePrice?.ToString("C")</div>
+                        </td>
                         <td class="px-4 py-3">@item.RequestType</td>
-                        <td class="px-4 py-3">@item.EmployeeId</td>
+                        @* <td class="px-4 py-3">@item.EmployeeId</td> *@
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded-full text-xs font-semibold @GetStatusClass(item.Status)">
                                 @item.Status

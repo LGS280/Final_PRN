@@ -23,6 +23,23 @@
 <section class="container py-5">
     <h2 class="text-center fw-bold mb-5 text-primary display-6">Latest Articles</h2>
     <div class="row g-4">
+        <!-- Search + Filter -->
+        <form asp-action="Index" method="get" class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="🔎 Search title..."
+                   class="form-control w-auto" />
+
+            <select name="blogType" class="form-select w-auto">
+                <option value="">All Blog Types</option>
+                @foreach (var type in ViewBag.BlogTypeOptions as List<string>)
+                {
+                    <option value="@type" selected="@(ViewBag.BlogType == type ? "selected" : null)">@type</option>
+                }
+            </select>
+
+            <button type="submit" class="btn btn-primary px-4">Filter</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+        </form>
+
         @foreach (var blog in Model)
         {
             <div class="col-sm-6 col-lg-4">
@@ -39,19 +56,23 @@
                             <span class="badge bg-gradient bg-primary rounded-pill mb-2 text-uppercase">@blog.BlogType</span>
                         }
 
-                        <h5 class="card-title text-dark">@blog.Title</h5>
-                        <p class="card-text text-muted flex-grow-1">@blog.Description?.Substring(0, Math.Min(100, blog.Description.Length))...</p>
+                    <h5 class="card-title text-dark">@blog.Title</h5>
+                    <p class="card-text text-muted flex-grow-1">@blog.Description?.Substring(0, Math.Min(100, blog.Description.Length))...</p>
 
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-circle border border-white shadow-sm" alt="avatar" />
-                                <small class="text-muted">@blog.CreatedDate.ToString("dd MMM yyyy")</small>
-                            </div>
-                            <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })" class="btn btn-sm btn-outline-primary rounded-pill">Read More</a>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-circle border border-white shadow-sm" alt="avatar" />
+                            <small class="text-muted">
+                                @(blog.CreatedDate.HasValue
+                                                                ? blog.CreatedDate.Value.ToString("dd MMM yyyy")
+                                                                : "N/A")
+                            </small>
                         </div>
+                        <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })" class="btn btn-sm btn-outline-primary rounded-pill">Read More</a>
                     </div>
                 </div>
             </div>
-        }
+        </div>
+                }
     </div>
 </section>

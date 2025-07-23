@@ -27,7 +27,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-8 4h6m-9 4h12M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2h-2l-2-3H9L7 5H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            @Model.CreatedDate.ToString("dd MMM yyyy")
+            @(Model.CreatedDate.HasValue? Model.CreatedDate.Value.ToString("dd MMM yyyy") : "N/A")
         </span>
         @if (!string.IsNullOrEmpty(Model.BlogType))
         {
