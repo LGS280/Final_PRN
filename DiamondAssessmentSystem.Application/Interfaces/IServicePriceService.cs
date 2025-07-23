@@ -9,8 +9,8 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<IEnumerable<ServicePriceDto>> GetAllAsync();
         Task<IEnumerable<ServicePriceDto>> GetByStatusAsync(string status);
         Task<ServicePriceDto?> GetByIdAsync(int id);
-        Task<ServicePriceDto> CreateAsync(ServicePriceCreateDto dto);
-        Task<bool> UpdateAsync(int id, ServicePriceCreateDto dto);
+        Task<ServicePriceDto> CreateAsync(ServicePriceCreateDto dto, string userId);
+        Task<bool> UpdateAsync(int id, ServicePriceCreateDto dto, string userId);
         Task<bool> SoftDeleteAsync(int id);
     }
 }

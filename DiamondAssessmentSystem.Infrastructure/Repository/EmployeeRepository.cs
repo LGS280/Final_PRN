@@ -29,6 +29,18 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .FirstOrDefaultAsync(e => e.UserId == userId);
         }
 
+        public async Task<User?> GetUserById(int id)
+        {
+            var user = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return await _context.Users.FirstOrDefaultAsync(e => e.Id == user.UserId);
+        }
+
         public async Task<bool> UpdateEmployeeAsync(Employee employee)
         {
             var existingEmployee = await _context.Employees

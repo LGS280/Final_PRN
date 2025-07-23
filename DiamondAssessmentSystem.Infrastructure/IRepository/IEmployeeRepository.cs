@@ -6,6 +6,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
     {
         Task<IEnumerable<Employee>> GetAllEmployeesAsync();
         Task<Employee?> GetEmployeeByIdAsync(string userId);
+        Task<User?> GetUserById(int id);
         Task<bool> UpdateEmployeeAsync(Employee employee);
         Task<string?> GetEmployeeEmail(string userId);
     }

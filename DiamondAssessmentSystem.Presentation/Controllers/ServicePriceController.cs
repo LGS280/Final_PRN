@@ -1,31 +1,41 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     public class ServicePriceController : Controller
     {
         private readonly IServicePriceService _servicePriceService;
+        private readonly ICurrentUserService _currentUser;
+        private readonly IEmployeeService _employeeService;
 
-        public ServicePriceController(IServicePriceService servicePriceService)
+        public ServicePriceController(IServicePriceService servicePriceService, ICurrentUserService currentUser, IEmployeeService employeeService)
         {
             _servicePriceService = servicePriceService;
+            _currentUser = currentUser;
+            _employeeService = employeeService;
         }
 
         // GET: ServicePrice
         public async Task<IActionResult> Index()
         {
-            var result = await _servicePriceService.GetAllAsync();
-            if (result == null || !result.Any())
+            var services = await _servicePriceService.GetAllAsync() ?? new List<ServicePriceDto>();
+
+            foreach (var service in services)
             {
-                return View("Empty"); // Handle empty List.
+                var user = await _employeeService.GetUserById(service.EmployeeId); 
+
+                service.EmployeeName = user != null ? $"{user.FirstName} {user.LastName}" : "Unknown";
             }
-            return View(result);
+
+            return View(services);
         }
 
         public async Task<IActionResult> Status(string status)
@@ -55,9 +65,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         // GET: ServicePrice/Create
         [HttpGet]
-        public IActionResult Create() //If the check passes then return to what there will be
+        public IActionResult Create() 
         {
-            //Returns what is valid. 
             return View();
         }
 
@@ -66,30 +75,36 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ServicePriceCreateDto dto)
         {
+            var userId = _currentUser.UserId;
 
-            //For this one we have to check and then add
+            if (string.IsNullOrEmpty(userId))
+            {
+                ModelState.AddModelError(string.Empty, "Please login before trying to see profile.");
+                return View(); 
+            }
+
             if (ModelState.IsValid)
             {
 
                 try
                 {
-                    var created = await _servicePriceService.CreateAsync(dto);
+                    var created = await _servicePriceService.CreateAsync(dto, userId);
                     return RedirectToAction(nameof(Index));   //Once it works, return
                 }
                 //If it's something that needs to be verified please report.
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, $"Request could not be sent \n More details: {ex}");
-                    //Just to make sure, code is running.
+
                     return View();
                 }
             }
-            return View(); //If all those code are not valid, code reloads to the page
+            return View(); 
         }
 
         // GET: ServicePrice/Edit/{id}
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)   //Getting what will be editted.
+        public async Task<IActionResult> Edit(int id) 
         {
             //Find if there or not
             var ServicePrice = await _servicePriceService.GetByIdAsync(id);
@@ -101,13 +116,11 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 Price = ServicePrice.Price,
                 Description = ServicePrice.Description,
                 Duration = ServicePrice.Duration,
-                Status = ServicePrice.Status,
-                EmployeeId = ServicePrice.EmployeeId
+                Status = ServicePrice.Status
             };
 
-            ViewBag.Id = ServicePrice.ServiceId; // Store the service ID in ViewBag for use in the view
+            ViewBag.Id = ServicePrice.ServiceId; 
 
-            //Loads code, will be edited.
             return View(servicePriceDto);
         }
 
@@ -115,6 +128,14 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ServicePriceCreateDto dto)
         {
+            var userId = _currentUser.UserId;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                ModelState.AddModelError(string.Empty, "Please login before trying to see profile.");
+                return View(); 
+            }
+
             //Make sure is correct.
             if (!ModelState.IsValid)
                 return View();
@@ -122,11 +143,11 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             try
             {
                 //Validate before calling what will be
-                var updated = await _servicePriceService.UpdateAsync(id, dto);
+                var updated = await _servicePriceService.UpdateAsync(id, dto, userId);
                 //Return what the user did, or it may lead to what user does.
                 if (!updated)
                 {
-                    ModelState.AddModelError(string.Empty, "Lỗi update");
+                    ModelState.AddModelError(string.Empty, "Error update");
                     return View(dto);  //If it does not work, return to the same page.
                 }
 
