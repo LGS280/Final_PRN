@@ -13,7 +13,7 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<IEnumerable<ResultDto>> GetResultsAsync(int customerId);
         Task<IEnumerable<ResultDto>> GetPersonalResults(string userId);
         Task<ResultDto> GetResultByIdAsync(int id);
-        Task<bool> CreateResultAsync(int orderId, ResultCreateDto resultCreateDto);
+        Task<bool> CreateResultAsync(ResultCreateDto resultCreateDto);
         Task<bool> UpdateResultAsync(int id, ResultCreateDto resultCreateDto);
         Task<bool> DeleteResultAsync(int id);
     }

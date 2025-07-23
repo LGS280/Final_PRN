@@ -14,18 +14,21 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly IResultRepository _resultRepository;
         private readonly ICertificateRepository _certificateRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IRequestRepository _requestRepository;
         private readonly IMapper _mapper;
 
         public ResultService(
             IResultRepository resultRepository,
             IMapper mapper,
             ICertificateRepository certificateRepository,
-            IOrderRepository orderRepository)
+            IOrderRepository orderRepository,
+            IRequestRepository requestRepository)
         {
             _resultRepository = resultRepository;
             _mapper = mapper;
             _certificateRepository = certificateRepository;
             _orderRepository = orderRepository;
+            _requestRepository = requestRepository;
         }
 
         public async Task<IEnumerable<ResultDto>> GetResultsAsync() =>
@@ -43,14 +46,12 @@ namespace DiamondAssessmentSystem.Application.Services
             return result == null ? null : _mapper.Map<ResultDto>(result);
         }
 
-        public async Task<bool> CreateResultAsync(int orderId, ResultCreateDto dto)
+        public async Task<bool> CreateResultAsync(ResultCreateDto dto)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            if (order == null || order.Status != "Completed")
-                return false;
+            var request = await _requestRepository.GetRequestByIdAsync(dto.RequestId);
 
-            if (order.Service == null || dto.RequestId != order.Service.ServiceId)
-                return false;
+            if (request == null)
+                throw new Exception($"Request is invalid!");
 
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;

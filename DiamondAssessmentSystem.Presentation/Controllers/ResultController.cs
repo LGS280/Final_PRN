@@ -49,15 +49,33 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateResult(int orderId, ResultCreateDto dto)
+        public async Task<IActionResult> Create(int orderId, ResultCreateDto dto)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Please correct the errors in the form.";
+                return View(dto);
+            }
 
-            var success = await _resultService.CreateResultAsync(orderId, dto);
-            if (!success) return View("Unauthorized");
+            try
+            {
+                var success = await _resultService.CreateResultAsync(dto);
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = "You are not authorized to perform this action.";
+                    return View(dto);
+                }
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Result created successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return View(dto);
+            }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -67,7 +85,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             var dto = new ResultCreateDto
             {
-                DiamondId = result.DiamondId,
                 RequestId = result.RequestId,
                 DiamondOrigin = result.DiamondOrigin,
                 Shape = result.Shape,
