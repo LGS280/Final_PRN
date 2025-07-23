@@ -92,5 +92,33 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .Select(g => (g.Status, g.RequestCount))
                 .ToList();
         }
+
+        public async Task<int> GetAccountCreatedInMonthAsync(int month)
+        {
+            return await _context.Users
+                .Where(a => a.DateCreated.Value.Month == month && a.DateCreated.Value.Year == DateTime.Now.Year)
+                .CountAsync();
+        }
+
+        public async Task<int> GetTotalOrderCountAsync()
+        {
+            return await _context.Orders.CountAsync();
+        }
+
+        public async Task<Dictionary<string, int>> GetOrderCountByTypeAsync()
+        {
+            return await _context.Orders
+                .GroupBy(o => o.Service.ServiceType)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Type, x => x.Count);
+        }
+
+        public async Task<Dictionary<string, int>> GetRequestChosenByUsersAsync()
+        {
+            return await _context.Requests
+                .GroupBy(r => r.RequestType ?? "Unknown")
+                .Select(g => new { RequestType = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.RequestType, x => x.Count);
+        }
     }
 }

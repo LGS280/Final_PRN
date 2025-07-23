@@ -1,0 +1,104 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ManagerDashboardDTO
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+}
+
+<h2 class="text-center mb-4">📊 Thống kê Quản lý</h2>
+
+<style>
+    .chart-container {
+        width: 300px;
+        height: 300px;
+        margin: auto;
+    }
+
+    .chart-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-bottom: 2rem;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-6 chart-box">
+        <h6>Số tài khoản tạo trong tháng</h6>
+        <div class="chart-container">
+            <canvas id="accountsChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6 chart-box">
+        <h6>Số lượng đơn hàng theo loại</h6>
+        <div class="chart-container">
+            <canvas id="orderTypeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 chart-box">
+        <h6>Request được chọn bởi người dùng</h6>
+        <div class="chart-container">
+            <canvas id="requestChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6 chart-box">
+        <h6>Tổng đơn hàng</h6>
+        <div class="chart-container">
+            <canvas id="orderTotalChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        new Chart(document.getElementById('accountsChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Đã tạo', 'Còn lại'],
+                datasets: [{
+                    data: [@Model.AccountsCreatedThisMonth, Math.max(0, 100 - @Model.AccountsCreatedThisMonth)],
+                    backgroundColor: ['#4CAF50', '#E0E0E0']
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('orderTypeChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.OrdersByType.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.OrdersByType.Values)),
+                    backgroundColor: ['#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#8BC34A']
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('requestChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.RequestsChosen.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.RequestsChosen.Values)),
+                    backgroundColor: ['#3F51B5', '#8BC34A', '#FFC107', '#795548', '#607D8B']
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('orderTotalChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Tổng đơn hàng', 'Khác'],
+                datasets: [{
+                    data: [@Model.TotalOrders, Math.max(0, 100 - @Model.TotalOrders)],
+                    backgroundColor: ['#00BCD4', '#E0E0E0']
+                }]
+            }
+        });
+    </script>
+}

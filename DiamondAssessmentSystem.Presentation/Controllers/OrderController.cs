@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [Authorize(Roles = "Staff,Customer")]
+    [Authorize(Roles = "Staff,Customer, Manager")]
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;

@@ -1,10 +1,11 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
@@ -14,12 +15,14 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ICurrentUserService _currentUser;
         private readonly ILogger<EmployeeController> _logger;
+        private readonly IReportService _reportService;
 
-        public EmployeeController(IEmployeeService employeeService, ICurrentUserService currentUser, ILogger<EmployeeController> logger)
+        public EmployeeController(IEmployeeService employeeService, ICurrentUserService currentUser, ILogger<EmployeeController> logger, IReportService reportService)
         {
             _employeeService = employeeService;
             _currentUser = currentUser;
             _logger = logger;
+            _reportService = reportService;
         }
 
         // GET: Employee/Me
@@ -119,6 +122,35 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         public IActionResult Unauthorized()   
         {
             return View();
+        }
+
+        public async Task<IActionResult> ManagerDashBoard()
+        {
+            var currentMonth = DateTime.Now.Month;
+
+            try
+            {
+                var accountsCreated = await _reportService.GetAccountCreatedInMonthAsync(currentMonth);
+                var totalOrders = await _reportService.GetTotalOrderCountAsync();
+                var ordersByType = await _reportService.GetOrderCountByTypeAsync();
+                var requestsChosen = await _reportService.GetRequestChosenByUsersAsync();
+
+                var model = new ManagerDashboardDTO
+                {
+                    AccountsCreatedThisMonth = accountsCreated,
+                    TotalOrders = totalOrders,
+                    OrdersByType = ordersByType,
+                    RequestsChosen = requestsChosen
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load manager dashboard.");
+                TempData["Error"] = "Something went wrong loading dashboard.";
+                return RedirectToAction("Me");
+            }
         }
     }
 }

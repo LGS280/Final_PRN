@@ -53,6 +53,18 @@ namespace DiamondAssessmentSystem.Application.Services
             var result = await _reportRepository.GetRequestCountsByStatusAsync();
             return _mapper.Map<List<ReportRequestStatusDto>>(result);
         }
+
+        public async Task<int> GetAccountCreatedInMonthAsync(int month)
+        => await _reportRepository.GetAccountCreatedInMonthAsync(month);
+
+        public async Task<int> GetTotalOrderCountAsync()
+            => await _reportRepository.GetTotalOrderCountAsync();
+
+        public async Task<Dictionary<string, int>> GetOrderCountByTypeAsync()
+            => await _reportRepository.GetOrderCountByTypeAsync();
+
+        public async Task<Dictionary<string, int>> GetRequestChosenByUsersAsync()
+            => await _reportRepository.GetRequestChosenByUsersAsync();
     }
 
 }

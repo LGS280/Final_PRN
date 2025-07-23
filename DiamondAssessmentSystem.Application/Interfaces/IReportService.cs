@@ -18,5 +18,9 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<int> GetTotalRequestsAsync();
         Task<decimal> GetTotalRevenueAsync();
         Task<List<ReportTopCustomerDto>> GetTopCustomersAsync(int top);
+        Task<int> GetAccountCreatedInMonthAsync(int month);
+        Task<int> GetTotalOrderCountAsync();
+        Task<Dictionary<string, int>> GetOrderCountByTypeAsync();
+        Task<Dictionary<string, int>> GetRequestChosenByUsersAsync();
     }
 }
