@@ -75,7 +75,7 @@ namespace DiamondAssessmentSystem.Application.Services
             }
         }
 
-        public async Task<bool> UpdateResultAsync(int id, ResultCreateDto dto)
+        public async Task<bool> UpdateResultAsync(int id, ResultUpdateDto dto)
         {
             var existingResult = await _resultRepository.GetResultByIdAsync(id);
             if (existingResult == null)
@@ -85,9 +85,10 @@ namespace DiamondAssessmentSystem.Application.Services
             if (cert?.Status == "Issued")
                 return false;
 
+            // Cập nhật thông tin
             _mapper.Map(dto, existingResult);
+            existingResult.ModifiedDate = DateTime.Now;
 
-            // Tạo Certificate nếu chưa có và trạng thái là Completed
             if (existingResult.Status == "Completed" && cert == null)
             {
                 var newCert = new Certificate
@@ -98,9 +99,10 @@ namespace DiamondAssessmentSystem.Application.Services
                 };
                 await _certificateRepository.CreateCertificateAsync(newCert);
             }
-            existingResult.ModifiedDate = DateTime.Now;
+
             return await _resultRepository.UpdateResultAsync(existingResult);
         }
+
 
         public async Task<bool> DeleteResultAsync(int id)
         {
