@@ -27,10 +27,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         }
 
         // GET: Request
-        public async Task<IActionResult> Index() // Changed from GetAllRequests
+        public async Task<IActionResult> Index() 
         {
             var requests = await _requestService.GetRequestsAsync();
-            return View(requests);  // Returns the data
+            return View(requests);  
         }
 
         // GET: Request/Details/{id}
@@ -46,24 +46,22 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         }
 
         // GET: Request/My
-        public async Task<IActionResult> My() // Changed from GetMyRequests
+        public async Task<IActionResult> My() 
         {
-            if (!User.Identity.IsAuthenticated) //Check to ensure user authentication
+            if (!User.Identity.IsAuthenticated) 
             {
-                //If unauthenticated direct them to Login
                 return RedirectToAction("Login", "Auth");
             }
 
             var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
             {
-                // if there is a userid issue, load to new page/error for the user.
                 return View("UnAuthorized");
             }
 
             var requests = await _requestService.GetRequestsByCustomerIdAsync(userId);
 
-            return View(requests);  //Load and direct data into action.
+            return View(requests);  
         }
 
         // GET: Request/Create
@@ -74,12 +72,35 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             ViewBag.Services = activeServices.Select(s => new SelectListItem
             {
                 Value = s.ServiceId.ToString(),
-                Text = $"{s.ServiceType} - {s.Price:C}" // VD: "Standard - $50.00"
+                Text = $"{s.ServiceType} - {s.Price:C}"
             }).ToList();
+
+            ViewBag.ServiceDetails = activeServices.Select(s => new
+            {
+                serviceId = s.ServiceId,
+                serviceType = s.ServiceType,
+                price = s.Price,
+                priceFormatted = s.Price.ToString("C"),
+                duration = s.Duration,
+                description = s.Description,
+                category = s.ServiceType.Split('-')[0].Trim(), 
+                status = s.Status
+            }).ToList();
+
+            ViewBag.Categories = activeServices
+                .Select(s => s.ServiceType.Split('-')[0].Trim())
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            ViewBag.Statuses = activeServices
+                .Select(s => s.Status)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
 
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -90,46 +111,67 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             if (!ModelState.IsValid)
             {
-                // ⚠️ Cần load lại danh sách dịch vụ nếu có lỗi
-                var activeServices = await _servicePriceService.GetByStatusAsync("Active");
-                ViewBag.Services = activeServices.Select(s => new SelectListItem
-                {
-                    Value = s.ServiceId.ToString(),
-                    Text = $"{s.ServiceType} - {s.Price:C}"
-                }).ToList();
-
-                return View("Create", createDto);
+                await LoadServicesAsync();
+                return View(createDto);
             }
 
             try
             {
                 var userId = _currentUser.UserId;
                 if (string.IsNullOrEmpty(userId))
-                {
-                    ModelState.AddModelError(string.Empty, "User is not valid.");
-                    return View("Create", createDto);
-                }
+                    throw new Exception("Invalid user.");
 
                 string status = action == "Submit" ? "Pending" : "Draft";
+                var result = await _requestService.CreateRequestForCustomerAsync(userId, createDto, status);
 
-                var created = await _requestService.CreateRequestForCustomerAsync(userId, createDto, status);
-                return _currentUser.Role == "Customer"
-                    ? RedirectToAction(nameof(My))
-                    : RedirectToAction(nameof(Index));
+                if (result == null)
+                    throw new Exception("Request creation failed.");
+
+                ViewBag.PopupType = "success";
+                ViewBag.PopupMessage = "Request submitted successfully.";
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Can’t connect to DB: " + ex.Message);
-
-                var activeServices = await _servicePriceService.GetByStatusAsync("Active");
-                ViewBag.Services = activeServices.Select(s => new SelectListItem
-                {
-                    Value = s.ServiceId.ToString(),
-                    Text = $"{s.ServiceType} - {s.Price:C}"
-                }).ToList();
-
-                return View("Create", createDto);
+                ViewBag.PopupType = "error";
+                ViewBag.PopupMessage = $"Error: {ex.Message}";
             }
+
+            await LoadServicesAsync();
+            return View(createDto);
+        }
+
+        private async Task LoadServicesAsync()
+        {
+            var activeServices = await _servicePriceService.GetByStatusAsync("Active");
+
+            ViewBag.Services = activeServices.Select(s => new SelectListItem
+            {
+                Value = s.ServiceId.ToString(),
+                Text = $"{s.ServiceType} - {s.Price:C}"
+            }).ToList();
+
+            ViewBag.Categories = activeServices
+                .Select(s => s.ServiceType.Split('-')[0].Trim())
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            ViewBag.Statuses = activeServices
+                .Select(s => s.Status)
+                .Distinct()
+                .ToList();
+
+            ViewBag.ServiceDetails = activeServices.Select(s => new
+            {
+                serviceId = s.ServiceId,
+                serviceType = s.ServiceType,
+                price = s.Price,
+                priceFormatted = s.Price.ToString("C"),
+                duration = s.Duration,
+                description = s.Description,
+                category = s.ServiceType.Split('-')[0].Trim(),
+                status = s.Status
+            }).ToList();
         }
 
         // GET: Request/Cancel/{id}
@@ -141,28 +183,22 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            // Validate for user 
             var userId = _currentUser.UserId;
 
-            // Validate action based on request (only to see code can only be done on the right area)
             if (userId == null)
             {
-                //Return Error if no User Id, and if the system isn't able to retrieve.
                 return RedirectToAction("Error");
             }
 
-            // Try to cancel,
             try
             {
-                //Perform action
                 var success = await _requestService.CancelRequestAsync(userId, id);
-                return RedirectToAction("Index");   //Goes home 
+                return RedirectToAction("Index");   
             }
             catch (Exception ex)
             {
-                //If system is not, or there is incorrect validation
                 ModelState.AddModelError(string.Empty, $"Request could not be validate \n  Error is {ex}");
-                return View();  //Sends back code to test, it works!
+                return View();  
             }
         }
 
@@ -174,7 +210,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return NotFound();
             }
 
-            // Ngăn không cho edit nếu status là Pending
             if (request.Status == "Pending")
             {
                 TempData["ErrorMessage"] = "Cannot edit a request that is already pending.";
@@ -185,12 +220,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             {
                 ServiceId = request.ServiceId,
                 RequestType = request.RequestType,
-                // Nếu có thêm fields thì gán vào đây
             };
 
             ViewBag.Id = request.RequestId;
 
-            // Load dropdown danh sách dịch vụ
             var activeServices = await _servicePriceService.GetByStatusAsync("Active");
             ViewBag.Services = activeServices.Select(s => new SelectListItem
             {
@@ -204,13 +237,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, RequestCreateDto updateDto)    //POSTs and put new function.
+        public async Task<IActionResult> Edit(int id, RequestCreateDto updateDto)    
         {
-            //Requires Code to make it work
             if (!ModelState.IsValid)
-                return View();   //if error please load code and see what happened.
-
-
+                return View();   
 
             try
             {
@@ -218,17 +248,15 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
                 if (!updated)
                 {
-                    //If error redirect
                     return View("Unauthorized");
                 }
 
-                //If that is not the situation, return the proper value
                 return RedirectToAction(nameof(Index)); 
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Please validate code.");
-                return View(ex.Message); // returns original
+                return View(ex.Message); 
             }
         }
     }

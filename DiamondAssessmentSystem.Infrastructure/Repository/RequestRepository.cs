@@ -31,6 +31,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             return await _context.Requests
                 .Include(r => r.Customer)
                 .Include(r => r.Employee)
+                .Include(r => r.Service)
                 .Include(r => r.CommitmentRecords)
                 .Include(r => r.SealingRecords)
                 .FirstOrDefaultAsync(r => r.RequestId == id);
@@ -55,6 +56,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         {
             return await _context.Requests
                 .Include(r => r.Customer)
+                .Include(r => r.Service) 
                 .Where(r =>
                     r.Customer != null &&
                     r.Customer.UserId == userId &&
