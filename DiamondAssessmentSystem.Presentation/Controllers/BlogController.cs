@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    [Authorize(Roles = "Staff,Customer")]
+    //[Authorize(Roles = "Staff,Customer")]
     public class BlogController : Controller  // Inherit from Controller
     {
         private readonly IBlogService _blogService;

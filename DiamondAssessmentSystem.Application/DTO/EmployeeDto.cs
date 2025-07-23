@@ -40,7 +40,7 @@ namespace DiamondAssessmentSystem.Application.DTO
         public string? Gender { get; set; }
 
         public decimal? Salary { get; set; }
-        [Required]
-        public string UserName { get; set; }
+
+        //public string UserName { get; set; }
     }
 }

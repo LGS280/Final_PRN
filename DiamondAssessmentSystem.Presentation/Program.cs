@@ -4,7 +4,8 @@ using DiamondAssessmentSystem.Application.Services;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
 using DiamondAssessmentSystem.Infrastructure.Repository;
-using DiamondAssessmentSystem.Infrastructure.SeedData;
+using DiamondAssessmentSystem.Presentation.Data;
+using DiamondAssessmentSystem.Presentation.Data.Seed;
 using DiamondAssessmentSystem.Presentation.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -18,6 +19,8 @@ namespace DiamondAssessmentSystem.Presentation
 {
     public class Program
     {
+        public static IServiceProvider ServiceProvider { get; private set; }
+
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -84,6 +87,7 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IConversationService, ConversationService>();
             builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
+            builder.Services.AddScoped<IAIService, GeminiAIService>();
 
             // ==================== Repositories ====================
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -173,18 +177,32 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+            Program.ServiceProvider = app.Services;
 
             // ==================== Database Seeding ====================
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var context = services.GetRequiredService<DiamondAssessmentDbContext>();
+                var config = services.GetRequiredService<IConfiguration>();
+                var userManager = services.GetRequiredService<UserManager<User>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-                await DbInitializer.SeedDefaultAdminAsync(services);
-                await RoleSeeder.SeedRolesAsync(roleManager, logger);
-                await DataSeeder.SeedSampleDataAsync(services, context);
+                // Kiểm tra có user nào thuộc role Admin không
+                var hasAdmin = (await userManager.GetUsersInRoleAsync("Admin")).Any();
+                if (!hasAdmin)
+                {
+                    DbInitializer.Seed(context);
+                    await RoleSeeder.SeedRolesAsync(roleManager, logger);
+                    await AdminSeeder.SeedAdminAsync(userManager, roleManager, config, logger);
+                    await UserRoleSeeder.SeedUserRolesAsync(userManager, logger);
+                    BlogSeeder.Seed(context, config);
+                }
+                else
+                {
+                    logger.LogInformation("Seed skipped: Admin user already exists.");
+                }
             }
 
             // ==================== Middleware Pipeline ====================
