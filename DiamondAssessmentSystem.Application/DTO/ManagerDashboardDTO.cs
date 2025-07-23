@@ -8,9 +8,12 @@ namespace DiamondAssessmentSystem.Application.DTO
 {
     public class ManagerDashboardDTO
     {
-        public int AccountsCreatedThisMonth { get; set; }
+        public Dictionary<string, int> AccountsCreatedPerDay { get; set; } = new();
         public int TotalOrders { get; set; }
         public Dictionary<string, int> OrdersByType { get; set; } = new();
-        public Dictionary<string, int> RequestsChosen { get; set; } = new();
+        public int TotalRequestChosen { get; set; }
+
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }

@@ -124,33 +124,27 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View();
         }
 
-        public async Task<IActionResult> ManagerDashBoard()
+        public async Task<IActionResult> ManagerDashboard(DateTime? fromDate, DateTime? toDate)
         {
-            var currentMonth = DateTime.Now.Month;
+            fromDate ??= DateTime.Today.AddDays(-7);
+            toDate ??= DateTime.Today;
 
-            try
+            var accountsPerDay = await _reportService.GetAccountCreatedPerDayAsync(fromDate.Value, toDate.Value);
+            var totalOrders = await _reportService.GetTotalOrderCountAsync();
+            var ordersByType = await _reportService.GetOrderCountByTypeAsync();
+            var totalRequests = await _reportService.GetTotalRequestChosenAsync(); // thay thế pie chart
+
+            var model = new ManagerDashboardDTO
             {
-                var accountsCreated = await _reportService.GetAccountCreatedInMonthAsync(currentMonth);
-                var totalOrders = await _reportService.GetTotalOrderCountAsync();
-                var ordersByType = await _reportService.GetOrderCountByTypeAsync();
-                var requestsChosen = await _reportService.GetRequestChosenByUsersAsync();
+                FromDate = fromDate,
+                ToDate = toDate,
+                AccountsCreatedPerDay = accountsPerDay,
+                TotalOrders = totalOrders,
+                OrdersByType = ordersByType,
+                TotalRequestChosen = totalRequests
+            };
 
-                var model = new ManagerDashboardDTO
-                {
-                    AccountsCreatedThisMonth = accountsCreated,
-                    TotalOrders = totalOrders,
-                    OrdersByType = ordersByType,
-                    RequestsChosen = requestsChosen
-                };
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to load manager dashboard.");
-                TempData["Error"] = "Something went wrong loading dashboard.";
-                return RedirectToAction("Me");
-            }
+            return View(model);
         }
     }
 }

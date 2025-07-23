@@ -21,5 +21,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
         Task<int> GetTotalOrderCountAsync();
         Task<Dictionary<string, int>> GetOrderCountByTypeAsync();
         Task<Dictionary<string, int>> GetRequestChosenByUsersAsync();
+        Task<int> GetTotalRequestChosenAsync();
+        Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to);
     }
 }

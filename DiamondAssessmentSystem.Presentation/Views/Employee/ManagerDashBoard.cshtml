@@ -1,10 +1,25 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.ManagerDashboardDTO
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Manager Dashboard";
 }
 
 <h2 class="text-center mb-4">📊 Thống kê Quản lý</h2>
+
+<form method="get" class="row mb-4">
+    <div class="col-md-3">
+        <label for="fromDate">Từ ngày:</label>
+        <input type="date" class="form-control" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label for="toDate">Đến ngày:</label>
+        <input type="date" class="form-control" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Lọc dữ liệu</button>
+    </div>
+</form>
 
 <style>
     .chart-container {
@@ -24,14 +39,12 @@
 
 <div class="row">
     <div class="col-md-6 chart-box">
-        <h6>Số tài khoản tạo trong tháng</h6>
-        <div class="chart-container">
-            <canvas id="accountsChart"></canvas>
-        </div>
+        <h6>Tài khoản tạo mỗi ngày</h6>
+        <canvas id="accountsLineChart" width="300" height="300"></canvas>
     </div>
 
     <div class="col-md-6 chart-box">
-        <h6>Số lượng đơn hàng theo loại</h6>
+        <h6>Đơn hàng theo loại</h6>
         <div class="chart-container">
             <canvas id="orderTypeChart"></canvas>
         </div>
@@ -40,9 +53,9 @@
 
 <div class="row">
     <div class="col-md-6 chart-box">
-        <h6>Request được chọn bởi người dùng</h6>
-        <div class="chart-container">
-            <canvas id="requestChart"></canvas>
+        <h6>Tổng request được chọn</h6>
+        <div style="font-size: 48px; font-weight: bold; color: #007bff;">
+            @Model.TotalRequestChosen
         </div>
     </div>
 
@@ -56,40 +69,44 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        new Chart(document.getElementById('accountsChart'), {
-            type: 'pie',
+        // Line Chart: Accounts Per Day
+        new Chart(document.getElementById('accountsLineChart'), {
+            type: 'line',
             data: {
-                labels: ['Đã tạo', 'Còn lại'],
+                labels: @Html.Raw(Json.Serialize(Model.AccountsCreatedPerDay.Keys)),
                 datasets: [{
-                    data: [@Model.AccountsCreatedThisMonth, Math.max(0, 100 - @Model.AccountsCreatedThisMonth)],
-                    backgroundColor: ['#4CAF50', '#E0E0E0']
+                    label: 'Tài khoản tạo',
+                    data: @Html.Raw(Json.Serialize(Model.AccountsCreatedPerDay.Values)),
+                    backgroundColor: 'rgba(75,192,192,0.4)',
+                    borderColor: '#2196F3',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
                 }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
             }
         });
 
+        // Pie Chart: Orders By Type
         new Chart(document.getElementById('orderTypeChart'), {
             type: 'pie',
             data: {
                 labels: @Html.Raw(Json.Serialize(Model.OrdersByType.Keys)),
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(Model.OrdersByType.Values)),
-                    backgroundColor: ['#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#8BC34A']
+                    backgroundColor: ['#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4']
                 }]
             }
         });
 
-        new Chart(document.getElementById('requestChart'), {
-            type: 'pie',
-            data: {
-                labels: @Html.Raw(Json.Serialize(Model.RequestsChosen.Keys)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(Model.RequestsChosen.Values)),
-                    backgroundColor: ['#3F51B5', '#8BC34A', '#FFC107', '#795548', '#607D8B']
-                }]
-            }
-        });
-
+        // Pie Chart: Total Orders
         new Chart(document.getElementById('orderTotalChart'), {
             type: 'pie',
             data: {

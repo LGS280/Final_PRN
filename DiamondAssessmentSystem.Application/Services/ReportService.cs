@@ -65,6 +65,11 @@ namespace DiamondAssessmentSystem.Application.Services
 
         public async Task<Dictionary<string, int>> GetRequestChosenByUsersAsync()
             => await _reportRepository.GetRequestChosenByUsersAsync();
+
+        public async Task<int> GetTotalRequestChosenAsync() 
+            => await _reportRepository.GetTotalRequestChosenAsync();
+        public async Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to)
+            => await _reportRepository.GetAccountCreatedPerDayAsync(from, to);
     }
 
 }

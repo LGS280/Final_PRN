@@ -22,5 +22,7 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<int> GetTotalOrderCountAsync();
         Task<Dictionary<string, int>> GetOrderCountByTypeAsync();
         Task<Dictionary<string, int>> GetRequestChosenByUsersAsync();
+        Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to);
+        Task<int> GetTotalRequestChosenAsync();
     }
 }
