@@ -19,6 +19,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         public async Task<IEnumerable<Request>> GetRequestsAsync()
         {
             return await _context.Requests
+                .Include(r => r.Service)
                 .Include(r => r.Customer)
                 .Include(r => r.Employee)
                 .Include(r => r.CommitmentRecords)

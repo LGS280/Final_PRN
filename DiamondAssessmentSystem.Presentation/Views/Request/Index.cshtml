@@ -15,9 +15,7 @@
             <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
                 <tr>
                     <th class="px-4 py-3 text-left">ID</th>
-                    <th class="px-4 py-3 text-left">Form Type</th>
                     <th class="px-4 py-3 text-left">Request Date</th>
-                    <th class="px-4 py-3 text-left">Customer ID</th>
                     <th class="px-4 py-3 text-left">Service</th>
                     <th class="px-4 py-3 text-left">Type</th>
                     <th class="px-4 py-3 text-left">Employee</th>
@@ -30,35 +28,29 @@
                 {
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 font-mono">@item.RequestId</td>
-                        <td class="px-4 py-3">@item.FormType</td>
-                        <td class="px-4 py-3">@item.RequestDate.ToString("dd MMM yyyy")</td>
-                        @* <td class="px-4 py-3">@item.CustomerId</td> *@
+                        <td class="px-4 py-3">@item.RequestDate.ToString("dd/MM/yyyy")</td>
                         <td class="px-4 py-3">
                             <div class="font-medium">@item.ServiceType</div>
                             <div class="text-sm text-gray-500">@item.ServicePrice?.ToString("C")</div>
                         </td>
                         <td class="px-4 py-3">@item.RequestType</td>
-                        @* <td class="px-4 py-3">@item.EmployeeId</td> *@
+                        <td class="px-4 py-3">@item.EmployeeName</td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded-full text-xs font-semibold @GetStatusClass(item.Status)">
                                 @item.Status
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <div class="flex justify-center gap-2">
-                                <a asp-action="Details" asp-route-id="@item.RequestId" class="text-blue-600 hover:underline text-sm">Details</a>
+                            <div class="flex justify-center gap-3 text-sm">
+                                <a asp-action="Details" asp-route-id="@item.RequestId" class="text-blue-600 hover:underline">Details</a>
 
-                                @if (item.Status == "Draft")
+                                @if (item.Status != "Draft" && item.Status != "Completed")
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.RequestId" class="text-yellow-600 hover:underline text-sm">Edit</a>
-
-                                    <form asp-action="Cancel" method="post" asp-route-id="@item.RequestId" onsubmit="return confirm('Are you sure you want to cancel this request?');">
-                                        <button type="submit" class="text-red-500 hover:underline text-sm">Cancel</button>
-                                    </form>
+                                    <a asp-controller="Result" asp-action="Create" asp-route-id="@item.RequestId" class="text-yellow-600 hover:underline">Update Result</a>
                                 }
                                 else
                                 {
-                                    <span class="text-gray-400 text-sm">Locked</span>
+                                    <span class="text-gray-400">Locked</span>
                                 }
                             </div>
                         </td>
