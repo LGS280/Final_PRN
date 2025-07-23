@@ -1,4 +1,5 @@
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Application.Services;
 using DiamondAssessmentSystem.Presentation.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -9,12 +10,13 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBlogService _blogService;
+        private readonly IServicePriceService _servicePriceService;
 
-        public HomeController(ILogger<HomeController> logger, IBlogService blogService)
+        public HomeController(ILogger<HomeController> logger, IBlogService blogService, IServicePriceService servicePriceService)
         {
             _logger = logger;
             _blogService = blogService;
-
+            _servicePriceService = servicePriceService;
         }
 
         [HttpGet]
@@ -37,6 +39,12 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(blogs);
         }
 
+        public async Task<IActionResult> Services()
+        {
+            var services = await _servicePriceService.GetByStatusAsync("Active");
+            return View(services);
+        }
+
         public IActionResult GetStarted()
         {
             if (!User.Identity.IsAuthenticated)
@@ -44,7 +52,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             return RedirectToAction("My", "Request");
         }
-
 
         public IActionResult Privacy()
         {

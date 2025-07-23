@@ -152,6 +152,12 @@
 
         filterAndSort();
 
+        const initialServiceId = "@Model.ServiceId";
+        if (initialServiceId) {
+            serviceSelect.value = initialServiceId;
+            updateServiceDetails(initialServiceId);
+        }
+
         @if (!string.IsNullOrEmpty(ViewBag.PopupMessage))
         {
                 <text>
