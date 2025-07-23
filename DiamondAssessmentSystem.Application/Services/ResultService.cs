@@ -1,8 +1,9 @@
-﻿using DiamondAssessmentSystem.Application.DTO;
+﻿using AutoMapper;
+using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,18 +17,21 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IRequestRepository _requestRepository;
         private readonly IMapper _mapper;
+        private readonly DiamondAssessmentDbContext _context;
 
         public ResultService(
             IResultRepository resultRepository,
             IMapper mapper,
             ICertificateRepository certificateRepository,
             IOrderRepository orderRepository,
+            DiamondAssessmentDbContext context,
             IRequestRepository requestRepository)
         {
             _resultRepository = resultRepository;
             _mapper = mapper;
             _certificateRepository = certificateRepository;
             _orderRepository = orderRepository;
+            _context = context;
             _requestRepository = requestRepository;
         }
 
@@ -51,11 +55,24 @@ namespace DiamondAssessmentSystem.Application.Services
             var request = await _requestRepository.GetRequestByIdAsync(dto.RequestId);
 
             if (request == null)
-                throw new Exception($"Request is invalid!");
+                throw new Exception("Request is invalid!");
 
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;
-            return await _resultRepository.CreateResultAsync(result) != null;
+
+
+            try
+            {
+                // Gọi repository để add và lưu
+                var created = await _resultRepository.CreateResultAsync(result);
+                return created != null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Lỗi khi tạo result: " + ex.Message);
+                Console.WriteLine("📌 Chi tiết: " + ex.InnerException?.Message);
+                return false;
+            }
         }
 
         public async Task<bool> UpdateResultAsync(int id, ResultCreateDto dto)

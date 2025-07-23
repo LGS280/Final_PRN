@@ -1,11 +1,13 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
@@ -13,12 +15,14 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
     public class ResultController : Controller
     {
         private readonly IResultService _resultService;
+        private readonly IRequestService _requestService;
         private readonly ICurrentUserService _currentUser;
 
-        public ResultController(IResultService resultService, ICurrentUserService currentUser)
+        public ResultController(IResultService resultService, ICurrentUserService currentUser, IRequestService requestService)
         {
             _resultService = resultService;
             _currentUser = currentUser;
+            _requestService = requestService;
         }
 
         public async Task<IActionResult> Index()
@@ -45,34 +49,58 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create() => View();
+        public async Task<IActionResult> Create(int id)
+        {
+            var request = await _requestService.GetRequestByIdAsync(id);
+            if (request == null)
+            {
+                TempData["Error"] = "Request is invalid!";
+                return RedirectToAction("Index", "Request");
+            }
+
+            var model = new ResultCreateDto
+            {
+                RequestId = id,
+            };
+
+            return View(model);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int orderId, ResultCreateDto dto)
+        public async Task<IActionResult> Create(ResultCreateDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                TempData["ErrorMessage"] = "Please correct the errors in the form.";
-                return View(dto);
-            }
-
             try
             {
-                var success = await _resultService.CreateResultAsync(dto);
-                if (!success)
+                // Validate RequestId trước (nếu cần)
+                var request = await _requestService.GetRequestByIdAsync(dto.RequestId);
+                if (request == null)
                 {
-                    TempData["ErrorMessage"] = "You are not authorized to perform this action.";
-                    return View(dto);
+                    TempData["Error"] = "Request is invalid!";
+                    return RedirectToAction("Index", "Request");
                 }
 
-                TempData["SuccessMessage"] = "Result created successfully!";
-                return RedirectToAction(nameof(Index));
+                // Gán AssessmentStaff = EmployeeId hiện tại
+                if (_currentUser.AssociatedId.HasValue)
+                {
+                    dto.AssessmentStaff = _currentUser.AssociatedId.Value;
+                }
+                else
+                {
+                    TempData["Error"] = "You are not authorized to create results.";
+                    return RedirectToAction("Index", "Request");
+                }
+
+                await _resultService.CreateResultAsync(dto);
+
+                TempData["Success"] = "Result created successfully!";
+                return RedirectToAction("Index", "Request");
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
-                return View(dto);
+                TempData["Error"] = $"An error occurred: {ex.Message}";
+                return RedirectToAction("Index", "Request");
             }
         }
 

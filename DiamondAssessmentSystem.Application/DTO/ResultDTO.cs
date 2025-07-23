@@ -41,6 +41,8 @@
 
         public int RequestId { get; set; }
 
+        public int AssessmentStaff { get; set; }
+
         public string DiamondOrigin { get; set; } = null!;
 
         public string Shape { get; set; } = null!;
