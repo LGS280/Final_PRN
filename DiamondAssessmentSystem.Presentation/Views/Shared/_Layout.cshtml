@@ -61,6 +61,9 @@
                 else if (role == "manager")
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service Management</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
                 }
                 else if (role == "customer")
                 {
