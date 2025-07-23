@@ -140,6 +140,24 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(createDto);
         }
 
+        [HttpGet]
+        [AllowAnonymous] 
+        public async Task<IActionResult> Create(int serviceId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Create", "Request", new { serviceId }) });
+            }
+
+            var dto = new RequestCreateDto
+            {
+                ServiceId = serviceId
+            };
+
+            await LoadServicesAsync();
+            return View(dto);
+        }
+
         private async Task LoadServicesAsync()
         {
             var activeServices = await _servicePriceService.GetByStatusAsync("Active");

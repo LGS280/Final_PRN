@@ -39,6 +39,7 @@
             <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-4 text-sm font-medium">
                 <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Services">Our Services</a>
 
                 @if (role == "admin")
                 {
@@ -49,7 +50,7 @@
                 }
                 else if (role == "consultant")
                 {
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat (Consultant)</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Consultant" asp-action="Dashboard">🧑‍💼 Chat</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
                 }
                 else if (role == "assessor")
@@ -59,13 +60,10 @@
                 }
                 else if (role == "manager")
                 {
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service Management</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
-    
                 }
                 else if (role == "customer")
                 {
