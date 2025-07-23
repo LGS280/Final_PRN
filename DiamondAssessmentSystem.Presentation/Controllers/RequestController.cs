@@ -258,7 +258,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         public async Task<IActionResult> Edit(int id, RequestCreateDto updateDto)    
         {
             if (!ModelState.IsValid)
-                return View();   
+                return View(updateDto);   
 
             try
             {
@@ -269,7 +269,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return View("Unauthorized");
                 }
 
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(My)); 
             }
             catch (Exception ex)
             {

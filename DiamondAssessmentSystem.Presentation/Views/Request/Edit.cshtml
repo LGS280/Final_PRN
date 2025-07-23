@@ -18,9 +18,14 @@
             <span asp-validation-for="ServiceId" class="text-red-500 text-sm"></span>
         </div>
 
-        <div>
-            <label asp-for="RequestType" class="block font-semibold text-gray-700">Request Type</label>
-            <input asp-for="RequestType" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" />
+        <div class="mb-4">
+            <label asp-for="RequestType" class="font-semibold text-gray-700">Request Type</label>
+            <select asp-for="RequestType" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" id="RequestType">
+                <option value="">-- Select Type --</option>
+                <option>Normal</option>
+                <option>Urgent</option>
+                <option>VIP</option>
+            </select>
             <span asp-validation-for="RequestType" class="text-red-500 text-sm"></span>
         </div>
 
@@ -30,3 +35,7 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
