@@ -38,11 +38,14 @@
 
             <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-4 text-sm font-medium">
+                <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
+
                 @if (role == "admin")
                 {
-                    <a asp-controller="Admin" asp-action="Customers">Manage Customers</a>
-                    <a asp-controller="Admin" asp-action="Employees">Manage Employees</a>
-                    <a asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">📝 Blog Management</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Customers">Manage Customers</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="Employees">Manage Employees</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Admin" asp-action="CreateAccount">Create Employee Account</a>
                 }
                 else if (role == "consultant")
                 {
@@ -61,13 +64,15 @@
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 Orders</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
+                }
+                else if (role == "manager")
+                {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
     
                 }
                 else if (role == "customer")
                 {
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Personal">Certificate</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Customer" asp-action="Me">Profile</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="My">Requests</a>
@@ -77,9 +82,6 @@
 
                 @if (!isAuthenticated)
                 {
-                    <div class="flex justify-center w-full">
-                        <a class="text-gray-700 hover:text-blue-600" asp-controller="Home" asp-action="Index">Home</a>
-                    </div>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="Login">Login</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Auth" asp-action="RegisterCustomer">Register</a>
                 }

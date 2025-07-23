@@ -56,15 +56,18 @@ namespace DiamondAssessmentSystem.Application.Services
 
         public async Task<bool> UpdateBlog(string userId, BlogDto blogDto)
         {
-            if (string.IsNullOrWhiteSpace(blogDto.Status))
-            {
-                blogDto.Status = "Draft";
-            }
+            var blogInDb = await _blogRepository.GetBlogByIdAsync(blogDto.BlogId);
+            if (blogInDb == null)
+                return false;
 
-            var blog = _mapper.Map<Blog>(blogDto);
+            blogInDb.Title = blogDto.Title;
+            blogInDb.Content = blogDto.Content;
+            blogInDb.ImageUrl = blogDto.ImageUrl;
+            blogInDb.BlogType = blogDto.BlogType;
+            blogInDb.Status = string.IsNullOrWhiteSpace(blogDto.Status) ? "Draft" : blogDto.Status;
+            blogInDb.UpdatedDate = DateTime.UtcNow;
 
-            var updated = await _blogRepository.UpdateBlogAsync(userId, blog);
-
+            var updated = await _blogRepository.UpdateBlogAsync(userId, blogInDb);
             return updated;
         }
 

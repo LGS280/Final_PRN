@@ -31,7 +31,24 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<RequestDto?> GetRequestByIdAsync(int id)
         {
             var request = await _requestRepository.GetRequestByIdAsync(id);
-            return request == null ? null : _mapper.Map<RequestDto>(request);
+            if (request == null) return null;
+
+            var dto = _mapper.Map<RequestDto>(request);
+
+            if (request.Service != null)
+            {
+                dto.ServiceType = request.Service.ServiceType;
+                dto.ServicePrice = request.Service.Price;
+                dto.ServiceDuration = request.Service.Duration;
+                dto.ServiceDescription = request.Service.Description;
+            }
+
+            if (request.Employee?.User != null)
+            {
+                dto.EmployeeName = $"{request.Employee.User.FirstName} {request.Employee.User.LastName}".Trim();
+            }
+
+            return dto;
         }
 
         public async Task<IEnumerable<RequestDto>> GetRequestsByCustomerIdAsync(string userId)
@@ -54,25 +71,22 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<List<RequestWithServiceDto>> GetDraftOrPendingRequestsWithServiceAsync(string userId)
         {
             var requests = await _requestRepository.GetDraftOrPendingRequestsAsync(userId);
-            var result = new List<RequestWithServiceDto>();
 
-            foreach (var r in requests)
-            {
-                var service = await _priceRepository.GetByIdAsync(r.ServiceId);
-                if (service == null) continue;
-
-                result.Add(new RequestWithServiceDto
+            return requests
+                .Where(r => r.Service != null)
+                .Select(r => new RequestWithServiceDto
                 {
                     RequestId = r.RequestId,
                     RequestType = r.RequestType,
                     RequestDate = r.RequestDate,
-                    ServiceId = service.ServiceId,
-                    ServiceType = service.ServiceType,
-                    Price = service.Price
-                });
-            }
-
-            return result;
+                    ServiceId = r.Service.ServiceId,
+                    ServiceType = r.Service.ServiceType,
+                    Price = r.Service.Price,
+                    Duration = r.Service.Duration,
+                    Description = r.Service.Description,
+                    Status = r.Service.Status
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -106,11 +120,20 @@ namespace DiamondAssessmentSystem.Application.Services
 
             if (existingRequest.Status != "Draft")
             {
-                return false; // Only Draft can be updated
+                return false; 
             }
 
             _mapper.Map(updateDto, existingRequest);
             return await _requestRepository.UpdateRequestAsync(existingRequest);
+        }
+
+        public async Task<bool> UpdateRequestStatusAsync(int requestId, string newStatus)
+        {
+            var request = await _requestRepository.GetRequestByIdAsync(requestId);
+            if (request == null) return false;
+
+            request.Status = newStatus;
+            return await _requestRepository.UpdateRequestAsync(request);
         }
     }
 }

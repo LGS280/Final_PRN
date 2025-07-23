@@ -17,6 +17,7 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly IServicePriceRepository _servicePriceRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
+        private readonly IRequestService _requestService;
 
         public OrderService(
             IOrderRepository orderRepo,
@@ -26,7 +27,8 @@ namespace DiamondAssessmentSystem.Application.Services
             IVnPayService vnPay,
             IPaymentRepository paymentRepo,
             IServicePriceRepository servicePriceRepository,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            IRequestService requestService)
         {
             _orderRepo = orderRepo;
             _mapper = mapper;
@@ -36,6 +38,7 @@ namespace DiamondAssessmentSystem.Application.Services
             _paymentRepo = paymentRepo;
             _servicePriceRepository = servicePriceRepository;
             _customerRepository = customerRepository;
+            _requestService = requestService;
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersAsync() =>
@@ -53,7 +56,7 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<bool> CreateOrderAsync(string userId, int requestId, OrderCreateDto dto, string paymentType, VnPaymentResponseFromFe? paymentRequest)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
-            if (!await UpdateRequestStatusAsync(requestId)) return false;
+            if (!await _requestService.UpdateRequestStatusAsync(requestId, "Ordered")) return false;
 
             var order = _mapper.Map<Order>(dto);
 
@@ -107,58 +110,6 @@ namespace DiamondAssessmentSystem.Application.Services
 
         public async Task<bool> CancelOrderAsync(int id) =>
             await _orderRepo.CancelOrderAsync(id);
-
-        //public async Task<bool> UpdateOrderAsync(int orderId, string userId, OrderCreateDto data, int requestId, string paymentType)
-        //{
-        //    var order = await _orderRepo.GetByIdAsync(orderId);
-        //    if (order == null) return false;
-
-        //    // Lấy Customer từ User
-        //    var customer = await _customerRepository.GetByUserIdAsync(userId);
-        //    if (customer == null || customer.CustomerId != order.CustomerId)
-        //        return false;
-
-        //    if (order.Status == "Completed" || order.Status == "Canceled")
-        //        return false;
-
-        //    // Lấy lại service từ request
-        //    var request = await _requestRepo.GetRequestByIdAsync(requestId);
-        //    if (request == null || request.CustomerId != customer.CustomerId)
-        //        return false;
-
-        //    var service = await _servicePriceRepository.GetByIdAsync(request.ServiceId);
-        //    if (service == null)
-        //        return false;
-
-        //    // Cập nhật Order
-        //    order.OrderDate = data.OrderDate;
-        //    order.ServiceId = service.ServiceId;
-        //    order.TotalPrice = service.Price;
-        //    order.Status = "Pending"; // giữ nguyên hoặc gán lại
-
-        //    var existingPayment = order.Payments.FirstOrDefault();
-        //    if (existingPayment != null && existingPayment.Status != "Completed")
-        //    {
-        //        existingPayment.Method = paymentType;
-        //        existingPayment.Amount = service.Price;
-        //        existingPayment.PaymentDate = DateTime.UtcNow;
-        //        existingPayment.Status = "Pending";
-        //    }
-        //    else if (existingPayment == null)
-        //    {
-        //        order.Payments.Add(new Payment
-        //        {
-        //            OrderId = order.OrderId, 
-        //            Amount = service.Price,
-        //            Method = paymentType,
-        //            PaymentDate = DateTime.UtcNow,
-        //            Status = "Pending"
-        //        });
-        //    }
-
-        //    return await _orderRepo.UpdateAsync(order);
-        //}
-
         public async Task<bool> UpdatePaymentAsync(string userId, int orderId, string status)
         {
             var order = await _orderRepo.GetOrderByIdAsync(orderId);

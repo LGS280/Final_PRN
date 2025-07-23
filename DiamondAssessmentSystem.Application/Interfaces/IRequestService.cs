@@ -14,5 +14,6 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<RequestDto?> CreateRequestForCustomerAsync(string userId, RequestCreateDto dto, string status);
         Task<bool> CancelRequestAsync(string userId, int requestId);
         Task<bool> UpdateRequestAsync(int id, RequestCreateDto updateDto);
+        Task<bool> UpdateRequestStatusAsync(int requestId, string newStatus);
     }
 }

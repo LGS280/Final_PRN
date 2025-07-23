@@ -1,5 +1,6 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,17 +16,20 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         private readonly ICurrentUserService _currentUser;
         private readonly IRequestService _requestService;
         private readonly IServicePriceService _servicePriceService;
+        private readonly ICustomerService _customerService;
 
         public OrderController(
             IOrderService orderService,
             ICurrentUserService currentUser,
             IRequestService requestService,
-            IServicePriceService servicePriceService)
+            IServicePriceService servicePriceService,
+            ICustomerService customerService)
         {
             _orderService = orderService;
             _currentUser = currentUser;
             _requestService = requestService;
             _servicePriceService = servicePriceService;
+            _customerService = customerService;
         }
 
         // GET: /Order/All (Admin/Staff)
@@ -55,41 +59,67 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(order);
         }
 
-        // GET: /Order/Create
-        public async Task<IActionResult> Create()
+        [HttpGet]
+        public async Task<IActionResult> Create(int? requestId)
         {
             var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
 
-            var requestWithServices = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+            var customer = await _customerService.GetCustomerByIdAsync(userId);
+            ViewBag.CustomerInfo = customer;
 
-            ViewBag.RequestOptions = requestWithServices.Select(r => new SelectListItem
+            var requests = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+
+            ViewBag.RequestOptions = requests.Select(r => new SelectListItem
             {
                 Value = r.RequestId.ToString(),
                 Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
             }).ToList();
 
-            var serviceMap = requestWithServices.ToDictionary(
+            var map = requests.ToDictionary(
                 r => r.RequestId.ToString(),
                 r => new
                 {
+                    requestType = r.RequestType,
+                    requestDate = r.RequestDate.ToString("yyyy-MM-dd"),
+                    status = r.Status,
                     serviceId = r.ServiceId,
-                    price = r.Price
+                    serviceType = r.ServiceType,
+                    price = r.Price,
+                    duration = r.Duration,
+                    description = r.Description,
+                    employeeName = r.EmployeeName
                 });
 
-            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
-                serviceMap,
-                new JsonSerializerSettings
+            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(map, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+
+            if (requestId.HasValue && map.TryGetValue(requestId.Value.ToString(), out var service))
+            {
+                var dto = new OrderCreateCombineDto
                 {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
+                    PaymentInfo = new OrderPaymentDto
+                    {
+                        RequestId = requestId.Value,
+                        PaymentType = ""
+                    },
+                    OrderData = new OrderCreateDto
+                    {
+                        OrderDate = DateTime.UtcNow,
+                        ServiceId = service.serviceId,
+                        TotalPrice = Convert.ToDecimal(service.price)
+                    }
+                };
+                return View(dto);
+            }
 
             return View(new OrderCreateCombineDto());
         }
 
-        // POST: /Order/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderCreateCombineDto model)
@@ -98,15 +128,24 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
 
+            var customer = await _customerService.GetCustomerByIdAsync(userId);
+            if (IsCustomerProfileIncomplete(customer))
+            {
+                TempData["ProfileIncomplete"] = true;
+                await LoadRequestOptionsToViewBag(userId);
+                ViewBag.CustomerInfo = customer;
+                return View(model);
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadRequestOptionsToViewBag(userId);
+                ViewBag.CustomerInfo = customer;
                 return View(model);
             }
 
             try
             {
-                // ONLINE: redirect to VNPay
                 if (model.PaymentInfo.PaymentType == "Online")
                 {
                     var paymentRequest = new VnPaymentRequestDto
@@ -120,7 +159,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return RedirectToAction("RedirectToVnPay", "Payment", paymentRequest);
                 }
 
-                // OFFLINE: create order
                 var created = await _orderService.CreateOrderAsync(
                     userId,
                     model.PaymentInfo.RequestId,
@@ -133,10 +171,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Failed to create order.");
                     await LoadRequestOptionsToViewBag(userId);
+                    ViewBag.CustomerInfo = customer;
                     return View(model);
                 }
 
-                // ✅ Redirect based on role
                 return _currentUser.Role?.ToLower() == "customer"
                     ? RedirectToAction(nameof(MyOrder))
                     : RedirectToAction(nameof(Index));
@@ -145,118 +183,55 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             {
                 ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
                 await LoadRequestOptionsToViewBag(userId);
+                ViewBag.CustomerInfo = customer;
                 return View(model);
             }
         }
 
-        // Helper: Load dropdown and JSON map
         private async Task LoadRequestOptionsToViewBag(string userId)
         {
-            var requestWithServices = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
+            var requests = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
 
-            ViewBag.RequestOptions = requestWithServices.Select(r => new SelectListItem
+            ViewBag.RequestOptions = requests.Select(r => new SelectListItem
             {
                 Value = r.RequestId.ToString(),
                 Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
             }).ToList();
 
-            var serviceMap = requestWithServices.ToDictionary(
+            var map = requests.ToDictionary(
                 r => r.RequestId.ToString(),
                 r => new
                 {
+                    requestType = r.RequestType,
+                    requestDate = r.RequestDate.ToString("yyyy-MM-dd"),
+                    status = r.Status,
                     serviceId = r.ServiceId,
-                    price = r.Price
+                    serviceType = r.ServiceType,
+                    price = r.Price,
+                    duration = r.Duration,
+                    description = r.Description,
+                    employeeName = r.EmployeeName
                 });
 
-            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
-                serviceMap,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
+            ViewBag.ServiceMapJson = JsonConvert.SerializeObject(map, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
         }
-    
 
-        //// GET: /Order/Edit/5
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    var userId = _currentUser.UserId;
-        //    if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Auth");
-
-        //    var order = await _orderService.GetOrderByIdAsync(id);
-        //    if (order == null || order.Status == "Completed" || order.Status == "Canceled")
-        //        return NotFound();
-
-        //    var requests = await _requestService.GetDraftOrPendingRequestsWithServiceAsync(userId);
-
-        //    ViewBag.RequestOptions = requests.Select(r => new SelectListItem
-        //    {
-        //        Value = r.RequestId.ToString(),
-        //        Text = $"Request #{r.RequestId} - {r.RequestType} ({r.ServiceType})"
-        //    }).ToList();
-
-        //    var serviceMap = requests.ToDictionary(
-        //        r => r.RequestId.ToString(),
-        //        r => new { serviceId = r.ServiceId, price = r.Price });
-
-        //    ViewBag.ServiceMapJson = JsonConvert.SerializeObject(
-        //        serviceMap,
-        //        new JsonSerializerSettings
-        //        {
-        //            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //        });
-
-        //    // Ghép dữ liệu vào CombineDto
-        //    var model = new OrderCreateCombineDto
-        //    {
-        //        OrderData = new OrderCreateDto
-        //        {
-        //            OrderDate = order.OrderDate,
-        //            ServiceId = order.ServiceId,
-        //            TotalPrice = order.TotalPrice
-        //        },
-        //        PaymentInfo = new OrderPaymentDto
-        //        {
-        //            RequestId = order.RequestId,
-        //            PaymentType = "Offline" 
-        //        }
-        //    };
-
-        //    ViewBag.OrderId = order.OrderId;
-        //    return View(model);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, OrderCreateCombineDto model)
-        //{
-        //    var userId = _currentUser.UserId;
-        //    if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Auth");
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        await LoadRequestOptionsToViewBag(userId);
-        //        return View(model);
-        //    }
-
-        //    var success = await _orderService.UpdateOrderAsync(
-        //        id, userId,
-        //        model.OrderData,
-        //        model.PaymentInfo.RequestId,
-        //        model.PaymentInfo.PaymentType
-        //    );
-
-        //    if (!success)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Failed to update order.");
-        //        await LoadRequestOptionsToViewBag(userId);
-        //        return View(model);
-        //    }
-
-        //    return RedirectToAction(nameof(MyOrder));
-        //}
+        private bool IsCustomerProfileIncomplete(CustomerDto c)
+        {
+            return string.IsNullOrWhiteSpace(c.FirstName) ||
+                   string.IsNullOrWhiteSpace(c.LastName) ||
+                   string.IsNullOrWhiteSpace(c.Gender) ||
+                   string.IsNullOrWhiteSpace(c.Phone) ||
+                   string.IsNullOrWhiteSpace(c.Email) ||
+                   string.IsNullOrWhiteSpace(c.IdCard) ||
+                   string.IsNullOrWhiteSpace(c.Address) ||
+                   string.IsNullOrWhiteSpace(c.UnitName) ||
+                   string.IsNullOrWhiteSpace(c.TaxCode);
+        }
 
         // POST: /Order/Cancel/5
         [HttpPost]
