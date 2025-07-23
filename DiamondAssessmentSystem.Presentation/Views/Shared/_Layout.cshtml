@@ -59,15 +59,12 @@
                 }
                 else if (role == "manager")
                 {
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">📝 Blog Management</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Requests</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 Orders</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
-                }
-                else if (role == "manager")
-                {
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="ManagerDashBoard">DashBoard</a>
     
                 }
                 else if (role == "customer")
