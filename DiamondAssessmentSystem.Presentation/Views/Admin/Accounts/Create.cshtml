@@ -1,4 +1,4 @@
-﻿@using DiamondAssessmentSystem.Application.DTO
+﻿    @using DiamondAssessmentSystem.Application.DTO
 @model RegisterEmployeesDto
 @{
     ViewData["Title"] = "Create Employee Account";
@@ -26,6 +26,24 @@
             <label asp-for="Username" class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
             <input asp-for="Username" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Username" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="FirstName" class="block text-sm font-semibold text-gray-700 mb-1">First Name</label>
+            <input asp-for="FirstName" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span asp-validation-for="FirstName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="LastName" class="block text-sm font-semibold text-gray-700 mb-1">Last Name</label>
+            <input asp-for="LastName" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span asp-validation-for="LastName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="PhoneNumber" class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+            <input asp-for="PhoneNumber" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span asp-validation-for="PhoneNumber" class="text-red-500 text-sm"></span>
         </div>
 
         <div>
