@@ -1,23 +1,26 @@
 ﻿@model DiamondAssessmentSystem.Application.DTO.EmployeeUpdateDto
 @{
     ViewData["Title"] = "Edit Employee";
+    var popupType = ViewBag.PopupType as string;
+    var popupMessage = ViewBag.PopupMessage as string;
 }
 
 <div class="max-w-xl mx-auto py-10">
     <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">@ViewData["Title"]</h2>
 
     <!-- Modal Notification -->
-    <div class="modal fade" id="popupModal" tabindex="-1" aria-labelledby="popupModalLabel" aria-hidden="true">
+    <div class="modal fade" id="popupModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-xl shadow">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="popupModalLabel">Notification</h5>
+                <div class="modal-header @(popupType == "success" ? "bg-success" : "bg-danger") text-white">
+                    <h5 class="modal-title">Notification</h5>
                 </div>
                 <div class="modal-body text-center text-gray-700">
-                    @TempData["Success"] @TempData["Error"]
+                    @popupMessage
                 </div>
-                <div class="modal-footer justify-content-center">
-                    <a href="@Url.Action("Employees", "Admin")" class="btn btn-success">Go to Employee List</a>
+                <div class="modal-footer justify-content-center space-x-2">
+                    <a href="@Url.Action("Employees", "Admin")" class="btn btn-success">Back to List</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay Here</button>
                 </div>
             </div>
         </div>
@@ -73,11 +76,9 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
-    @if (TempData["Success"] != null || TempData["Error"] != null)
+    @if (!string.IsNullOrEmpty(popupMessage))
     {
         <script>
             window.addEventListener('DOMContentLoaded', () => {

@@ -53,6 +53,27 @@ namespace DiamondAssessmentSystem.Application.Services
             return await _customerRepository.UpdateCustomerAsync(customer);
         }
 
+        public async Task<bool> UpdateCustomerAsync(CustomerUpdateDtoV2 dto)
+        {
+            var customer = await _customerRepository.GetCustomerByIdAsync(dto.UserId);
+            if (customer == null) return false;
+
+            var user = customer.User;
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.PhoneNumber = dto.Phone;
+            user.Gender = dto.Gender;
+            user.Email = dto.Email;
+            user.UserName = dto.UserName;
+
+            customer.Address = dto.Address;
+            customer.Idcard = string.IsNullOrEmpty(dto.IdCard) ? null : decimal.Parse(dto.IdCard);
+            customer.UnitName = dto.UnitName;
+            customer.TaxCode = dto.TaxCode;
+
+            return await _customerRepository.UpdateCustomerAsync(customer);
+        }
+
         public async Task<bool> DeleteCustomerAsync(string userId)
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(userId);

@@ -13,5 +13,6 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<CustomerDto> GetCustomerByIdAsync(string userId);
         Task<bool> UpdateCustomerAsync(string userId, CustomerCreateDto dto);
         Task<bool> DeleteCustomerAsync(string userId);
+        Task<bool> UpdateCustomerAsync(CustomerUpdateDtoV2 dto);
     }
 }

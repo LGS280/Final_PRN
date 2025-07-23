@@ -3,6 +3,7 @@ using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -58,6 +59,11 @@ namespace DiamondAssessmentSystem.Application.Services
 
             await _userRepository.DeleteUserAsync(userId);
             return true;
+        }
+
+        public async Task<string?> GetEmployeeEmail(string userId)
+        {
+            return await _employeeRepository.GetEmployeeEmail(userId);
         }
     }
 }

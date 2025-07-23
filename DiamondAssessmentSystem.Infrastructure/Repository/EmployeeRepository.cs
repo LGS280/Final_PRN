@@ -65,5 +65,14 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         {
             return await _context.Employees.AnyAsync(e => e.EmployeeId == id);
         }
+
+        public async Task<string?> GetEmployeeEmail(string userId)
+        {
+            var employee = await _context.Employees
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(e => e.UserId == userId);
+
+            return employee?.User?.Email;
+        }
     }
 }

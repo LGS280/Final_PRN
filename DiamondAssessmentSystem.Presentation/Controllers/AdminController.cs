@@ -36,33 +36,40 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             var customer = await _customerService.GetCustomerByIdAsync(id);
             if (customer == null) return NotFound();
 
-            var updateDto = new CustomerUpdateDto
+            var dto = new CustomerUpdateDtoV2
             {
-                UserId = customer.Acc?.UserId,
-                Customer = new CustomerCreateDto
-                {
-                    FirstName = customer.FirstName,
-                    LastName = customer.LastName,
-                    Phone = customer.Phone,
-                    Address = customer.Address,
-                    IdCard = customer.IdCard,
-                    Gender = customer.Gender,
-                    UnitName = customer.UnitName,
-                    TaxCode = customer.TaxCode,
-                }
+                UserId = id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Gender = customer.Gender,
+                Phone = customer.Phone,
+                IdCard = customer.IdCard,
+                Address = customer.Address,
+                UnitName = customer.UnitName,
+                TaxCode = customer.TaxCode,
+                Email = customer.Email,
+                UserName = customer.UserName
             };
 
-            return View("Customers/Edit", updateDto); 
+            return View("Customers/Edit", dto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditCustomer(CustomerUpdateDto model)
+        public async Task<IActionResult> EditCustomer(CustomerUpdateDtoV2 model)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.PopupType = "error";
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                ViewBag.PopupMessage = "Invalid input:<br/>" + string.Join("<br/>", errors);
                 return View("Customers/Edit", model);
+            }
 
-            var updated = await _customerService.UpdateCustomerAsync(model.UserId, model.Customer);
-            return updated ? RedirectToAction(nameof(Customers)) : NotFound();
+            var updated = await _customerService.UpdateCustomerAsync(model);
+            ViewBag.PopupType = updated ? "success" : "error";
+            ViewBag.PopupMessage = updated ? "Customer updated successfully." : "Failed to update customer.";
+
+            return View("Customers/Edit", model);
         }
 
         public async Task<IActionResult> DeleteCustomer(string id)
@@ -117,8 +124,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 Salary = emp.Salary
             };
 
-            ViewBag.UserId = emp.UserId; 
-            ViewBag.Email = emp.Email;  
+            ViewBag.UserId = emp.UserId;
+            ViewBag.Email = emp.Email;
 
             return View("Employees/Edit", dto);
         }
@@ -126,23 +133,25 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> EditEmployee(string id, EmployeeUpdateDto dto)
         {
+            ViewBag.UserId = id;
+
             if (!ModelState.IsValid)
             {
-                ViewBag.UserId = id;
+                var email = await _employeeService.GetEmployeeEmail(id);
+                ViewBag.Email = email;
+                ViewBag.PopupType = "error";
+                ViewBag.PopupMessage = "Invalid input. Please check and try again.";
                 return View("Employees/Edit", dto);
             }
 
-            var updated = await _employeeService.UpdateEmployee(id, dto);
-            if (updated)
-            {
-                TempData["Success"] = "Employee updated successfully.";
-                return RedirectToAction(nameof(Employees));
-            }
-            else
-            {
-                TempData["Error"] = "Failed to update employee.";
-                return RedirectToAction(nameof(EditEmployee), new { id });
-            }
+            var result = await _employeeService.UpdateEmployee(id, dto);
+            var emailAfterUpdate = await _employeeService.GetEmployeeEmail(id);
+            ViewBag.Email = emailAfterUpdate;
+
+            ViewBag.PopupType = result ? "success" : "error";
+            ViewBag.PopupMessage = result ? "Employee updated successfully." : "Failed to update employee.";
+
+            return View("Employees/Edit", dto);
         }
 
         public async Task<IActionResult> DeleteEmployee(string id)
