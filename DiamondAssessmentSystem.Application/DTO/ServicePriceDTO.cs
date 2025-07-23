@@ -18,6 +18,7 @@ namespace DiamondAssessmentSystem.Application.DTO
         public int Duration { get; set; }
 
         public int EmployeeId { get; set; }
+        public string? EmployeeName { get; set; }
 
         [Required]
         public string Status { get; set; } = null!;

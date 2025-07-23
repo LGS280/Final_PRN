@@ -43,23 +43,62 @@ else
                         <td class="px-4 py-2">@item.Price.ToString("C")</td>
                         <td class="px-4 py-2">@item.Description</td>
                         <td class="px-4 py-2">@item.Duration</td>
-                        <td class="px-4 py-2">@item.EmployeeId</td>
+                        <td class="px-4 py-2">@item.EmployeeName</td>
                         <td class="px-4 py-2">
                             <span class="inline-block px-2 py-1 text-xs rounded-full @(item.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600")">
                                 @item.Status
                             </span>
                         </td>
                         <td class="px-4 py-2 space-x-2">
-                            <a asp-action="Details" asp-route-id="@item.ServiceId"
-                               class="text-blue-600 hover:underline">Details</a>
-                            <a asp-action="Edit" asp-route-id="@item.ServiceId"
-                               class="text-yellow-600 hover:underline">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@item.ServiceId"
-                               class="text-red-600 hover:underline">Delete</a>
+                            <a asp-action="Details" asp-route-id="@item.ServiceId" class="text-blue-600 hover:underline">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.ServiceId" class="text-yellow-600 hover:underline">Edit</a>
+
+                            <a href="#" class="text-red-600 hover:underline delete-confirm" data-id="@item.ServiceId">
+                                Delete
+                            </a>
+
+                            <form id="delete-form-@item.ServiceId" asp-action="Delete" asp-route-id="@item.ServiceId" method="post" class="hidden">
+                                @Html.AntiForgeryToken()
+                            </form>
                         </td>
+
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 }
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-confirm').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const serviceId = this.getAttribute('data-id');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This action cannot be undone.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e3342f',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.getElementById(`delete-form-${serviceId}`);
+                            if (form) {
+                                form.submit();
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
+

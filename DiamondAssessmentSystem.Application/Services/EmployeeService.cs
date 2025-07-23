@@ -34,6 +34,12 @@ namespace DiamondAssessmentSystem.Application.Services
             return employee == null ? null : _mapper.Map<EmployeeDto>(employee);
         }
 
+        public async Task<AccountDto?> GetUserById(int id)
+        {
+            var user = await _employeeRepository.GetUserById(id);
+            return user == null ? null : _mapper.Map<AccountDto>(user);
+        }
+
         public async Task<bool> UpdateEmployee(string userId, EmployeeUpdateDto dto)
         {
             var employee = await _employeeRepository.GetEmployeeByIdAsync(userId);

@@ -11,6 +11,7 @@ namespace DiamondAssessmentSystem.Application.Interfaces
     {
         Task<IEnumerable<EmployeeDto>> GetAllEmployeesAsync();
         Task<EmployeeDto?> GetEmployees(string userId);
+        Task<AccountDto?> GetUserById(int id);
         Task<bool> UpdateEmployee(string userId, EmployeeUpdateDto dto);
         Task<bool> DeleteEmployeeAsync(string userId);
         Task<string?> GetEmployeeEmail(string userId);

@@ -51,16 +51,18 @@
                 }
                 else if (role == "assessor")
                 {
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">View Requests</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Requests</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Result" asp-action="Index">Result</a>
                 }
-                else if (role == "staff")
+                else if (role == "manager")
                 {
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Blog" asp-action="Index">📝 Blog Management</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Reque  st" asp-action="Index">📋 View Requests</a>
-                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 View Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Request" asp-action="Index">Requests</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Order" asp-action="Index">📦 Orders</a>
+                    <a class="text-gray-700 hover:text-blue-600" asp-controller="Certificate" asp-action="Management">Certificate</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="Employee" asp-action="Me">My Profile</a>
                     <a class="text-gray-700 hover:text-blue-600" asp-controller="ServicePrice" asp-action="Index">Service</a>
+    
                 }
                 else if (role == "customer")
                 {
