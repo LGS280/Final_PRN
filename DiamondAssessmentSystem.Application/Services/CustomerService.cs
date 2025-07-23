@@ -3,9 +3,11 @@ using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
+using PhoneNumbers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DiamondAssessmentSystem.Application.Services
 {
@@ -39,6 +41,12 @@ namespace DiamondAssessmentSystem.Application.Services
             var customer = await _customerRepository.GetCustomerByIdAsync(userId);
             if (customer == null) return false;
 
+            if (!IsPhoneNumberValid(dto.Phone, "VN"))
+            {
+                throw new Exception($"Phone is invalid!");
+
+            }
+
             // Cập nhật thông tin user
             customer.User.FirstName = dto.FirstName;
             customer.User.LastName = dto.LastName;
@@ -57,6 +65,12 @@ namespace DiamondAssessmentSystem.Application.Services
         {
             var customer = await _customerRepository.GetCustomerByIdAsync(dto.UserId);
             if (customer == null) return false;
+
+            if (!IsPhoneNumberValid(dto.Phone, "VN"))
+            {
+                throw new Exception($"Phone is invalid!");
+
+            } 
 
             var user = customer.User;
             user.FirstName = dto.FirstName;
@@ -81,6 +95,25 @@ namespace DiamondAssessmentSystem.Application.Services
 
             await _userRepository.DeleteUserAsync(userId);
             return true;
+        }
+
+        private bool IsPhoneNumberValid(string phoneNumber, string regionCode)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return false;
+            }
+
+            try
+            {
+                var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+                var parsedNumber = phoneNumberUtil.Parse(phoneNumber, regionCode);
+                return phoneNumberUtil.IsValidNumber(parsedNumber);
+            }
+            catch (NumberParseException)
+            {
+                return false;
+            }
         }
     }
 }

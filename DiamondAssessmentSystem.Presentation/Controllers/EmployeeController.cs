@@ -1,10 +1,11 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
+using DiamondAssessmentSystem.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
@@ -14,12 +15,14 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ICurrentUserService _currentUser;
         private readonly ILogger<EmployeeController> _logger;
+        private readonly IReportService _reportService;
 
-        public EmployeeController(IEmployeeService employeeService, ICurrentUserService currentUser, ILogger<EmployeeController> logger)
+        public EmployeeController(IEmployeeService employeeService, ICurrentUserService currentUser, ILogger<EmployeeController> logger, IReportService reportService)
         {
             _employeeService = employeeService;
             _currentUser = currentUser;
             _logger = logger;
+            _reportService = reportService;
         }
 
         // GET: Employee/Me
@@ -119,6 +122,29 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         public IActionResult Unauthorized()   
         {
             return View();
+        }
+
+        public async Task<IActionResult> ManagerDashboard(DateTime? fromDate, DateTime? toDate)
+        {
+            fromDate ??= DateTime.Today.AddDays(-7);
+            toDate ??= DateTime.Today;
+
+            var accountsPerDay = await _reportService.GetAccountCreatedPerDayAsync(fromDate.Value, toDate.Value);
+            var totalOrders = await _reportService.GetTotalOrderCountAsync();
+            var ordersByType = await _reportService.GetOrderCountByTypeAsync();
+            var totalRequests = await _reportService.GetTotalRequestChosenAsync(); // thay thế pie chart
+
+            var model = new ManagerDashboardDTO
+            {
+                FromDate = fromDate,
+                ToDate = toDate,
+                AccountsCreatedPerDay = accountsPerDay,
+                TotalOrders = totalOrders,
+                OrdersByType = ordersByType,
+                TotalRequestChosen = totalRequests
+            };
+
+            return View(model);
         }
     }
 }
