@@ -127,13 +127,40 @@
         });
 
                 // Pie Chart: Order Status (Paid vs Cancelled)
+        // new Chart(document.getElementById('orderStatusChart'), {
+        //     type: 'pie',
+        //     data: {
+        //         labels: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys)),
+        //         datasets: [{
+        //             data: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values)),
+        //             backgroundColor: ['#4CAF50', '#F44336'] 
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true
+        //     }
+        // });
+
+                // Pie Chart: Order Status (Paid vs Cancelled)
+        const orderStatusLabels = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys));
+        const orderStatusValues = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values));
+
+        // Mapping màu cố định
+        const statusColors = {
+            "Paid": "#4CAF50",       // Xanh lá
+            "Cancelled": "#F44336"   // Đỏ
+        };
+
+        // Gán màu đúng theo label
+        const orderStatusColors = orderStatusLabels.map(label => statusColors[label] || "#9E9E9E");
+
         new Chart(document.getElementById('orderStatusChart'), {
             type: 'pie',
             data: {
-                labels: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys)),
+                labels: orderStatusLabels,
                 datasets: [{
-                    data: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values)),
-                    backgroundColor: ['#4CAF50', '#F44336']
+                    data: orderStatusValues,
+                    backgroundColor: orderStatusColors
                 }]
             },
             options: {

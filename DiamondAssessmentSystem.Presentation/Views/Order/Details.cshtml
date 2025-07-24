@@ -46,9 +46,9 @@
         {
             <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
         }
-        else
+        else if (User.IsInRole("Customer"))
         {
-            <a asp-action="Index" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+            <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
 		}
 
         @if (!User.IsInRole("Staff"))

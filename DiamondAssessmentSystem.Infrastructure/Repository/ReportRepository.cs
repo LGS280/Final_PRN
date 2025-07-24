@@ -139,7 +139,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         {
             return await _context.Orders
                 .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate)
-                .GroupBy(o => o.Status.ToLower())
+                .GroupBy(o => o.Status)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(g => g.Status, g => g.Count);
         }
