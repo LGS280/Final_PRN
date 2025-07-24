@@ -161,15 +161,25 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 UserName = model.UserName
             };
 
-            var updated = await _customerService.UpdateCustomerAsync(model.UserId, customerDto);
-            if (!updated)
+            try
             {
-                ModelState.AddModelError(string.Empty, "Cập nhật thất bại. Vui lòng kiểm tra lại dữ liệu hoặc thử lại sau.");
+                var updated = await _customerService.UpdateCustomerAsync(model.UserId, customerDto);
+                if (!updated)
+                {
+                    TempData["Error"] = "Update failed. Please try again.";
+                    return View("EditCustomerVer1", model);
+                }
+
+                TempData["UpdateSuccess"] = "Profile updated successfully!";
+                return RedirectToAction("EditCustomerVer1");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error: {ex.Message}";
                 return View("EditCustomerVer1", model);
             }
-
-            TempData["UpdateSuccess"] = true;
-            return RedirectToAction("EditCustomerVer1");
         }
+
+
     }
 }

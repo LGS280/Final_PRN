@@ -44,7 +44,7 @@
             <a asp-action="My" class="text-blue-600 hover:underline">← Back to My Requests</a>
         }
 
-        @if (!User.IsInRole("Consultant") && Model.Status == "Pending")
+        @if (User.IsInRole("Customer") && Model.Status == "Pending")
         {
             <a asp-controller="Order" asp-action="Create" asp-route-requestId="@Model.RequestId"
                class="inline-block text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md">💳 Pay Now</a>

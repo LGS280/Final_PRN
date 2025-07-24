@@ -19,6 +19,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         public async Task<IEnumerable<Request>> GetRequestsAsync()
         {
             return await _context.Requests
+                .Include(r => r.Service)
                 .Include(r => r.Customer)
                 .Include(r => r.Employee)
                 .Include(r => r.CommitmentRecords)
@@ -26,15 +27,21 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .ToListAsync();
         }
 
+        //public async Task<Request?> GetRequestByIdAsync(int id)
+        //{
+        //    return await _context.Requests
+        //        .Include(r => r.Customer)
+        //        .Include(r => r.Employee).ThenInclude(e => e.User)
+        //        .Include(r => r.CommitmentRecords)
+        //        .Include(r => r.SealingRecords)
+        //        .Include(r => r.Service)
+        //        .FirstOrDefaultAsync(r => r.RequestId == id);
+        //}
+
         public async Task<Request?> GetRequestByIdAsync(int id)
         {
-            return await _context.Requests
-                .Include(r => r.Customer)
-                .Include(r => r.Employee)
-                .Include(r => r.Service)
-                .Include(r => r.CommitmentRecords)
-                .Include(r => r.SealingRecords)
-                .FirstOrDefaultAsync(r => r.RequestId == id);
+            return await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == id);
+
         }
 
         public async Task<IEnumerable<Request>> GetRequestsByCustomerAsync(string userId)

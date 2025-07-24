@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    //  [Route("[controller]")] // Removed route attribute
     public class AuthController : Controller 
     {
         private readonly IAuthService _authService;

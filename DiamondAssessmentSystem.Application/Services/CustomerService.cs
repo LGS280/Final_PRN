@@ -41,6 +41,12 @@ namespace DiamondAssessmentSystem.Application.Services
             var customer = await _customerRepository.GetCustomerByIdAsync(userId);
             if (customer == null) return false;
 
+            if (!IsPhoneNumberValid(dto.Phone, "VN"))
+            {
+                throw new Exception($"Phone is invalid!");
+
+            }
+
             // Cập nhật thông tin user
             customer.User.FirstName = dto.FirstName;
             customer.User.LastName = dto.LastName;
