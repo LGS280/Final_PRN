@@ -1,8 +1,10 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.Models;
+using DiamondAssessmentSystem.Presentation.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -15,12 +17,15 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         private readonly IServicePriceService _servicePriceService;
         private readonly ICurrentUserService _currentUser;
         private readonly IEmployeeService _employeeService;
-
-        public ServicePriceController(IServicePriceService servicePriceService, ICurrentUserService currentUser, IEmployeeService employeeService)
+        private readonly IHubContext<ServicePriceHub> _hubContext;
+        public ServicePriceController(IServicePriceService servicePriceService, 
+            ICurrentUserService currentUser, IEmployeeService employeeService,
+            IHubContext<ServicePriceHub> hubContext)
         {
             _servicePriceService = servicePriceService;
             _currentUser = currentUser;
             _employeeService = employeeService;
+            _hubContext = hubContext;
         }
 
         // GET: ServicePrice
@@ -44,7 +49,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             if (result == null || !result.Any())
             {
-                //Handle, when there isn't a lot to process
                 return View("Empty");
             }
 
@@ -56,11 +60,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             if (ServicePrice == null)
             {
-                //If it never loads what we need, then we need to return an error.
                 return View("NotFound");
             }
 
-            return View(ServicePrice);  //If there, we can finally load all of it
+            return View(ServicePrice);  
         }
 
         // GET: ServicePrice/Create
@@ -89,9 +92,9 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 try
                 {
                     var created = await _servicePriceService.CreateAsync(dto, userId);
-                    return RedirectToAction(nameof(Index));   //Once it works, return
+                    await _hubContext.Clients.All.SendAsync("ServicePriceChanged", "create", created);
+                    return RedirectToAction(nameof(Index));   
                 }
-                //If it's something that needs to be verified please report.
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, $"Request could not be sent \n More details: {ex}");
@@ -106,7 +109,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id) 
         {
-            //Find if there or not
             var ServicePrice = await _servicePriceService.GetByIdAsync(id);
             if (ServicePrice == null) return NotFound();
 
@@ -136,43 +138,47 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return View(); 
             }
 
-            //Make sure is correct.
             if (!ModelState.IsValid)
                 return View();
 
             try
             {
-                //Validate before calling what will be
                 var updated = await _servicePriceService.UpdateAsync(id, dto, userId);
-                //Return what the user did, or it may lead to what user does.
                 if (!updated)
                 {
                     ModelState.AddModelError(string.Empty, "Error update");
-                    return View(dto);  //If it does not work, return to the same page.
+                    return View(dto);  
                 }
 
-                return RedirectToAction(nameof(Index));   //Return function
+                await _hubContext.Clients.All.SendAsync("ServicePriceChanged", "edit", new
+                {
+                    id,
+                    dto.ServiceType,
+                    dto.Price,
+                    dto.Description,
+                    dto.Duration,
+                    dto.Status
+                });
+
+                return RedirectToAction(nameof(Index));   
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Please have all code or values in place.");
-                //Returns and reload the error.
                 return View(ex.Message);
             }
         }
 
         // GET: ServicePrice/Delete/{id}
-        public async Task<IActionResult> Delete(int id)  //Gets the Method and Loads to Confirm
+        public async Task<IActionResult> Delete(int id)  
         {
-            //Get data to show, else there may be nothing there
             var result = await _servicePriceService.GetByIdAsync(id);
 
             if (result == null)
             {
-                return NotFound();   //Returns page to reload
+                return NotFound();  
             }
 
-            //Validate that there is correct code and working function.
             return View(result);
         }
 
@@ -185,18 +191,18 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            // Try to cancel, Validate that you see.
             try
             {
-                //Delete action to make sure is deleted and it's function
                 var action = await _servicePriceService.SoftDeleteAsync(id);
-                //And load and work
+
+                await _hubContext.Clients.All.SendAsync("ServicePriceChanged", "delete", new { id });
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Unable to validate system \n Returning action code");
-                return View(); //Trys to load code back if unable to remove!
+                return View(); 
             }
         }
     }

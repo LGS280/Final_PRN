@@ -44,3 +44,20 @@
         }
     </div>
 </section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hub/serviceprice")
+            .build();
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        connection.on("ServicePriceChanged", function (action, data) {
+            console.log("ServicePrice update on Home/Services:", action, data);
+            location.reload(); 
+        });
+    </script>
+}
+

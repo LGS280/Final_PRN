@@ -4,22 +4,52 @@
     ViewData["Title"] = "Service Details";
 }
 
-<div class="max-w-3xl mx-auto p-6 bg-white shadow rounded">
-    <h1 class="text-2xl font-bold mb-4 text-blue-700">🔍 @ViewData["Title"]</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-        <div><strong>ID:</strong> @Model.ServiceId</div>
-        <div><strong>Type:</strong> @Model.ServiceType</div>
-        <div><strong>Price:</strong> @Model.Price.ToString("C")</div>
-        <div><strong>Description:</strong> @Model.Description</div>
-        <div><strong>Duration (days):</strong> @Model.Duration</div>
-        <div><strong>Employee:</strong> @Model.EmployeeId</div>
+<div class="max-w-4xl mx-auto px-6 py-8 bg-white shadow-lg rounded-xl border border-gray-200">
+    <h1 class="text-3xl font-bold text-blue-800 mb-6 flex items-center space-x-2">
+        <span>🔍</span><span>@ViewData["Title"]</span>
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4 text-sm text-gray-800">
         <div>
-            <strong>Status:</strong>
-            <span class="@(Model.Status == "Active" ? "text-green-600" : "text-gray-500")">@Model.Status</span>
+            <span class="block text-gray-500 font-semibold">ID</span>
+            <span>@Model.ServiceId</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Type</span>
+            <span>@Model.ServiceType</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Price</span>
+            <span class="text-green-700 font-medium">@Model.Price.ToString("C")</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Description</span>
+            <span>@Model.Description</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Duration (days)</span>
+            <span>@Model.Duration</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Employee</span>
+            <span>@Model.EmployeeId</span>
+        </div>
+        <div>
+            <span class="block text-gray-500 font-semibold">Status</span>
+            <span class="font-semibold @(Model.Status == "Active" ? "text-green-600" : "text-gray-500")">
+                @Model.Status
+            </span>
         </div>
     </div>
-    <div class="mt-6 flex gap-4">
-        <a asp-action="Edit" asp-route-id="@Model.ServiceId" class="text-yellow-600 hover:underline">✏️ Edit</a>
-        <a asp-action="Index" class="text-blue-600 hover:underline">⬅️ Back to List</a>
+
+    <div class="mt-8 flex space-x-4">
+        <a asp-action="Edit" asp-route-id="@Model.ServiceId"
+           class="inline-block px-4 py-2 bg-yellow-100 text-yellow-700 font-medium rounded hover:bg-yellow-200 transition">
+            ✏️ Edit
+        </a>
+        <a asp-action="Index"
+           class="inline-block px-4 py-2 bg-blue-100 text-blue-700 font-medium rounded hover:bg-blue-200 transition">
+            ⬅️ Back to List
+        </a>
     </div>
 </div>
