@@ -108,6 +108,17 @@ namespace DiamondAssessmentSystem.Application.Map
 
             CreateMap<Certificate, CertificateDto>().ReverseMap();
             CreateMap<Certificate, CertificateCreateDto>().ReverseMap();
+            CreateMap<Certificate, CertificateEditDto>().ReverseMap();
+            CreateMap<CertificateEditDto, Certificate>();
+            CreateMap<CertificateDto, CertificateEditDto>();
+            CreateMap<CertificateEditDto, Certificate>()
+                .ForMember(dest => dest.CertificateNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedDate, opt => opt.Ignore());
+
+
+
 
             CreateMap<BlogDto, Blog>()
     .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))

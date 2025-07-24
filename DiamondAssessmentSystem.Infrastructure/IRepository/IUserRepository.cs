@@ -18,6 +18,8 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
         Task<User?> ValidateUserCredentialsAsync(string email, string password);
         Task<IList<string>> GetUserRolesAsync(User user);
         Task<int?> GetAssociatedIdByUserIdAsync(string userId);
+        Task<User?> GetUserByEmployeeIdAsync(int employeeId);
+
 
     }
 }

@@ -17,7 +17,8 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IRequestRepository _requestRepository;
         private readonly IMapper _mapper;
-        private readonly DiamondAssessmentDbContext _context;
+        //private readonly DiamondAssessmentDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
         public ResultService(
             IResultRepository resultRepository,
@@ -25,13 +26,15 @@ namespace DiamondAssessmentSystem.Application.Services
             ICertificateRepository certificateRepository,
             IOrderRepository orderRepository,
             DiamondAssessmentDbContext context,
+            ICurrentUserService currentUserService,
             IRequestRepository requestRepository)
         {
             _resultRepository = resultRepository;
             _mapper = mapper;
             _certificateRepository = certificateRepository;
             _orderRepository = orderRepository;
-            _context = context;
+            //_context = context;
+            _currentUserService = currentUserService;
             _requestRepository = requestRepository;
         }
 
@@ -60,19 +63,36 @@ namespace DiamondAssessmentSystem.Application.Services
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;
 
+            if (_currentUserService.Role == "Assessor" && _currentUserService.AssociatedId.HasValue)
+            {
+                result.EmployeeId = _currentUserService.AssociatedId.Value;
+            }
 
             try
             {
-                // Gọi repository để add và lưu
                 var created = await _resultRepository.CreateResultAsync(result);
+
+                if (created != null && created.Status == "Completed")
+                {
+                    var certificate = new Certificate
+                    {
+                        ResultId = created.ResultId,
+                        IssueDate = DateTime.UtcNow,
+                        Status = "Pending"
+                    };
+
+                    await _certificateRepository.CreateCertificateAsync(certificate);
+                }
+
                 return created != null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("❌ Lỗi khi tạo result: " + ex.Message);
-                Console.WriteLine("📌 Chi tiết: " + ex.InnerException?.Message);
+                Console.WriteLine("Lỗi khi tạo result: " + ex.Message);
+                Console.WriteLine("Chi tiết: " + ex.InnerException?.Message);
                 return false;
             }
+
         }
 
         public async Task<bool> UpdateResultAsync(int id, ResultUpdateDto dto)
