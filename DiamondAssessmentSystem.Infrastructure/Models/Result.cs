@@ -11,8 +11,6 @@ public partial class Result
 
     public int RequestId { get; set; }
 
-    public int EmployeeId { get; set; } // Added field for assessment staff
-
     public string DiamondOrigin { get; set; } = null!;
 
     public string Shape { get; set; } = null!;

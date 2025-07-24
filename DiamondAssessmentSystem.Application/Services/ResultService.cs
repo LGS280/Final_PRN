@@ -65,12 +65,14 @@ namespace DiamondAssessmentSystem.Application.Services
 
             if (_currentUserService.Role == "Assessor" && _currentUserService.AssociatedId.HasValue)
             {
-                result.EmployeeId = _currentUserService.AssociatedId.Value;
+                request.EmployeeId = _currentUserService.AssociatedId.Value;
             }
 
             try
             {
                 var created = await _resultRepository.CreateResultAsync(result);
+                var updated = await _requestRepository.UpdateRequestAsync(request);
+                if (!updated) return false;
 
                 if (created != null && created.Status == "Completed")
                 {
