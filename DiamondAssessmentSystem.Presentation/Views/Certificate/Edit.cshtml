@@ -1,0 +1,58 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CertificateEditDto
+
+@{
+    ViewData["Title"] = "Edit Certificate";
+}
+
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">@ViewData["Title"]</h1>
+
+    <form asp-action="Edit" method="post" class="space-y-6 bg-white p-6 shadow-md rounded-xl border">
+        <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+        <input type="hidden" asp-for="CertificateId" />
+        <input type="hidden" asp-for="ResultId" />
+
+        <div>
+            <label asp-for="CertificateNumber" class="block font-semibold text-gray-700">Certificate Number</label>
+            <input asp-for="CertificateNumber" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" readonly />
+            <span asp-validation-for="CertificateNumber" class="text-sm text-red-500"></span>
+        </div>
+
+        <div>
+            <label asp-for="IssueDate" class="block font-semibold text-gray-700">Issue Date</label>
+            <input asp-for="IssueDate" type="date" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" />
+            <span asp-validation-for="IssueDate" class="text-sm text-red-500"></span>
+        </div>
+
+        <div>
+            <label asp-for="Status" class="block font-semibold text-gray-700">Status</label>
+            <select asp-for="Status" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                <option value="">-- Select Status --</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <span asp-validation-for="Status" class="text-sm text-red-500"></span>
+        </div>
+
+        <div>
+            <label class="block font-semibold text-gray-700">Approved By</label>
+            <input value="@Model.ApprovedBy" class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+        </div>
+
+        <div>
+            <label class="block font-semibold text-gray-700">Approved Date</label>
+            <input value="@(Model.ApprovedDate?.ToString("yyyy-MM-dd") ?? "")" class="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-gray-100" readonly />
+        </div>
+
+        <div class="flex justify-between items-center mt-4">
+            <a asp-action="Management" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+            <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

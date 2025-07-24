@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiamondAssessmentSystem.Application", "DiamondAssessmentSystem.Application\DiamondAssessmentSystem.Application.csproj", "{0C7D25D5-070C-499A-8F99-6006F58DD683}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiamondAssessmentSystem.Infrastructure", "DiamondAssessmentSystem.Infrastructure\DiamondAssessmentSystem.Infrastructure.csproj", "{5EE4290A-0F5E-41BA-BB49-891897D25AA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiamondAssessmentSystem.Presentation", "DiamondAssessmentSystem.Presentation\DiamondAssessmentSystem.Presentation.csproj", "{202EB6B6-7793-48B7-BCF8-9403CF11E12B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C7D25D5-070C-499A-8F99-6006F58DD683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C7D25D5-070C-499A-8F99-6006F58DD683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C7D25D5-070C-499A-8F99-6006F58DD683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C7D25D5-070C-499A-8F99-6006F58DD683}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EE4290A-0F5E-41BA-BB49-891897D25AA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EE4290A-0F5E-41BA-BB49-891897D25AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EE4290A-0F5E-41BA-BB49-891897D25AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EE4290A-0F5E-41BA-BB49-891897D25AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{202EB6B6-7793-48B7-BCF8-9403CF11E12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{202EB6B6-7793-48B7-BCF8-9403CF11E12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{202EB6B6-7793-48B7-BCF8-9403CF11E12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{202EB6B6-7793-48B7-BCF8-9403CF11E12B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A198CCF-3C31-4994-83EE-FA24AB4C8B48}
+	EndGlobalSection
+EndGlobal

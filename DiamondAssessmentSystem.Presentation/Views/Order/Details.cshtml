@@ -1,0 +1,65 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderDto
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📋 Order Details</h1>
+
+    <div class="bg-white shadow rounded-xl p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <span class="font-semibold text-gray-700">Order ID:</span>
+                <div>@Model.OrderId</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Order Date:</span>
+                <div>@Model.OrderDate.ToShortDateString()</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Service ID:</span>
+                <div>@Model.ServiceId</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Service Type:</span>
+                <div>@Model.ServiceType</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Total Price:</span>
+                <div>@Model.TotalPrice.ToString("C")</div>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-700">Status:</span>
+                <div>
+                    <span class="inline-block px-2 py-1 rounded text-xs font-medium @(
+                          Model.Status == "Completed" ? "bg-green-100 text-green-700" :
+                          Model.Status == "Pending" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-800")">
+                        @Model.Status
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+        @if (User.IsInRole("Staff"))
+        {
+            <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+        }
+        else if (User.IsInRole("Customer"))
+        {
+            <a asp-action="MyOrder" class="text-blue-600 hover:underline text-sm">← Back to Orders</a>
+		}
+
+        @if (!User.IsInRole("Staff"))
+        {
+            <form asp-action="Cancel" asp-route-id="@Model.OrderId" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                <button type="submit"
+                        class="text-sm text-red-600 hover:underline"
+                        @(Model.Status == "Paid" || Model.Status == "Completed" || Model.Status == "Canceled" ? "disabled class='opacity-50 cursor-not-allowed'" : "")>
+                    Cancel Order
+                </button>
+            </form>
+        }
+    </div>
+</div>

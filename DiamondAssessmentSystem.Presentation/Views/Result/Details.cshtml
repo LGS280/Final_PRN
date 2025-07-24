@@ -1,0 +1,41 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ResultDto
+@{
+    ViewData["Title"] = "Result Details";
+}
+
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">@ViewData["Title"]</h1>
+
+    <div class="bg-white shadow rounded-xl p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div><span class="font-semibold">Result ID:</span> @Model.ResultId</div>
+            @* <div><span class="font-semibold">Assessment Staff:</span> @Model.AssessmentStaff</div> *@
+            <div><span class="font-semibold">Request ID:</span> @Model.RequestId</div>
+            <div><span class="font-semibold">Origin:</span> @Model.DiamondOrigin</div>
+            <div><span class="font-semibold">Shape:</span> @Model.Shape</div>
+            <div><span class="font-semibold">Measurements:</span> @Model.Measurements</div>
+            <div><span class="font-semibold">Carat Weight:</span> @Model.CaratWeight</div>
+            <div><span class="font-semibold">Color:</span> @Model.Color</div>
+            <div><span class="font-semibold">Clarity:</span> @Model.Clarity</div>
+            <div><span class="font-semibold">Cut:</span> @Model.Cut</div>
+            <div><span class="font-semibold">Proportions:</span> @Model.Proportions</div>
+            <div><span class="font-semibold">Polish:</span> @Model.Polish</div>
+            <div><span class="font-semibold">Symmetry:</span> @Model.Symmetry</div>
+            <div><span class="font-semibold">Fluorescence:</span> @Model.Fluorescence</div>
+            <div>
+                <span class="font-semibold">Status:</span>
+                <span class="inline-block px-2 py-1 rounded text-xs font-semibold
+                      @(Model.Status == "Completed" ? "bg-green-100 text-green-700" :
+                                              Model.Status == "InProgress" ? "bg-yellow-100 text-yellow-700" :
+                                              "bg-gray-100 text-gray-700")">
+                    @Model.Status
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+        <a asp-action="Edit" asp-route-id="@Model.ResultId" class="text-sm text-yellow-600 hover:underline">✏️ Edit</a>
+        <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
+    </div>
+</div>

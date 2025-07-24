@@ -1,0 +1,172 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.ManagerDashboardDTO
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+}
+
+<h2 class="text-center mb-4">📊 Thống kê Quản lý</h2>
+
+<form method="get" class="row mb-4">
+    <div class="col-md-3">
+        <label for="fromDate">Từ ngày:</label>
+        <input type="date" class="form-control" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label for="toDate">Đến ngày:</label>
+        <input type="date" class="form-control" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Lọc dữ liệu</button>
+    </div>
+</form>
+
+<style>
+    .chart-container {
+        width: 350px;
+        height: 350px;
+        margin: auto;
+    }
+
+    .chart-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-bottom: 2rem;
+    }
+
+    .small-chart{
+        width: 500px;
+        height: 500px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-6 chart-box">
+        <h6>Tài khoản tạo mỗi ngày</h6>
+        <div class="chart-container small-chart">
+            <canvas id="accountsLineChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6 chart-box">
+        <h6>Đơn hàng theo loại</h6>
+        <div class="chart-container">
+            <canvas id="orderTypeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 chart-box">
+        <h6>Tổng request được chọn</h6>
+        <div style="font-size: 48px; font-weight: bold; color: #007bff;">
+            @Model.TotalRequestChosen
+        </div>
+    </div>
+
+    <div class="col-md-6 chart-box">
+        <h6>Đơn hàng theo trạng thái (Paid vs Cancelled)</h6>
+        <div class="chart-container">
+            <canvas id="orderStatusChart"></canvas>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Line Chart: Accounts Per Day
+        new Chart(document.getElementById('accountsLineChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.AccountsCreatedPerDay.Keys)),
+                datasets: [{
+                    label: 'Tài khoản tạo',
+                    data: @Html.Raw(Json.Serialize(Model.AccountsCreatedPerDay.Values)),
+                    backgroundColor: 'rgba(75,192,192,0.4)',
+                    borderColor: '#2196F3',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Pie Chart: Orders By Type
+        new Chart(document.getElementById('orderTypeChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.OrdersByType.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.OrdersByType.Values)),
+                    backgroundColor: ['#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4']
+                }]
+            }
+        });
+
+        // Pie Chart: Total Orders
+        new Chart(document.getElementById('orderTotalChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Tổng đơn hàng', 'Khác'],
+                datasets: [{
+                    data: [@Model.TotalOrders, Math.max(0, 100 - @Model.TotalOrders)],
+                    backgroundColor: ['#00BCD4', '#E0E0E0']
+                }]
+            }
+        });
+
+                // Pie Chart: Order Status (Paid vs Cancelled)
+        // new Chart(document.getElementById('orderStatusChart'), {
+        //     type: 'pie',
+        //     data: {
+        //         labels: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys)),
+        //         datasets: [{
+        //             data: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values)),
+        //             backgroundColor: ['#4CAF50', '#F44336'] 
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true
+        //     }
+        // });
+
+                // Pie Chart: Order Status (Paid vs Cancelled)
+        const orderStatusLabels = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys));
+        const orderStatusValues = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values));
+
+        // Mapping màu cố định
+        const statusColors = {
+            "Paid": "#4CAF50",       // Xanh lá
+            "Cancelled": "#F44336"   // Đỏ
+        };
+
+        // Gán màu đúng theo label
+        const orderStatusColors = orderStatusLabels.map(label => statusColors[label] || "#9E9E9E");
+
+        new Chart(document.getElementById('orderStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: orderStatusLabels,
+                datasets: [{
+                    data: orderStatusValues,
+                    backgroundColor: orderStatusColors
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+    </script>
+}

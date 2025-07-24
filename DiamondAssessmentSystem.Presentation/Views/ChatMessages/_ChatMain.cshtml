@@ -1,0 +1,19 @@
+﻿@model (DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel Chat, string CurrentUserRole)
+
+<section class="col-span-8 h-full flex flex-col bg-white border rounded-2xl shadow-2xl overflow-hidden">
+    <div class="shrink-0 px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-white">
+        <h1 class="text-xl font-semibold text-gray-800">💬 Service Consulting</h1>
+    </div>
+
+    <div id="chat-messages" class="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-gray-50 scroll-smooth custom-scrollbar">
+        @foreach (var msg in Model.Chat.Messages)
+        {
+            var tuple = (Message: msg, CurrentUserRole: Model.CurrentUserRole);
+            @await Html.PartialAsync("_ChatMessage", tuple)
+        }
+    </div>
+
+    <div class="shrink-0 px-6 py-4 border-t bg-white">
+        @await Html.PartialAsync("_SendMessageForm", Model.Chat.ConversationId)
+    </div>
+</section>

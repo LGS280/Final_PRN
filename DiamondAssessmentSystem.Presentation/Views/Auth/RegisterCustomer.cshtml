@@ -1,0 +1,96 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.RegisterDto
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="min-h-screen flex items-center justify-center px-4 py-6"
+     style="
+        background-image:
+            url('https://www.transparenttextures.com/patterns/cubes.png'),
+            linear-gradient(to bottom right, #dbeafe, #f0f9ff);
+        background-blend-mode: multiply;
+        background-size: contain;
+     ">
+    <div class="w-full max-w-4xl bg-white shadow-lg rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        <!-- Left: Image -->
+        <div class="hidden md:block">
+            <img src="https://cdn.pixabay.com/photo/2018/02/27/13/31/diamond-3185447_1280.jpg?auto=format&fit=crop&w=720&q=80"
+                 alt="Register visual" class="h-full w-full object-cover" />
+        </div>
+
+        <!-- Right: Form -->
+        <div class="p-10 space-y-6">
+            @if (TempData["Success"] != null)
+            {
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 text-sm text-center">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm text-center">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <h2 class="text-3xl font-bold text-gray-800 text-center">Create Account</h2>
+
+            <form asp-action="RegisterCustomer" method="post" class="space-y-5">
+                <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+                <div>
+                    <label asp-for="Username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input asp-for="Username" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Username" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input asp-for="Email" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input asp-for="Password" type="password" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition">
+                    Register
+                </button>
+            </form>
+
+            <!-- Success Modal -->
+            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-3 shadow">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="successModalLabel">Registration Successful</h5>
+                        </div>
+                        <div class="modal-body text-center text-gray-700">
+                            Your account has been created successfully.
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <a href="@Url.Action("Login", "Auth")" class="btn btn-success">Go to Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-gray-600">
+                Already have an account?
+                <a asp-action="Login" class="text-blue-600 hover:underline font-medium">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+@if (TempData["Success"] != null)
+{
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+            modal.show();
+        });
+    </script>
+}

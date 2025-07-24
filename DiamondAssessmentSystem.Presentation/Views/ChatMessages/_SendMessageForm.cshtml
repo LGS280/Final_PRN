@@ -1,0 +1,61 @@
+﻿@model int
+
+<div class="shrink-0 px-6 py-4 border-t bg-white">
+    <form id="sendMessageForm" method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 w-full relative">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="conversationId" value="@Model" />
+
+        <div class="relative w-full flex-1">
+            <input type="text" name="Message" id="text-message"
+                   class="w-full p-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Type a message..." autocomplete="off" />
+
+            <!-- Mention box -->
+            <div id="mention-box"
+                 class="absolute left-4 bottom-14 z-50 bg-white border border-gray-300 shadow-lg rounded-md hidden">
+                <button type="button"
+                        id="mention-gemini"
+                        class="block w-full text-left px-4 py-2 hover:bg-blue-100 text-sm">
+                    Gemini
+                </button>
+            </div>
+        </div>
+
+        <!-- Emoji Button + Panel -->
+        <div id="emoji-picker-wrapper" class="relative">
+            <button type="button" id="emoji-toggle-btn"
+                    class="text-xl px-3 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition shadow-sm focus:outline-none">
+                😊
+            </button>
+
+            <div id="emoji-panel"
+                 class="absolute bottom-full mb-2 right-0 hidden bg-white border border-gray-300 rounded-xl shadow p-2 grid grid-cols-6 gap-2 z-50 w-max">
+                @{
+                    var emojis = new[] { "😀", "😂", "😍", "😎", "😢", "👍", "🙏", "💡", "🔥", "❤️", "🤔", "🎉" };
+                }
+                @foreach (var emoji in emojis)
+                {
+                    <button type="button" class="emoji-item text-xl hover:bg-gray-100 rounded p-1">@emoji</button>
+                }
+            </div>
+        </div>
+
+        <!-- File upload -->
+        <label for="file-upload"
+               class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-full transition">
+            📎
+            <input type="file" name="file" id="file-upload" class="hidden" />
+        </label>
+
+        <!-- Submit -->
+        <button type="submit"
+                class="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition">
+            Send
+        </button>
+    </form>
+
+    <progress id="upload-progress"
+              value="0"
+              max="100"
+              class="w-full mt-2 h-2 hidden bg-gray-200 rounded overflow-hidden"></progress>
+</div>

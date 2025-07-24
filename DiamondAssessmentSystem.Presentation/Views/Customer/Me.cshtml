@@ -1,0 +1,72 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CustomerDto
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">@ViewData["Title"]</h1>
+
+    <div class="bg-white rounded-2xl shadow-lg p-8 space-y-8">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+            <div class="flex-shrink-0 text-center">
+                <i class="bi bi-person-circle text-gray-400" style="font-size: 120px;"></i>
+                <h3 class="text-xl font-semibold mt-4">@Model.UserName</h3>
+                <p class="text-gray-500"><i class="bi bi-envelope me-1"></i> @Model.Email</p>
+                @if (Model.Point.HasValue)
+                {
+                    <p class="mt-1 text-sm text-green-600">Loyalty Points: <span class="font-medium">@Model.Point</span></p>
+                }
+            </div>
+
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Full Name</label>
+                    <div>@($"{Model.FirstName} {Model.LastName}")</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Gender</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Gender) ? "Not updated yet" : Model.Gender)</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Phone</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not updated yet" : Model.Phone)</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">ID Card</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.IdCard) ? "Not updated yet" : Model.IdCard)</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Address</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Address) ? "Not updated yet" : Model.Address)</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Unit Name</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.UnitName) ? "Not updated yet" : Model.UnitName)</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-500 font-medium mb-1">Tax Code</label>
+                    <div>@(string.IsNullOrWhiteSpace(Model.TaxCode) ? "Not updated yet" : Model.TaxCode)</div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Note))
+                {
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-500 font-medium mb-1">Note</label>
+                        <div>@Model.Note</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="text-end">
+            <a asp-action="EditCustomerVer1" class="btn btn-primary">Edit Profile</a>
+        </div>
+    </div>
+</div>

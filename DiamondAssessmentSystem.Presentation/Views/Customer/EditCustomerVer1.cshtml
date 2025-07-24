@@ -1,0 +1,157 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.CustomerUpdateDtoVer1
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<h1 class="mb-4 text-center">@ViewData["Title"]</h1>
+<hr />
+
+@if (ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState[string.Empty].Errors)
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+@if (TempData["UpdateSuccess"] != null)
+{
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Updated successfully</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Profile information has been updated.</p>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="@Url.Action("Me", "Customer")" class="btn btn-outline-secondary">Return to profile</a>
+                        <button class="btn btn-success" onclick="closePopup()">Stay on page</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+
+    <script>
+        function closePopup() {
+            document.querySelector('.modal').remove();
+            document.querySelector('.modal-backdrop').remove();
+        }
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md mb-4 text-sm text-center">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <form asp-action="EditCustomerVer1" method="post" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="UserId" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3 row" style="display:none">
+                <label asp-for="UserName" class="col-sm-3 col-form-label">Username</label>
+                <div class="col-sm-9">
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="FirstName" class="col-sm-3 col-form-label">First Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="LastName" class="col-sm-3 col-form-label">Last Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="Gender" class="col-sm-3 col-form-label">Gender</label>
+                <div class="col-sm-9">
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="Phone" class="col-sm-3 col-form-label">Phone</label>
+                <div class="col-sm-9">
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label">Email</label>
+                <div class="col-sm-9 pt-2">
+                    <span>@Model.Email</span>
+                    <input type="hidden" asp-for="Email" />
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="IdCard" class="col-sm-3 col-form-label">ID Card</label>
+                <div class="col-sm-9">
+                    <input asp-for="IdCard" class="form-control" />
+                    <span asp-validation-for="IdCard" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="Address" class="col-sm-3 col-form-label">Address</label>
+                <div class="col-sm-9">
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="UnitName" class="col-sm-3 col-form-label">Unit Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="UnitName" class="form-control" />
+                    <span asp-validation-for="UnitName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label asp-for="TaxCode" class="col-sm-3 col-form-label">Tax Code</label>
+                <div class="col-sm-9">
+                    <input asp-for="TaxCode" class="form-control" />
+                    <span asp-validation-for="TaxCode" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a asp-action="Me" class="btn btn-outline-secondary">Back to Profile</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

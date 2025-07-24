@@ -1,0 +1,46 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
+
+<aside class="col-span-4 h-full bg-white/70 border border-blue-100 rounded-2xl shadow-xl backdrop-blur-sm p-6 overflow-y-auto space-y-8">
+    <div class="rounded-xl shadow-lg p-5 flex flex-col gap-3 border border-blue-300 bg-gradient-to-br from-white via-blue-50 to-white">
+        <div class="flex items-center gap-4">
+            <img src="/images/logo.jpg" class="w-14 h-14 rounded-full ring-2 ring-blue-300 shadow-sm" />
+            <div>
+                <h2 class="text-xl font-extrabold text-blue-800 drop-shadow-sm">Giám định kim cương</h2>
+                <p class="text-sm text-gray-700 leading-snug">
+                    Dịch vụ giám định <span class="text-blue-600 font-semibold">chính xác</span>,
+                    <span class="text-blue-600 font-semibold">minh bạch</span> và
+                    <span class="text-blue-600 font-semibold">nhanh chóng</span>.
+                </p>
+            </div>
+        </div>
+        <a href="/Request/Create" class="self-start text-sm bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-indigo-600 transition shadow-md">
+            → Gửi yêu cầu ngay
+        </a>
+    </div>
+
+    <div>
+        <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-1 border-blue-200">📰 Bài viết nổi bật</h3>
+        <div class="space-y-4">
+            @foreach (var blog in Model.Take(3))
+            {
+                <a href="/Blog/Details/@blog.BlogId"
+                   class="flex border border-gray-200 rounded-xl overflow-hidden shadow group bg-white hover:bg-blue-50 transition">
+                    @if (!string.IsNullOrEmpty(blog.ImageUrl))
+                    {
+                        <img src="@blog.ImageUrl" class="w-20 h-20 object-cover" />
+                    }
+                    else
+                    {
+                        <div class="w-20 h-20 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-500">
+                            🖼
+                        </div>
+                    }
+                    <div class="p-3 flex-1">
+                        <h4 class="font-semibold text-gray-800 group-hover:text-blue-600 truncate">@blog.Title</h4>
+                        <p class="text-xs text-gray-600 line-clamp-2">@blog.Description</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</aside>

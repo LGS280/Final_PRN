@@ -1,0 +1,79 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Hero Section -->
+<section class="relative overflow-hidden text-white py-5" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.08;"></div>
+    <div class="container py-5 text-center position-relative z-1">
+        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">Welcome to Diamond Insight</h1>
+        <h2 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">Precision in Every Sparkle</h2>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">At Diamond Insight, we specialize in professional diamond grading and certification services. With cutting-edge technology and industry-standard expertise, we help you understand the true quality and value of your diamonds. Whether you're a jeweler, collector, or buyer, our mission is to provide trustworthy, transparent, and consistent evaluations that shine with integrity.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a asp-controller="Home" asp-action="GetStarted" class="btn btn-success btn-lg px-4 rounded-pill shadow-lg transition-transform" style="transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Get Started</a>
+            <a href="#" class="btn btn-outline-light btn-lg px-4 rounded-pill shadow-lg transition-transform" style="transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="bi bi-play-circle-fill me-2"></i> Watch Video
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<!-- Blog Grid Section -->
+<section class="container py-5">
+    <h2 class="text-center fw-bold mb-5 text-primary display-6">Latest Articles</h2>
+    <div class="row g-4">
+        <!-- Search + Filter -->
+        <form asp-action="Index" method="get" class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="🔎 Search title..."
+                   class="form-control w-auto" />
+
+            <select name="blogType" class="form-select w-auto">
+                <option value="">All Blog Types</option>
+                @foreach (var type in ViewBag.BlogTypeOptions as List<string>)
+                {
+                    <option value="@type" selected="@(ViewBag.BlogType == type ? "selected" : null)">@type</option>
+                }
+            </select>
+
+            <button type="submit" class="btn btn-primary px-4">Filter</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+        </form>
+
+        @foreach (var blog in Model)
+        {
+            <div class="col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-lg border-0 rounded-4 overflow-hidden transition-all" style="transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div class="ratio ratio-4x3">
+                        <img src="@blog.ImageUrl"
+                             class="card-img-top object-fit-cover"
+                             alt="@blog.Title"
+                             style="object-fit: cover; border-top-left-radius: .5rem; border-top-right-radius: .5rem;" />
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        @if (!string.IsNullOrEmpty(blog.BlogType))
+                        {
+                            <span class="badge bg-gradient bg-primary rounded-pill mb-2 text-uppercase">@blog.BlogType</span>
+                        }
+
+                    <h5 class="card-title text-dark">@blog.Title</h5>
+                    <p class="card-text text-muted flex-grow-1">@blog.Description?.Substring(0, Math.Min(100, blog.Description.Length))...</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://i.pravatar.cc/32?u=@blog.BlogId" class="rounded-circle border border-white shadow-sm" alt="avatar" />
+                            <small class="text-muted">
+                                @(blog.CreatedDate.HasValue
+                                                                ? blog.CreatedDate.Value.ToString("dd MMM yyyy")
+                                                                : "N/A")
+                            </small>
+                        </div>
+                        <a href="@Url.Action("Details", "Blog", new { id = blog.BlogId })" class="btn btn-sm btn-outline-primary rounded-pill">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+                }
+    </div>
+</section>

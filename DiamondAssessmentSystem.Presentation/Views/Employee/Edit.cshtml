@@ -1,0 +1,79 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.EmployeeUpdateDto
+
+@{
+    ViewData["Title"] = "Edit My Profile";
+}
+
+<h1 class="text-center text-primary my-1">@ViewData["Title"]</h1>
+
+<hr class="my-4" />
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <form asp-action="EditMe" class="bg-white p-5 rounded shadow-sm">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <!-- First Name -->
+            <div class="form-group mb-3">
+                <label asp-for="FirstName" class="control-label">First Name</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group mb-3">
+                <label asp-for="LastName" class="control-label">Last Name</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <!-- UserName -->
+            @* <div class="form-group mb-3" style="display:none">
+                <label asp-for="UserName" class="control-label">Username</label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div> *@
+
+            <!-- Phone -->
+            <div class="form-group mb-3">
+                <label asp-for="Phone" class="control-label">Phone</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <!-- Gender -->
+            @{
+                var genders = new SelectList(new[] { "Male", "Female" }, Model.Gender);
+            }
+            <div class="form-group mb-3">
+                <label asp-for="Gender" class="control-label">Gender</label>
+                <select asp-for="Gender" asp-items="genders" class="form-control">
+                    <option value="">Select Gender</option> <!-- Default placeholder -->
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary w-100" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <a asp-action="Me" class="text-decoration-none text-muted">Back to Profile</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

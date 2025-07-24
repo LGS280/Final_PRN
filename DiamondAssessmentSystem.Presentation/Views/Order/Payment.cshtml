@@ -1,0 +1,30 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderPaymentDto
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="max-w-xl mx-auto py-12 px-4">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">💳 Payment</h2>
+
+    <form asp-action="Payment" method="post" class="space-y-6 bg-white p-6 rounded-xl shadow-md border">
+        <div>
+            <label asp-for="RequestId" class="block font-semibold text-gray-700">Request ID</label>
+            <input asp-for="RequestId" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" />
+            <span asp-validation-for="RequestId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="PaymentType" class="block font-semibold text-gray-700">Payment Type</label>
+            <select asp-for="PaymentType" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                <option value="">-- Select Payment Type --</option>
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+            </select>
+            <span asp-validation-for="PaymentType" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Pay Now</button>
+        </div>
+    </form>
+</div>

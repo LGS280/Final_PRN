@@ -1,0 +1,22 @@
+﻿@using DiamondAssessmentSystem.Application.Interfaces
+@model DiamondAssessmentSystem.Application.DTO.ChatHistoryViewModel
+@inject IBlogService BlogService
+@inject ICurrentUserService CurrentUser
+
+@{
+    var blogs = await BlogService.GetBlogs();
+    var currentUserId = User?.FindFirst("sub")?.Value;
+    var currentUserRole = (CurrentUser.Role ?? "").ToLower();
+}
+
+<div class="h-full w-full grid grid-cols-12 gap-4 px-4 py-4 bg-gradient-to-tr from-blue-100 via-white to-indigo-100">
+    @await Html.PartialAsync("_ChatSidebar", blogs)
+    @await Html.PartialAsync("_ChatMain", (Model, currentUserRole))
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ChatSignalRScript", (Model.ConversationId, currentUserRole))
+    <script src="/js/sendMessage.js" asp-append-version="true"></script>
+    <script src="/js/geminiHandler.js" asp-append-version="true"></script>
+    <script src="/js/mentionHandler.js" asp-append-version="true"></script>
+}

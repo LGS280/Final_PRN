@@ -1,0 +1,81 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.OrderCreateCombineDto
+@{
+    ViewData["Title"] = "Edit Order";
+    var requestOptions = ViewBag.RequestOptions as List<SelectListItem>;
+    var serviceMapJson = ViewBag.ServiceMapJson;
+    var orderId = ViewBag.OrderId;
+}
+
+<div class="max-w-2xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">✏️ Edit Order</h1>
+
+    <form asp-action="Edit" method="post" class="space-y-6 bg-white p-6 shadow rounded-xl border">
+        <input type="hidden" name="id" value="@orderId" />
+        <div asp-validation-summary="All" class="text-red-500 text-sm"></div>
+
+        <div>
+            <label asp-for="PaymentInfo.RequestId" class="block font-semibold text-gray-700">Select Request</label>
+            <select asp-for="PaymentInfo.RequestId" id="PaymentInfo_RequestId"
+                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                <option value="">-- Choose Request --</option>
+                @foreach (var req in requestOptions)
+                {
+                    <option value="@req.Value" selected="@(req.Value == Model.PaymentInfo.RequestId.ToString())">
+                        @req.Text
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="PaymentInfo.RequestId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="OrderData.ServiceId" class="block font-semibold text-gray-700">Service ID</label>
+            <input asp-for="OrderData.ServiceId" id="OrderData_ServiceId"
+                   class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
+            <span asp-validation-for="OrderData.ServiceId" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="OrderData.TotalPrice" class="block font-semibold text-gray-700">Total Price</label>
+            <input asp-for="OrderData.TotalPrice" id="OrderData_TotalPrice"
+                   class="w-full mt-1 bg-gray-100 border-gray-300 rounded-md shadow-sm" readonly />
+            <span asp-validation-for="OrderData.TotalPrice" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="PaymentInfo.PaymentType" class="block font-semibold text-gray-700">Payment Type</label>
+            <select asp-for="PaymentInfo.PaymentType" id="PaymentInfo_PaymentType"
+                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                <option value="">-- Choose Payment Type --</option>
+                <option value="Online" selected="@(Model.PaymentInfo.PaymentType == "Online")">Online</option>
+                <option value="Offline" selected="@(Model.PaymentInfo.PaymentType == "Offline")">Offline</option>
+            </select>
+            <span asp-validation-for="PaymentInfo.PaymentType" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="flex justify-between">
+            <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition">
+                💾 Save Changes
+            </button>
+            <a asp-action="MyOrder" class="text-sm text-blue-600 hover:underline">← Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const serviceMap = @Html.Raw(serviceMapJson);
+
+        function onRequestChange() {
+            const selectedId = document.getElementById("PaymentInfo_RequestId").value;
+            const service = serviceMap[selectedId];
+            document.getElementById("OrderData_ServiceId").value = service?.serviceId || "";
+            document.getElementById("OrderData_TotalPrice").value = service?.price || "";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("PaymentInfo_RequestId").addEventListener("change", onRequestChange);
+            onRequestChange();
+        });
+    </script>
+}

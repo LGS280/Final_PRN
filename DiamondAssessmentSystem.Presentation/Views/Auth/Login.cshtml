@@ -1,0 +1,52 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.LoginDto
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="min-h-screen flex items-center justify-center px-4 py-6"
+     style="
+        background-image:
+            url('https://www.transparenttextures.com/patterns/cubes.png'),
+            linear-gradient(to bottom right, #dbeafe, #f0f9ff);
+        background-blend-mode: multiply;
+        background-size: contain;
+     ">
+    <div class="w-full max-w-3xl bg-white shadow-lg rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2 h-auto">
+        <!-- Left: Image -->
+        <div class="hidden md:block h-full">
+            <img src="https://cdn.pixabay.com/photo/2020/07/03/15/45/diamond-5366797_1280.jpg"
+                 alt="Login visual"
+                 class="h-full w-full object-cover" />
+        </div>
+
+        <!-- Right: Form -->
+        <div class="p-8 md:p-10 flex flex-col justify-center">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Welcome back 👋</h2>
+
+            <form asp-action="Login" method="post" class="space-y-5">
+                <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input asp-for="Email" type="email" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input asp-for="Password" type="password" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2" />
+                    <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition">
+                    Login
+                </button>
+            </form>
+
+            <p class="text-center text-sm text-gray-600 mt-6">
+                Don't have an account?
+                <a asp-action="RegisterCustomer" class="text-blue-600 hover:underline font-medium">Register</a>
+            </p>
+        </div>
+    </div>
+</div>

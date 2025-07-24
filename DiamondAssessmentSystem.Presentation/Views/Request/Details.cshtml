@@ -1,0 +1,66 @@
+﻿@model DiamondAssessmentSystem.Application.DTO.RequestDto
+@{
+    ViewData["Title"] = "Request Details";
+}
+
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📑 Request Details</h1>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="bg-red-100 text-red-700 p-4 mb-4 rounded-md">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="bg-white p-6 rounded-xl border shadow-sm space-y-4 text-sm text-gray-700">
+        <div><strong>ID:</strong> @Model.RequestId</div>
+        <div><strong>Form Type:</strong> @Model.FormType</div>
+        <div><strong>Request Date:</strong> @Model.RequestDate.ToString("dd MMM yyyy")</div>
+        <div class="mt-6 border-t pt-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Service Information</h2>
+            <div><strong>Service ID:</strong> @Model.ServiceId</div>
+            <div><strong>Type:</strong> @Model.ServiceType</div>
+            <div><strong>Price:</strong> @Model.ServicePrice?.ToString("C")</div>
+            <div><strong>Duration:</strong> @Model.ServiceDuration mins</div>
+            <div><strong>Description:</strong> @Model.ServiceDescription</div>
+        </div>
+        <div><strong>Request Type:</strong> @Model.RequestType</div>
+        @if (!string.IsNullOrEmpty(Model.EmployeeName))
+        {
+            <div><strong>Assigned To:</strong> @Model.EmployeeName</div>
+        }
+        <div><strong>Status:</strong> <span class="font-medium @GetStatusClass(Model.Status)">@Model.Status</span></div>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+        @if (!User.IsInRole("Consultant") && Model.Status != "Pending" && Model.Status != "Ordered")
+        {
+            <a asp-action="Edit" asp-route-id="@Model.RequestId" class="text-yellow-600 hover:underline">✏️ Edit</a>
+        }
+
+        @if (!User.IsInRole("Consultant"))
+        {
+            <a asp-action="My" class="text-blue-600 hover:underline">← Back to My Requests</a>
+        }
+
+        @if (User.IsInRole("Customer") && Model.Status == "Pending")
+        {
+            <a asp-controller="Order" asp-action="Create" asp-route-requestId="@Model.RequestId"
+               class="inline-block text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md">💳 Pay Now</a>
+        }
+    </div>
+</div>
+
+@functions {
+    string GetStatusClass(string? status)
+    {
+        return status switch
+        {
+            "Draft" => "text-yellow-600",
+            "Pending" => "text-blue-600",
+            "Completed" => "text-green-600",
+            _ => "text-gray-500"
+        };
+    }
+}

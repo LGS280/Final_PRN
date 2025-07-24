@@ -1,0 +1,101 @@
+﻿@model IEnumerable<DiamondAssessmentSystem.Application.DTO.BlogDto>
+@{
+    ViewData["Title"] = "Manage Blogs";
+    var statusOptions = ViewBag.StatusOptions as List<string>;
+    var selectedStatus = ViewBag.Status as string;
+    var searchQuery = ViewBag.Search as string;
+}
+
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- Title + Create Button -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">🛠️ Manage Blogs</h1>
+        <a asp-action="Create"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            ➕ Create New
+        </a>
+    </div>
+
+    <!-- Search + Filter Form -->
+    <form asp-action="Index" method="get" class="flex flex-wrap gap-4 mb-6 items-center">
+        <input type="text" name="search" value="@searchQuery" placeholder="🔎 Search by title..."
+               class="border border-gray-300 rounded-md px-3 py-2 w-64 shadow-sm" />
+
+        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 shadow-sm">
+            <option value="">All Statuses</option>
+            @foreach (var opt in statusOptions)
+            {
+                <option value="@opt" selected="@(selectedStatus == opt ? "selected" : null)">@opt</option>
+            }
+        </select>
+
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            Filter
+        </button>
+
+        <a asp-action="Index" class="text-sm text-gray-500 hover:text-blue-600">Reset</a>
+    </form>
+
+    <!-- Table -->
+    <div class="overflow-x-auto bg-white rounded-xl shadow-lg border">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100 text-sm text-gray-700 font-semibold">
+                <tr>
+                    <th class="px-6 py-3 text-left">ID</th>
+                    <th class="px-6 py-3 text-left">Title</th>
+                    <th class="px-6 py-3 text-left">Image</th>
+                    <th class="px-6 py-3 text-left">Created</th>
+                    <th class="px-6 py-3 text-left">Status</th>
+                    <th class="px-6 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">@item.BlogId</td>
+                        <td class="px-6 py-4 font-medium text-gray-800">@item.Title</td>
+                        <td class="px-6 py-4">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="blog image"
+                                     class="h-12 w-12 rounded object-cover border" />
+                            }
+                            else
+                            {
+                                <span class="text-gray-400 italic">No Image</span>
+                            }
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        @(item.CreatedDate.HasValue? item.CreatedDate.Value.ToString("dd MMM yyyy") : "N/A")
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
+                                @(item.Status == "Published" ? "bg-green-100 text-green-800" :
+                                                                item.Status == "Draft" ? "bg-yellow-100 text-yellow-800" :
+                                                                "bg-gray-100 text-gray-600")">
+                            @(string.IsNullOrEmpty(item.Status) ? "Unknown" : item.Status)
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <a asp-action="Details" asp-route-id="@item.BlogId"
+                               class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition">
+                                🔍 View
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.BlogId"
+                               class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition">
+                                ✏️ Edit
+                            </a>
+                            <a asp-action="ChangeStatus" asp-route-id="@item.BlogId"
+                               class="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition">
+                                🔄 Status
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+</div>
