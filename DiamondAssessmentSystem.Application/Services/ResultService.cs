@@ -59,7 +59,8 @@ namespace DiamondAssessmentSystem.Application.Services
 
             if (request == null)
                 throw new Exception("Request is invalid!");
-
+            request.EmployeeId = await _requestRepository.GetEmployeeId(_currentUserService.UserId);
+            var resultRequest = await _requestRepository.UpdateRequestAsync(request);
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;
 
