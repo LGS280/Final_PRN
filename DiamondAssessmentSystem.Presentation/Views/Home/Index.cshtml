@@ -11,7 +11,13 @@
         <h2 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">Precision in Every Sparkle</h2>
         <p class="lead mb-4 animate__animated animate__fadeInUp">At Diamond Insight, we specialize in professional diamond grading and certification services. With cutting-edge technology and industry-standard expertise, we help you understand the true quality and value of your diamonds. Whether you're a jeweler, collector, or buyer, our mission is to provide trustworthy, transparent, and consistent evaluations that shine with integrity.</p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a asp-controller="Home" asp-action="GetStarted" class="btn btn-success btn-lg px-4 rounded-pill shadow-lg transition-transform" style="transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Get Started</a>
+            <a href="@(User.Identity.IsAuthenticated? Url.Action("Create", "Request") : Url.Action("Login", "Auth"))"
+               class="btn btn-success btn-lg px-4 rounded-pill shadow-lg transition-transform"
+               style="transition: transform 0.3s;"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'">
+                Get Started
+            </a>
             <a href="#" class="btn btn-outline-light btn-lg px-4 rounded-pill shadow-lg transition-transform" style="transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="bi bi-play-circle-fill me-2"></i> Watch Video
             </a>
