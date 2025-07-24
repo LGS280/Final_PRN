@@ -1,9 +1,4 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Application.Interfaces
 {
@@ -24,5 +19,11 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<Dictionary<string, int>> GetRequestChosenByUsersAsync();
         Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to);
         Task<int> GetTotalRequestChosenAsync();
+        Task<int> GetTotalOrderCountAsync(DateTime fromDate, DateTime toDate);
+        Task<Dictionary<string, int>> GetOrderCountByTypeAsync(DateTime fromDate, DateTime toDate);
+        Task<int> GetTotalRequestChosenAsync(DateTime fromDate, DateTime toDate);
+
+        Task<Dictionary<string, int>> GetOrderStatusReportAsync(DateTime fromDate, DateTime toDate);
+        Task<Dictionary<string, int>> GetRequestStatusReportAsync(DateTime fromDate, DateTime toDate);
     }
 }

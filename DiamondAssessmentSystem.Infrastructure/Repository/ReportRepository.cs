@@ -134,5 +134,47 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         {
             return await _context.Requests.CountAsync();
         }
+
+        public async Task<Dictionary<string, int>> GetOrderCountByStatusAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _context.Orders
+                .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate)
+                .GroupBy(o => o.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.Status, g => g.Count);
+        }
+        public async Task<Dictionary<string, int>> GetRequestCountByStatusAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _context.Requests
+                .Where(r => r.RequestDate >= fromDate && r.RequestDate <= toDate)
+                .GroupBy(r => r.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.Status, g => g.Count);
+        }
+
+        public async Task<int> GetTotalOrderCountAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _context.Orders
+                .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate)
+                .CountAsync();
+        }
+
+        public async Task<Dictionary<string, int>> GetOrderCountByTypeAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _context.Orders
+                .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate)
+                .GroupBy(o => o.Status)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.Type, g => g.Count);
+        }
+
+        public async Task<int> GetTotalRequestChosenAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _context.Requests
+                .Where(r => r.RequestDate >= fromDate && r.RequestDate <= toDate)
+                .CountAsync();
+        }
+
+
     }
 }

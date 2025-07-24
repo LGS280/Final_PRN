@@ -23,8 +23,8 @@
 
 <style>
     .chart-container {
-        width: 300px;
-        height: 300px;
+        width: 350px;
+        height: 350px;
         margin: auto;
     }
 
@@ -35,12 +35,19 @@
         flex-direction: column;
         margin-bottom: 2rem;
     }
+
+    .small-chart{
+        width: 500px;
+        height: 500px;
+    }
 </style>
 
 <div class="row">
     <div class="col-md-6 chart-box">
         <h6>Tài khoản tạo mỗi ngày</h6>
-        <canvas id="accountsLineChart" width="300" height="300"></canvas>
+        <div class="chart-container small-chart">
+            <canvas id="accountsLineChart"></canvas>
+        </div>
     </div>
 
     <div class="col-md-6 chart-box">
@@ -60,10 +67,11 @@
     </div>
 
     <div class="col-md-6 chart-box">
-        <h6>Tổng đơn hàng</h6>
+        <h6>Đơn hàng theo trạng thái (Paid vs Cancelled)</h6>
         <div class="chart-container">
-            <canvas id="orderTotalChart"></canvas>
+            <canvas id="orderStatusChart"></canvas>
         </div>
+
     </div>
 </div>
 
@@ -117,5 +125,48 @@
                 }]
             }
         });
+
+                // Pie Chart: Order Status (Paid vs Cancelled)
+        // new Chart(document.getElementById('orderStatusChart'), {
+        //     type: 'pie',
+        //     data: {
+        //         labels: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys)),
+        //         datasets: [{
+        //             data: @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values)),
+        //             backgroundColor: ['#4CAF50', '#F44336'] 
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true
+        //     }
+        // });
+
+                // Pie Chart: Order Status (Paid vs Cancelled)
+        const orderStatusLabels = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Keys));
+        const orderStatusValues = @Html.Raw(Json.Serialize(Model.OrderStatusStats.Values));
+
+        // Mapping màu cố định
+        const statusColors = {
+            "Paid": "#4CAF50",       // Xanh lá
+            "Cancelled": "#F44336"   // Đỏ
+        };
+
+        // Gán màu đúng theo label
+        const orderStatusColors = orderStatusLabels.map(label => statusColors[label] || "#9E9E9E");
+
+        new Chart(document.getElementById('orderStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: orderStatusLabels,
+                datasets: [{
+                    data: orderStatusValues,
+                    backgroundColor: orderStatusColors
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
     </script>
 }

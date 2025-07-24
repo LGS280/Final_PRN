@@ -97,7 +97,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             if (order == null)
                 return false;
 
-            order.Status = "Canceled";
+            order.Status = "Cancelled";
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
             return true;

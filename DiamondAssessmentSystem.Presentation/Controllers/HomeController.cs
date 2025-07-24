@@ -39,9 +39,35 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             return View(blogs);
         }
 
-        public async Task<IActionResult> Services()
+        [HttpGet]
+        public async Task<IActionResult> Services(string? search, string? serviceType, int? duration, string? sortOrder)
         {
             var services = await _servicePriceService.GetByStatusAsync("Active");
+
+            if (!string.IsNullOrWhiteSpace(search))
+                services = services.Where(s =>
+                    (!string.IsNullOrEmpty(s.Description) && s.Description.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    s.ServiceType.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(serviceType))
+                services = services.Where(s => s.ServiceType == serviceType);
+
+            if (duration.HasValue)
+                services = services.Where(s => s.Duration == duration.Value);
+
+            services = sortOrder switch
+            {
+                "price_desc" => services.OrderByDescending(s => s.Price),
+                "price_asc" => services.OrderBy(s => s.Price),
+                _ => services
+            };
+
+            ViewBag.Search = search;
+            ViewBag.ServiceType = serviceType;
+            ViewBag.Duration = duration;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.ServiceTypeOptions = services.Select(s => s.ServiceType).Distinct().ToList();
+
             return View(services);
         }
 

@@ -53,4 +53,10 @@ namespace DiamondAssessmentSystem.Application.DTO
         [Required, MaxLength(50)]
         public string Status { get; set; } = string.Empty;
     }
+
+    public class OrderStatusDto
+    {
+        public int TotalPaid { get; set; }
+        public int TotalCancelled { get; set; }
+    }
 }
