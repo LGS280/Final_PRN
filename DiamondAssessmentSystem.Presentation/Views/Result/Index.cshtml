@@ -4,18 +4,20 @@
 }
 
 <div class="max-w-7xl mx-auto px-4 py-10">
-    @* <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
         <a asp-action="Create" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">➕ Create New</a>
-    </div> *@
+    </div>
 
     <div class="overflow-x-auto bg-white shadow rounded-xl">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                 <tr>
                     <th class="px-4 py-3 text-left">Result ID</th>
-                    <th class="px-4 py-3 text-left">Assessment Staff</th>
+                    <th class="px-4 py-3 text-left">Request ID</th>
                     <th class="px-4 py-3 text-left">Origin</th>
+                    <th class="px-4 py-3 text-left">Shape</th>
+                    <th class="px-4 py-3 text-left">Carat</th>
                     <th class="px-4 py-3 text-left">Cut</th>
                     <th class="px-4 py-3 text-left">Status</th>
                     <th class="px-4 py-3 text-left">Actions</th>
@@ -26,7 +28,10 @@
                 {
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3">@item.ResultId</td>
+                        <td class="px-4 py-3">@item.RequestId</td>
                         <td class="px-4 py-3">@item.DiamondOrigin</td>
+                        <td class="px-4 py-3">@item.Shape</td>
+                        <td class="px-4 py-3">@item.CaratWeight</td>
                         <td class="px-4 py-3">@item.Cut</td>
                         <td class="px-4 py-3">
                             <span class="inline-block px-2 py-1 rounded text-xs font-semibold
@@ -50,6 +55,8 @@
                                 }
             </tbody>
         </table>
+
+        @* Delete confirmation modal *@
         <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
             <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Deletion</h2>
@@ -79,7 +86,7 @@
             document.getElementById("deleteId").value = id;
 
             const form = document.getElementById("deleteForm");
-            form.action = `/Result/Delete/${id}`; // or use asp-route + anti-forgery if needed
+            form.action = `/Result/Delete/${id}`;
 
             document.getElementById("deleteModal").classList.remove("hidden");
         }
