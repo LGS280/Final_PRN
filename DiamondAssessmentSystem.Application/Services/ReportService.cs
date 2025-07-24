@@ -2,6 +2,7 @@
 using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
+using DiamondAssessmentSystem.Infrastructure.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,6 +71,23 @@ namespace DiamondAssessmentSystem.Application.Services
             => await _reportRepository.GetTotalRequestChosenAsync();
         public async Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to)
             => await _reportRepository.GetAccountCreatedPerDayAsync(from, to);
+
+        public async Task<Dictionary<string, int>> GetOrderStatusReportAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _reportRepository.GetOrderCountByStatusAsync(fromDate, toDate);
+        }
+        public async Task<Dictionary<string, int>> GetRequestStatusReportAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await _reportRepository.GetRequestCountByStatusAsync(fromDate, toDate);
+        }
+
+        public async Task<int> GetTotalOrderCountAsync(DateTime fromDate, DateTime toDate)
+            => await _reportRepository.GetTotalOrderCountAsync(fromDate, toDate);
+        public async Task<Dictionary<string, int>> GetOrderCountByTypeAsync(DateTime fromDate, DateTime toDate)
+            => await _reportRepository.GetOrderCountByTypeAsync(fromDate, toDate);
+        public async Task<int> GetTotalRequestChosenAsync(DateTime fromDate, DateTime toDate)
+            => await _reportRepository.GetTotalRequestChosenAsync(fromDate, toDate);
+
     }
 
 }
