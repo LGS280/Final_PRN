@@ -104,33 +104,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             }
         }
 
-
-        //[HttpGet]
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    var result = await _resultService.GetResultByIdAsync(id);
-        //    if (result == null) return NotFound();
-
-        //    var dto = new ResultCreateDto
-        //    {
-        //        RequestId = result.RequestId,
-        //        DiamondOrigin = result.DiamondOrigin,
-        //        Shape = result.Shape,
-        //        Measurements = result.Measurements,
-        //        CaratWeight = result.CaratWeight,
-        //        Color = result.Color,
-        //        Clarity = result.Clarity,
-        //        Cut = result.Cut,
-        //        Proportions = result.Proportions,
-        //        Polish = result.Polish,
-        //        Symmetry = result.Symmetry,
-        //        Fluorescence = result.Fluorescence,
-        //        Status = result.Status
-        //    };
-
-        //    return View(dto);
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ResultUpdateDto dto)

@@ -14,5 +14,6 @@ namespace DiamondAssessmentSystem.Application.Interfaces
         Task<CertificateDto> GetCertificateByIdAsync(int id);
         Task<CertificateDto> CreateCertificateAsync(CertificateCreateDto certificateCreateDto);
         Task<bool> UpdateCertificateAsync(string userId, CertificateCreateDto certificateCreateDto);
+        Task<bool> UpdateCertificateAsync(CertificateEditDto dto);
     }
 }

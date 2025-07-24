@@ -13,5 +13,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
         Task<Certificate?> GetPersonalCertificateById(string userId);
         Task<Certificate> CreateCertificateAsync(Certificate certificate);
         Task<bool> UpdateCertificateAsync(string userId, Certificate certificate);
+        Task<bool> UpdateAsync(Certificate certificate);
+        Task<Certificate?> GetLatestCertificateAsync();
     }
 }
