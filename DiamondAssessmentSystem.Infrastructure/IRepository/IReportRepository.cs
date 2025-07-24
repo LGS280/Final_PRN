@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DiamondAssessmentSystem.Infrastructure.IRepository
+﻿namespace DiamondAssessmentSystem.Infrastructure.IRepository
 {
     public interface IReportRepository
     {
@@ -23,5 +17,11 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
         Task<Dictionary<string, int>> GetRequestChosenByUsersAsync();
         Task<int> GetTotalRequestChosenAsync();
         Task<Dictionary<string, int>> GetAccountCreatedPerDayAsync(DateTime from, DateTime to);
+        Task<int> GetTotalOrderCountAsync(DateTime fromDate, DateTime toDate);
+        Task<Dictionary<string, int>> GetOrderCountByTypeAsync(DateTime fromDate, DateTime toDate);
+        Task<int> GetTotalRequestChosenAsync(DateTime fromDate, DateTime toDate);
+
+        Task<Dictionary<string, int>> GetOrderCountByStatusAsync(DateTime fromDate, DateTime toDate);
+        Task<Dictionary<string, int>> GetRequestCountByStatusAsync(DateTime fromDate, DateTime toDate);
     }
 }

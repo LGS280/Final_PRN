@@ -47,4 +47,10 @@ namespace DiamondAssessmentSystem.Application.DTO
 
         public string? EmployeeName { get; set; } 
     }
+
+    public class RequestStatisticDto
+    {
+        public int TotalPending { get; set; }
+        public int TotalCancelled { get; set; }
+    }
 }

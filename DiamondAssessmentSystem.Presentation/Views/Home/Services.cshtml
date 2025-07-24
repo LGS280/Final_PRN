@@ -15,6 +15,34 @@
 <!-- Service Grid Section -->
 <section class="container py-5">
     <h2 class="text-center fw-bold mb-5 text-primary display-6">Our Services</h2>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" value="@ViewBag.Search" placeholder="Search description or type">
+        </div>
+        <div class="col-md-3">
+            <select name="serviceType" class="form-select">
+                <option value="">All Types</option>
+                @foreach (var type in ViewBag.ServiceTypeOptions as List<string>)
+                {
+                    <option value="@type" selected="@(ViewBag.ServiceType == type ? "selected" : null)">@type</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="duration" class="form-control" value="@ViewBag.Duration" placeholder="Duration (days)">
+        </div>
+        <div class="col-md-2">
+            <select name="sortOrder" class="form-select">
+                <option value="">Sort by Price</option>
+                <option value="price_asc" selected="@(ViewBag.SortOrder == "price_asc" ? "selected" : null)">Price ↑</option>
+                <option value="price_desc" selected="@(ViewBag.SortOrder == "price_desc" ? "selected" : null)">Price ↓</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Apply</button>
+        </div>
+    </form>
+
     <div class="row g-4">
         @foreach (var service in Model)
         {

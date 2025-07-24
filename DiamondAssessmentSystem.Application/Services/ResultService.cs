@@ -66,6 +66,8 @@ namespace DiamondAssessmentSystem.Application.Services
             try
             {
                 var created = await _resultRepository.CreateResultAsync(result);
+                var updated = await _requestRepository.UpdateRequestAsync(request);
+                if (!updated) return false;
 
                 if (created != null && created.Status == "Completed")
                 {

@@ -133,6 +133,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             var totalOrders = await _reportService.GetTotalOrderCountAsync();
             var ordersByType = await _reportService.GetOrderCountByTypeAsync();
             var totalRequests = await _reportService.GetTotalRequestChosenAsync(); // thay thế pie chart
+            var ordersByStatus = await _reportService.GetOrderStatusReportAsync(fromDate.Value, toDate.Value);
 
             var model = new ManagerDashboardDTO
             {
@@ -141,7 +142,8 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 AccountsCreatedPerDay = accountsPerDay,
                 TotalOrders = totalOrders,
                 OrdersByType = ordersByType,
-                TotalRequestChosen = totalRequests
+                TotalRequestChosen = totalRequests,
+                OrderStatusStats = ordersByStatus,
             };
 
             return View(model);
