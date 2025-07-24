@@ -63,11 +63,6 @@ namespace DiamondAssessmentSystem.Application.Services
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;
 
-            if (_currentUserService.Role == "Assessor" && _currentUserService.AssociatedId.HasValue)
-            {
-                result.EmployeeId = _currentUserService.AssociatedId.Value;
-            }
-
             try
             {
                 var created = await _resultRepository.CreateResultAsync(result);

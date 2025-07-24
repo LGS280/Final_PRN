@@ -17,8 +17,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
 
         public async Task<IEnumerable<Result>> GetResultsAsync()
         {
-            return await _context.Results.Include(r => r.Request) 
-                                         .ThenInclude(r => r.Employee) 
+            return await _context.Results.Include(r => r.Request)
                                          .Include(r => r.Certificates)
                                          .ToListAsync();
         }
@@ -26,7 +25,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         public async Task<IEnumerable<Result>> GetResultsAsync(int customerId)
         {
             return await _context.Results
-              .Include(r => r.Request).ThenInclude(r => r.Employee)
+              .Include(r => r.Request)
               .Include(r => r.Certificates)
               .Where(r => r.Request.CustomerId == customerId)
               .ToListAsync();
