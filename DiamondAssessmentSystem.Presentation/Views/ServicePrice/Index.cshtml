@@ -47,8 +47,11 @@
                             <td class="px-6 py-4">@item.EmployeeName</td>
                             <td class="px-6 py-4">
                                 <span class="inline-block px-3 py-1 rounded-full text-xs font-medium
-                                            @(item.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600")">
-                                    @item.Status
+                                                   @(item.Status == "Active" ? "bg-green-100 text-green-800" :
+                                            item.Status == "Rejected" ? "bg-red-100 text-red-800" :
+                                      item.Status == "Inactive" ? "bg-red-100 text-red-800" :
+                                            "bg-gray-200 text-gray-600")">
+                            @item.Status
                                 </span>
                             </td>
                             <td class="px-6 py-4 space-x-2">
