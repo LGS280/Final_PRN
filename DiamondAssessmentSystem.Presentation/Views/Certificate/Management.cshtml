@@ -38,7 +38,7 @@
                     </td>
 
                         <td class="px-4 py-3 space-x-2">
-                            <a asp-controller="Result" asp-action="Index" asp-route-id="@item.CertificateId" class="text-blue-600 hover:underline">Details</a>
+                            <a asp-action="Details" asp-route-id="@item.CertificateId" class="text-blue-600 hover:underline">Details</a>
                         @if (item.Status != "Approved")
                             {
                                 <a asp-action="Edit" asp-route-id="@item.CertificateId" class="text-yellow-600 hover:underline">Edit</a>
