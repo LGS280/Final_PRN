@@ -231,6 +231,7 @@ namespace DiamondAssessmentSystem.Presentation
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<ChatHub>("/hub/chat").RequireCors("AllowSpecificOrigin");
+            app.MapHub<ServicePriceHub>("/hub/serviceprice").RequireCors("AllowSpecificOrigin");
 
             app.Run();
         }

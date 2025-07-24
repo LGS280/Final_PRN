@@ -90,6 +90,12 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             }
         }
 
+        public async Task<bool> UpdateAsync(Certificate certificate)
+        {
+            _context.Certificates.Update(certificate);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
         private async Task<bool> CertificateExistsAsync(int id)
         {
             return await _context.Certificates.AnyAsync(e => e.CertificateId == id);
@@ -117,6 +123,13 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             }
 
             return employee.EmployeeId;
+        }
+
+        public async Task<Certificate?> GetLatestCertificateAsync()
+        {
+            return await _context.Certificates
+                .OrderByDescending(c => c.CertificateId)
+                .FirstOrDefaultAsync();
         }
     }
 }
