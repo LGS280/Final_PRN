@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
 {
-    //[Authorize]   Requires authentication
-    public class CustomerController : Controller // MVC controller
+    public class CustomerController : Controller 
     {
         private readonly ICustomerService _customerService;
         private readonly ICurrentUserService _currentUser;
@@ -39,11 +38,10 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         }
 
         // GET: Customer/Me
-        public async Task<IActionResult> Me() // Show customer profile
+        public async Task<IActionResult> Me() 
         {
             if (!User.Identity.IsAuthenticated)
             {
-                // If the user is not authenticated, redirect to login page.
                 return RedirectToAction("Login", "Auth");
             }
 
@@ -63,7 +61,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return NotFound();
             }
 
-            return View(customer); // View for customer
+            return View(customer); 
         }
 
         public async Task<IActionResult> EditCustomer()
