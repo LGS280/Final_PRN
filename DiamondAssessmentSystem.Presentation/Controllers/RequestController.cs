@@ -258,7 +258,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         public async Task<IActionResult> Edit(int id, RequestCreateDto updateDto)    
         {
             if (!ModelState.IsValid)
-                return View();   
+                return View(updateDto);   
 
             try
             {
@@ -269,7 +269,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return View("Unauthorized");
                 }
 
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(My)); 
             }
             catch (Exception ex)
             {
@@ -277,5 +277,68 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return View(ex.Message); 
             }
         }
+
+        [Authorize(Roles = "Assessor,Manager")]
+        [HttpGet]
+        public async Task<IActionResult> EditAssessor(int id)
+        {
+            var request = await _requestService.GetRequestByIdAsync(id);
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            if (request.Status == "Completed" || request.Status == "Canceled")
+            {
+                TempData["Error"] = "Cannot edit a completed or canceled request.";
+                return RedirectToAction("IndexAssessor");
+            }
+
+            var dto = new RequestCreateDto
+            {
+                RequestType = request.RequestType,
+                ServiceId = request.ServiceId
+            };
+
+            await LoadServicesAsync();
+            ViewBag.Id = id;
+
+            return View("EditAssessor", dto);
+        }
+
+        [Authorize(Roles = "Assessor,Manager")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditAssessor(int id, RequestCreateDto updateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadServicesAsync();
+                ViewBag.Id = id;
+                return View("EditAssessor", updateDto);
+            }
+
+            try
+            {
+                var success = await _requestService.UpdateRequestAsync(id, updateDto);
+                if (!success)
+                {
+                    TempData["Error"] = "Update failed.";
+                    return RedirectToAction("IndexAssessor");
+                }
+
+                TempData["Success"] = "Update successful.";
+                return RedirectToAction("IndexAssessor");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Unexpected error: {ex.Message}");
+                await LoadServicesAsync();
+                ViewBag.Id = id;
+                return View("EditAssessor", updateDto);
+            }
+        }
+
+
     }
 }

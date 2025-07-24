@@ -7,9 +7,11 @@ public partial class Result
 {
     public int ResultId { get; set; }
 
-    public int DiamondId { get; set; }
+    public int? DiamondId { get; set; }
 
     public int RequestId { get; set; }
+
+    public int EmployeeId { get; set; } // Added field for assessment staff
 
     public string DiamondOrigin { get; set; } = null!;
 

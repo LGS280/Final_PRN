@@ -79,26 +79,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.delete-confirm').forEach(button => {
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const serviceId = this.getAttribute('data-id');
+                    const serviceId = button.dataset.id;
 
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This action cannot be undone.",
+                        title: 'Xác nhận xoá?',
+                        text: "Thao tác này không thể hoàn tác.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#e3342f',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, delete it!',
-                        cancelButtonText: 'Cancel'
+                        confirmButtonText: 'Vâng, xoá!',
+                        cancelButtonText: 'Huỷ'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const form = document.getElementById(`delete-form-${serviceId}`);
                             if (form) {
                                 form.submit();
+                            } else {
+                                console.error("Không tìm thấy form để xoá.");
                             }
                         }
                     });

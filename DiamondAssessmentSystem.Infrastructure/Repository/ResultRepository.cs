@@ -59,8 +59,16 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
         public async Task<Result> CreateResultAsync(Result result)
         {
             _context.Results.Add(result);
-            await _context.SaveChangesAsync();
-            return result;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return result;
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+            }
         }
 
         public async Task<bool> UpdateResultAsync(Result result)
