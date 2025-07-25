@@ -103,6 +103,23 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
             return true;
         }
 
+        public async Task<int> GetCurentOrderId(string userId)
+        {
+            var cusId = await GetCustomerIdAsync(userId);
+            var order = await _context.Orders.Where(od => od.CustomerId == cusId).OrderByDescending(od => od.OrderDate).FirstOrDefaultAsync();
+            int orderId = 0;
+            if (order != null)
+            {
+                orderId = order.OrderId;
+                if (orderId <= 0 || orderId == null)
+                {
+                    orderId = 0;
+                }
+            }
+            var orderIdNext = orderId += 1;
+            return orderIdNext;
+        }
+
         private async Task<int> GetCustomerIdAsync(string userId)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.UserId == userId);

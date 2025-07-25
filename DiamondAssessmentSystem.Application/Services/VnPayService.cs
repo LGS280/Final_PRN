@@ -20,29 +20,29 @@ namespace DiamondAssessmentSystem.Application.Services
             _currentUser = currentUser;
         }
 
-        public async Task<string> CreatePatmentUrl(HttpContext context, VnPaymentRequestDto paymentRequest)
+        public async Task<string> CreatePatmentUrl(HttpContext content, VnPaymentRequestDto paymentRequestModel)
         {
             var tick = DateTime.Now.Ticks.ToString();
-
+            var orderId = await _orderRepository.GetCurentOrderId(_currentUser.UserId);
             var vnpay = new VnPayLibrary();
             vnpay.AddRequestData("vnp_Version", _config["VnPay:Version"]);
             vnpay.AddRequestData("vnp_Command", _config["VnPay:Command"]);
             vnpay.AddRequestData("vnp_TmnCode", _config["VnPay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", ((int)(paymentRequest.Amount * 100)).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", paymentRequest.CreatedDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_Amount", (paymentRequestModel.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không 
+            //mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND
+            //(một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần(khử phần thập phân), sau đó gửi sang VNPAY
+            //là: 10000000
+
+            vnpay.AddRequestData("vnp_CreateDate", paymentRequestModel.CreatedDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", _config["VnPay:CurrCode"]);
-            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
+            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(content));
             vnpay.AddRequestData("vnp_Locale", _config["VnPay:Locale"]);
-
-            // Encode OrderInfo để sau này callback xử lý
-            var orderInfo = $"requestId={paymentRequest.RequestId};serviceId={paymentRequest.ServiceId};amount={paymentRequest.Amount}";
-            vnpay.AddRequestData("vnp_OrderInfo", orderInfo);
-            vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:ReturnUrl"]);
-            vnpay.AddRequestData("vnp_TxnRef", tick);
-
-            var paymentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
-            return paymentUrl;
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + orderId);
+            vnpay.AddRequestData("vnp_OrderType", "order"); 
+            vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
+            vnpay.AddRequestData("vnp_TxnRef", tick); 
+            var paymnentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
+            return paymnentUrl;
         }
 
         public VnPaymentRequestDto CreateVnpayModel(VnPaymentRequestDto input)

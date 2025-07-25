@@ -12,6 +12,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
         Task<bool> CreateOrderAsync(string userId, Order order);
         Task<bool> UpdateOrderAsync(Order order);
         Task<bool> CancelOrderAsync(int id);
+        Task<int> GetCurentOrderId(string userId);
         Task<Order?> GetByIdAsync(int orderId);
         Task<bool> UpdateAsync(Order order);
     }
