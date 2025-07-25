@@ -142,7 +142,7 @@ namespace DiamondAssessmentSystem.Infrastructure.Repository
                 .GroupBy(o => o.Status)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(g => g.Status, g => g.Count);
-        }
+        } 
         public async Task<Dictionary<string, int>> GetRequestCountByStatusAsync(DateTime fromDate, DateTime toDate)
         {
             return await _context.Requests
