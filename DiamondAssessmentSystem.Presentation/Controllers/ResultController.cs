@@ -81,17 +81,6 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                     return RedirectToAction("Index", "Request");
                 }
 
-                // Gán AssessmentStaff = EmployeeId hiện tại
-                if (_currentUser.AssociatedId.HasValue)
-                {
-                    dto.AssessmentStaff = _currentUser.AssociatedId.Value;
-                }
-                else
-                {
-                    TempData["Error"] = "You are not authorized to create results.";
-                    return RedirectToAction("Index", "Request");
-                }
-
                 await _resultService.CreateResultAsync(dto);
 
                 TempData["Success"] = "Result created successfully!";

@@ -59,18 +59,16 @@ namespace DiamondAssessmentSystem.Application.Services
 
             if (request == null)
                 throw new Exception("Request is invalid!");
-
+            request.EmployeeId = await _requestRepository.GetEmployeeId(_currentUserService.UserId);
+            var resultRequest = await _requestRepository.UpdateRequestAsync(request);
             var result = _mapper.Map<Result>(dto);
             result.ModifiedDate = DateTime.Now;
-
-            if (_currentUserService.Role == "Assessor" && _currentUserService.AssociatedId.HasValue)
-            {
-                result.EmployeeId = _currentUserService.AssociatedId.Value;
-            }
 
             try
             {
                 var created = await _resultRepository.CreateResultAsync(result);
+                var updated = await _requestRepository.UpdateRequestAsync(request);
+                if (!updated) return false;
 
                 if (created != null && created.Status == "Completed")
                 {

@@ -25,6 +25,7 @@ namespace DiamondAssessmentSystem.Infrastructure.IRepository
 
         // Cập nhật một yêu cầu
         Task<bool> UpdateRequestAsync(Request request);
+        Task<int> GetEmployeeId(string userId);
 
     }
 }
