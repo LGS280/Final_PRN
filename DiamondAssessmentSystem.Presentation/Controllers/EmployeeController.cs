@@ -1,4 +1,5 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
+using DiamondAssessmentSystem.Application.Enums;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -99,17 +100,32 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
 
             try
             {
-                var updated = await _employeeService.UpdateEmployee(userId, dto);
-                if (updated)
+                var result = await _employeeService.UpdateEmployee(userId, dto);
+
+                switch (result)
                 {
-                    TempData["SuccessMessage"] = "Profile updated successfully!";
-                    return RedirectToAction("Me");
+                    case EmployeeEnum.Success:
+                        TempData["SuccessMessage"] = "Profile updated successfully!";
+                        return RedirectToAction("Me");
+
+                    case EmployeeEnum.InvalidPhoneNumber:
+                        ModelState.AddModelError(nameof(dto.Phone), "Invalid phone number.");
+                        break;
+
+                    case EmployeeEnum.NotFound:
+                        ModelState.AddModelError(string.Empty, "User not found.");
+                        break;
+
+                    case EmployeeEnum.UpdateFailed:
+                        ModelState.AddModelError(string.Empty, "Failed to update profile.");
+                        break;
+
+                    default:
+                        ModelState.AddModelError(string.Empty, "An unknown error occurred.");
+                        break;
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to update profile.");
-                    return View("Edit", dto);
-                }
+
+                return View("Edit", dto);
             }
             catch (Exception ex)
             {

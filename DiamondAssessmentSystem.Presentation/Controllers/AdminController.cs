@@ -1,4 +1,5 @@
 ﻿using DiamondAssessmentSystem.Application.DTO;
+using DiamondAssessmentSystem.Application.Enums;
 using DiamondAssessmentSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -148,8 +149,37 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             var emailAfterUpdate = await _employeeService.GetEmployeeEmail(id);
             ViewBag.Email = emailAfterUpdate;
 
-            ViewBag.PopupType = result ? "success" : "error";
-            ViewBag.PopupMessage = result ? "Employee updated successfully." : "Failed to update employee.";
+            switch (result)
+            {
+                case EmployeeEnum.Success:
+                    ViewBag.PopupType = "success";
+                    ViewBag.PopupMessage = "Employee updated successfully.";
+                    break;
+
+                case EmployeeEnum.InvalidPhoneNumber:
+                    ViewBag.PopupType = "error";
+                    ViewBag.PopupMessage = "Invalid phone number.";
+                    ModelState.AddModelError(nameof(dto.Phone), "Invalid phone number.");
+                    break;
+
+                case EmployeeEnum.NotFound:
+                    ViewBag.PopupType = "error";
+                    ViewBag.PopupMessage = "Employee not found.";
+                    ModelState.AddModelError(string.Empty, "Employee not found.");
+                    break;
+
+                case EmployeeEnum.UpdateFailed:
+                    ViewBag.PopupType = "error";
+                    ViewBag.PopupMessage = "Failed to update employee.";
+                    ModelState.AddModelError(string.Empty, "Update failed. Please try again.");
+                    break;
+
+                default:
+                    ViewBag.PopupType = "error";
+                    ViewBag.PopupMessage = "An unknown error occurred.";
+                    ModelState.AddModelError(string.Empty, "An unknown error occurred.");
+                    break;
+            }
 
             return View("Employees/Edit", dto);
         }

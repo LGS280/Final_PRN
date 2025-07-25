@@ -1,4 +1,5 @@
-﻿using DiamondAssessmentSystem.Application.Interfaces;
+﻿using DiamondAssessmentSystem.Application.Email;
+using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Application.Map;
 using DiamondAssessmentSystem.Application.Services;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
@@ -39,7 +40,10 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddHttpContextAccessor();
 
             // ==================== Identity ====================
-            builder.Services.AddIdentity<User, IdentityRole>()
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = true;
+            })
                 .AddEntityFrameworkStores<DiamondAssessmentDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -70,6 +74,10 @@ namespace DiamondAssessmentSystem.Presentation
                     options.LoginPath = "/Auth/Login";
                     options.LogoutPath = "/Auth/Logout";
                 });
+
+            // ==================== Email===========================
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddTransient<IEmailService, EmailService>();
 
             // ==================== Application Services ====================
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();

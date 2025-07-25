@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DiamondAssessmentSystem.Application.DTO;
+using DiamondAssessmentSystem.Application.Enums;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using PhoneNumbers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -40,22 +42,29 @@ namespace DiamondAssessmentSystem.Application.Services
             return user == null ? null : _mapper.Map<AccountDto>(user);
         }
 
-        public async Task<bool> UpdateEmployee(string userId, EmployeeUpdateDto dto)
+        public async Task<EmployeeEnum> UpdateEmployee(string userId, EmployeeUpdateDto employeeDto)
         {
-            var employee = await _employeeRepository.GetEmployeeByIdAsync(userId);
-            if (employee == null) return false;
+            if (string.IsNullOrWhiteSpace(userId) || employeeDto == null)
+                return EmployeeEnum.NotFound;
 
-            employee.Salary = dto.Salary ?? 0;
+            var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(userId);
 
-            if (employee.User != null)
+            if (existingEmployee == null)
+                return EmployeeEnum.NotFound;
+
+            if (employeeDto.Phone != null)
             {
-                employee.User.FirstName = dto.FirstName;
-                employee.User.LastName = dto.LastName;
-                employee.User.PhoneNumber = dto.Phone;
-                employee.User.Gender = dto.Gender;
+                if (!IsPhoneNumberValid(employeeDto.Phone, "VN"))
+                {
+                    return EmployeeEnum.InvalidPhoneNumber;
+                }
             }
 
-            return await _employeeRepository.UpdateEmployeeAsync(employee);
+            _mapper.Map(employeeDto, existingEmployee);
+
+            var updateSuccess = await _employeeRepository.UpdateEmployeeAsync(existingEmployee);
+
+            return updateSuccess ? EmployeeEnum.Success : EmployeeEnum.UpdateFailed;
         }
 
         public async Task<bool> DeleteEmployeeAsync(string userId)
@@ -70,6 +79,25 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<string?> GetEmployeeEmail(string userId)
         {
             return await _employeeRepository.GetEmployeeEmail(userId);
+        }
+
+        private bool IsPhoneNumberValid(string phoneNumber, string regionCode)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return false;
+            }
+
+            try
+            {
+                var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+                var parsedNumber = phoneNumberUtil.Parse(phoneNumber, regionCode);
+                return phoneNumberUtil.IsValidNumber(parsedNumber);
+            }
+            catch (NumberParseException)
+            {
+                return false;
+            }
         }
     }
 }

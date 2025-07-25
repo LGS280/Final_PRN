@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using DiamondAssessmentSystem.Application.DTO;
+using DiamondAssessmentSystem.Application.Email;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -19,15 +22,21 @@ namespace DiamondAssessmentSystem.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
 
         public AuthService(
             IUserRepository userRepository,
             IConfiguration configuration,
+            IEmailService emailService,
+            UserManager<User> userManager,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _emailService = emailService;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -46,16 +55,33 @@ namespace DiamondAssessmentSystem.Application.Services
                 throw new Exception($"Unable to create account: {errors}");
             }
 
-            var roles = await _userRepository.GetUserRolesAsync(newUser);
+            // Generate email confirmation token
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
-            return "Registration successful";
+            // Encode token for URL
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            // Tạo URL xác nhận
+            var confirmationUrl = $"https://localhost:7278/api/Email/confirm?userId={newUser.Id}&token={encodedToken}";
+
+            var emailBody = EmailTemplates.ConfirmEmailTemplate(confirmationUrl);
+
+            await _emailService.SendEmailAsync(newUser.Email, "Confirm your email", emailBody);
+
+            return "Registration successful. Please check your email to confirm your account.";
         }
+
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
         {
             var user = await _userRepository.ValidateUserCredentialsAsync(loginDto.Email, loginDto.Password);
             if (user == null)
                 throw new UnauthorizedAccessException("Incorrect email or password.");
+
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                throw new Exception("You must confirm your email to log in.");
+            }
 
             var roles = await _userRepository.GetUserRolesAsync(user);
             var token = GenerateJwtToken(user, roles);
