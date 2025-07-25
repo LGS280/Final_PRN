@@ -41,8 +41,6 @@ namespace DiamondAssessmentSystem.Application.Map
 
             CreateMap<Result, ResultDto>().ReverseMap();
             CreateMap<Result, ResultCreateDto>().ReverseMap();
-            CreateMap<ResultCreateDto, Result>()
-                .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.AssessmentStaff)).ReverseMap();
             CreateMap<ResultUpdateDto, Result>();
 
 

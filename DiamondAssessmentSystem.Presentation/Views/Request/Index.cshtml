@@ -44,7 +44,7 @@
                             <div class="flex justify-center gap-3 text-sm">
                                 <a asp-action="Details" asp-route-id="@item.RequestId" class="text-blue-600 hover:underline">Details</a>
 
-                                @if (item.Status != "Draft" && item.Status != "Completed")
+                                @if (item.Status != "Draft" && item.Status != "Completed" && item.Status != "Pending")
                                 {
                                     <a asp-controller="Result" asp-action="Create" asp-route-id="@item.RequestId" class="text-yellow-600 hover:underline">Create Result</a>
 
@@ -71,6 +71,7 @@
             "Pending" => "bg-blue-100 text-blue-800",
             "Completed" => "bg-green-100 text-green-800",
             "Canceled" => "bg-red-100 text-red-800",
+            "Ordered" => "bg-purple-100 text-purple-800",
             _ => "bg-gray-100 text-gray-700"
         };
     }

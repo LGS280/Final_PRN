@@ -218,7 +218,7 @@ public partial class DiamondAssessmentDbContext : IdentityDbContext<User>
                 .HasColumnName("unit_name");
             entity.Property(e => e.UserId)
                 .IsRequired()
-                .HasMaxLength(450) 
+                .HasMaxLength(450)
                 .HasColumnName("userId");
 
             entity.HasOne(e => e.User)
