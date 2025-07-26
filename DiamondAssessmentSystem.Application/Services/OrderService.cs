@@ -80,10 +80,12 @@ namespace DiamondAssessmentSystem.Application.Services
                         throw new InvalidOperationException("Failed to save payment.");
 
                     order.Status = "Completed";
+                    order.OrderDate = DateTime.Now;
                     await _orderRepo.UpdateOrderAsync(order);
                 }
                 else if (paymentType == "Offline")
                 {
+                    order.OrderDate = DateTime.Now;
                     if (!await CreatePaymentRecordAsync(order.OrderId, order.TotalPrice, "Offline", "Pending"))
                         throw new InvalidOperationException("Failed to save offline payment.");
                 }

@@ -95,7 +95,7 @@ namespace DiamondAssessmentSystem.Application.Services
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            var confirmationUrl = $"https://localhost:7278/Auth/ConfirmEmail?userId={user.Id}&token={encodedToken}";
+            var confirmationUrl = $"https://0e9f9bbc75d8.ngrok-free.app/Auth/ConfirmEmail?userId={user.Id}&token={encodedToken}";
             var emailBody = EmailTemplates.ConfirmEmailTemplate(confirmationUrl);
 
             await _emailService.SendEmailAsync(user.Email, "Confirm your email", emailBody);

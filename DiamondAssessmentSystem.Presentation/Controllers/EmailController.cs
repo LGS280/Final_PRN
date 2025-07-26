@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 
-namespace YourAppNamespace.Controllers
+namespace DiamondAssessmentSystem.Presentation.Controllers
 {
     public class EmailController : Controller
     {
@@ -29,7 +29,7 @@ namespace YourAppNamespace.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
             if (result.Succeeded)
-                return View("ConfirmSuccess");
+                return View("ConfirmEmailNotice");
 
             return View("Error");
         }
