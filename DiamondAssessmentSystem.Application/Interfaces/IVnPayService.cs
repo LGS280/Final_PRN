@@ -10,8 +10,7 @@ namespace DiamondAssessmentSystem.Application.Interfaces
 {
     public interface IVnPayService
     {
-        Task<string> CreatePatmentUrl(HttpContext content, VnPaymentRequestDto paymentRequestModel);
+        Task<string> CreatePaymentUrl(HttpContext context, VnPaymentRequestDto request);
         VnPaymentResponseDto ExecutePayment(VnPaymentResponseFromFe request);
-        VnPaymentRequestDto CreateVnpayModel(VnPaymentRequestDto paymentRequest);
     }
 }

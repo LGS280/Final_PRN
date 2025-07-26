@@ -144,48 +144,35 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
                 return View(model);
             }
 
-            try
+            if (model.PaymentInfo.PaymentType.Equals("Online", StringComparison.OrdinalIgnoreCase))
             {
-                if (model.PaymentInfo.PaymentType == "Online")
+                var paymentRequest = new VnPaymentRequestDto
                 {
-                    var paymentRequest = new VnPaymentRequestDto
-                    {
-                        RequestId = model.PaymentInfo.RequestId,
-                        ServiceId = model.OrderData.ServiceId,
-                        Amount = (double)model.OrderData.TotalPrice,
-                        CreatedDate = DateTime.UtcNow
-                    };
+                    RequestId = model.PaymentInfo.RequestId,
+                    ServiceId = model.OrderData.ServiceId,
+                    Amount = (double)model.OrderData.TotalPrice,
+                    CreatedDate = DateTime.UtcNow
+                };
 
-                    return RedirectToAction("RedirectToVnPay", "Payment", paymentRequest);
-                }
-
-                var created = await _orderService.CreateOrderAsync(
-                    userId,
-                    model.PaymentInfo.RequestId,
-                    model.OrderData,
-                    "Offline",
-                    null
-                );
-
-                if (!created)
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to create order.");
-                    await LoadRequestOptionsToViewBag(userId);
-                    ViewBag.CustomerInfo = customer;
-                    return View(model);
-                }
-
-                return _currentUser.Role?.ToLower() == "customer"
-                    ? RedirectToAction(nameof(MyOrder))
-                    : RedirectToAction(nameof(Index));
+                return RedirectToAction("RedirectToVnPay", "Payment", paymentRequest);
             }
-            catch (Exception ex)
+
+            var created = await _orderService.CreateOrderAsync(
+                userId,
+                model.PaymentInfo.RequestId,
+                model.OrderData,
+                "Offline",
+                null);
+
+            if (!created)
             {
-                ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "Tạo đơn hàng thất bại.");
                 await LoadRequestOptionsToViewBag(userId);
                 ViewBag.CustomerInfo = customer;
                 return View(model);
             }
+
+            return RedirectToAction(_currentUser.Role?.ToLower() == "customer" ? nameof(MyOrder) : nameof(Index));
         }
 
         private async Task LoadRequestOptionsToViewBag(string userId)

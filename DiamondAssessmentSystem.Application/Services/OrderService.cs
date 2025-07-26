@@ -18,6 +18,7 @@ namespace DiamondAssessmentSystem.Application.Services
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
         private readonly IRequestService _requestService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public OrderService(
             IOrderRepository orderRepo,
@@ -28,7 +29,8 @@ namespace DiamondAssessmentSystem.Application.Services
             IPaymentRepository paymentRepo,
             IServicePriceRepository servicePriceRepository,
             ICustomerRepository customerRepository,
-            IRequestService requestService)
+            IRequestService requestService,
+            IUnitOfWork unitOfWork)
         {
             _orderRepo = orderRepo;
             _mapper = mapper;
@@ -39,6 +41,7 @@ namespace DiamondAssessmentSystem.Application.Services
             _servicePriceRepository = servicePriceRepository;
             _customerRepository = customerRepository;
             _requestService = requestService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersAsync() =>
@@ -58,30 +61,58 @@ namespace DiamondAssessmentSystem.Application.Services
             if (dto == null) throw new ArgumentNullException(nameof(dto));
             if (!await _requestService.UpdateRequestStatusAsync(requestId, "Ordered")) return false;
 
-            var order = _mapper.Map<Order>(dto);
-
-            switch (paymentType)
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
             {
-                case "Online":
-                    var result = _vnPay.ExecutePayment(paymentRequest!);
-                    if (result == null || !result.Success) return false;
+                var order = _mapper.Map<Order>(dto);
+                order.Status = "Pending";
+
+                if (!await _orderRepo.CreateOrderAsync(userId, order))
+                    throw new InvalidOperationException("Failed to create order.");
+
+                if (paymentType == "Online")
+                {
+                    var paymentResult = _vnPay.ExecutePayment(paymentRequest!);
+                    if (paymentResult == null || !paymentResult.Success)
+                        throw new InvalidOperationException("VNPAY payment failed.");
+
+                    if (!await CreatePaymentRecordAsync(order.OrderId, order.TotalPrice, "Online", "Completed"))
+                        throw new InvalidOperationException("Failed to save payment.");
+
                     order.Status = "Completed";
-                    break;
-
-                case "Offline":
-                    order.Status = "Pending";
-                    break;
-
-                default:
+                    await _orderRepo.UpdateOrderAsync(order);
+                }
+                else if (paymentType == "Offline")
+                {
+                    if (!await CreatePaymentRecordAsync(order.OrderId, order.TotalPrice, "Offline", "Pending"))
+                        throw new InvalidOperationException("Failed to save offline payment.");
+                }
+                else
+                {
                     throw new ArgumentException($"Invalid payment type: {paymentType}");
+                }
+
+                await transaction.CommitAsync();
+                return true;
             }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
 
-            if (!await _orderRepo.CreateOrderAsync(userId, order))
-                throw new InvalidOperationException("Failed to create order.");
-
-            await HandlePaymentRecordAsync(order.OrderId, order.TotalPrice, paymentType, order.Status);
-
-            return true;
+        private async Task<bool> CreatePaymentRecordAsync(int orderId, decimal amount, string method, string status)
+        {
+            var payment = new Payment
+            {
+                OrderId = orderId,
+                Amount = amount,
+                Method = method,
+                Status = status.ToString(),
+                PaymentDate = DateTime.UtcNow
+            };
+            return await _paymentRepo.CreatePayment(payment);
         }
 
         private async Task HandlePaymentRecordAsync(int orderId, decimal amount, string method, string status)
@@ -113,15 +144,34 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<bool> UpdatePaymentAsync(string userId, int orderId, string status)
         {
             var order = await _orderRepo.GetOrderByIdAsync(orderId);
-            if (status == "Completed")
+            if (order == null || order.Customer.UserId != userId) return false;
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
             {
-                order.Status = "Completed";
-                await _orderRepo.UpdateOrderAsync(order);
+                if (status == "Completed")
+                {
+                    order.Status = "Completed";
+                    await _orderRepo.UpdateOrderAsync(order);
+                }
+
+                var payment = await _paymentRepo.GetPaymentByOrderId(orderId);
+                if (payment != null)
+                {
+                    payment.Status = "Completed";
+                    payment.Method = "Offline";
+                    payment.PaymentDate = DateTime.UtcNow;
+                    await _paymentRepo.UpdatePayment(payment);
+                }
+
+                await transaction.CommitAsync();
+                return true;
             }
-
-            if (order?.Customer.UserId != userId) return false;
-
-            return await HandleOfflinePaymentUpdateAsync(order, status);
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         private async Task<bool> HandleOfflinePaymentUpdateAsync(Order order, string status)

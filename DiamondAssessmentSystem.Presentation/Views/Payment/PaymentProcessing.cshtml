@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Đang chuyển đến VNPay";
+}
+
+<div class="max-w-xl mx-auto py-20 px-6 text-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-6"></div>
+    <h2 class="text-xl font-semibold text-gray-700">Đang xử lý thanh toán...</h2>
+    <p class="text-sm text-gray-500 mt-2">Bạn sẽ được chuyển đến cổng thanh toán VNPay trong giây lát.</p>
+</div>
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const form = document.getElementById("vnPayForm");
+            if (form) form.submit();
+        }, 1000);
+    </script>
+}

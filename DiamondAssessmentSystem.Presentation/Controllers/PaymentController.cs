@@ -28,30 +28,31 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             if (paymentRequest == null || paymentRequest.Amount <= 0 || paymentRequest.RequestId <= 0)
                 return RedirectToAction("Create", "Order");
 
-            var url = await _vnPayService.CreatePatmentUrl(HttpContext, paymentRequest);
+            var url = await _vnPayService.CreatePaymentUrl(HttpContext, paymentRequest);
             return Redirect(url);
         }
 
         // GET: /Payment/Confirm
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Confirm(VnPaymentResponseFromFe response)
+        [Route("Payment/Confirm")]
+        public async Task<IActionResult> Confirm([FromQuery] VnPaymentResponseFromFe response)
         {
-            if (response == null)
+            if (response == null || string.IsNullOrWhiteSpace(response.VnPayResponseCode))
                 return RedirectToAction("PaymentFailed");
 
             var result = _vnPayService.ExecutePayment(response);
-            if (!result.Success)
+            if (!result.Success || result.OrderId == null)
                 return RedirectToAction("PaymentFailed");
 
             var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
 
-            // Parse OrderInfo
-            var orderMeta = ParseOrderInfo(response.OrderInfo);
-            if (!orderMeta.TryGetValue("serviceId", out var serviceIdStr) ||
-                !orderMeta.TryGetValue("amount", out var amountStr) ||
-                !orderMeta.TryGetValue("requestId", out var requestIdStr))
+            var orderInfo = ParseOrderInfo(response.OrderInfo ?? "");
+            if (!orderInfo.TryGetValue("requestId", out var requestIdStr) ||
+                !orderInfo.TryGetValue("serviceId", out var serviceIdStr) ||
+                !orderInfo.TryGetValue("amount", out var amountStr))
             {
                 return RedirectToAction("PaymentFailed");
             }
@@ -60,7 +61,7 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             {
                 OrderDate = DateTime.UtcNow,
                 ServiceId = int.Parse(serviceIdStr),
-                TotalPrice = Convert.ToDecimal(amountStr)
+                TotalPrice = decimal.Parse(amountStr)
             };
 
             var created = await _orderService.CreateOrderAsync(
@@ -73,13 +74,27 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
             if (!created)
                 return RedirectToAction("PaymentFailed");
 
-            return RedirectToAction("MyOrder", "Order");
+            ViewData["OrderId"] = result.OrderId;
+            return View("ConfirmSuccess");
+        }
+
+        private string ParseOrderInfoValue(string orderInfo, string key)
+        {
+            var parts = orderInfo.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var part in parts)
+            {
+                var keyValue = part.Split('=');
+                if (keyValue.Length == 2 && keyValue[0].Trim() == key)
+                    return keyValue[1].Trim();
+            }
+            return string.Empty;
         }
 
         // GET: /Payment/Failed
         public IActionResult PaymentFailed()
         {
-            return View(); // Views/Payment/PaymentFailed.cshtml
+            TempData["ErrorMessage"] = "Thanh toán thất bại. Vui lòng thử lại hoặc chọn phương thức khác.";
+            return View();
         }
 
         // Helper: Parse OrderInfo (e.g. requestId=5;serviceId=2;amount=300000)

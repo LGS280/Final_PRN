@@ -10,120 +10,102 @@ namespace DiamondAssessmentSystem.Application.Services
     public class VnPayService : IVnPayService
     {
         private readonly IConfiguration _config;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepository _orderRepo;
         private readonly ICurrentUserService _currentUser;
 
-        public VnPayService(IConfiguration config, IOrderRepository orderRepository, ICurrentUserService currentUser)
+        public VnPayService(IConfiguration config, IOrderRepository orderRepo, ICurrentUserService currentUser)
         {
             _config = config;
-            _orderRepository = orderRepository;
+            _orderRepo = orderRepo;
             _currentUser = currentUser;
         }
 
-        public async Task<string> CreatePatmentUrl(HttpContext content, VnPaymentRequestDto paymentRequestModel)
+        public async Task<string> CreatePaymentUrl(HttpContext context, VnPaymentRequestDto request)
         {
-            var tick = DateTime.Now.Ticks.ToString();
-            var orderId = await _orderRepository.GetCurentOrderId(_currentUser.UserId);
+            var txnRef = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            var orderId = await _orderRepo.GetCurentOrderId(_currentUser.UserId);
+
             var vnpay = new VnPayLibrary();
             vnpay.AddRequestData("vnp_Version", _config["VnPay:Version"]);
             vnpay.AddRequestData("vnp_Command", _config["VnPay:Command"]);
             vnpay.AddRequestData("vnp_TmnCode", _config["VnPay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", (paymentRequestModel.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không 
-            //mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND
-            //(một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần(khử phần thập phân), sau đó gửi sang VNPAY
-            //là: 10000000
-
-            vnpay.AddRequestData("vnp_CreateDate", paymentRequestModel.CreatedDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_Amount", ((int)(request.Amount * 100)).ToString());
+            vnpay.AddRequestData("vnp_CreateDate", request.CreatedDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", _config["VnPay:CurrCode"]);
-            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(content));
+            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", _config["VnPay:Locale"]);
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + orderId);
-            vnpay.AddRequestData("vnp_OrderType", "order"); 
+            vnpay.AddRequestData("vnp_OrderInfo", $"requestId={request.RequestId};serviceId={request.ServiceId};amount={request.Amount}");
+            vnpay.AddRequestData("vnp_OrderType", "order");
             vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
-            vnpay.AddRequestData("vnp_TxnRef", tick); 
-            var paymnentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
-            return paymnentUrl;
+            vnpay.AddRequestData("vnp_TxnRef", txnRef);
+
+            return vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
         }
 
-        public VnPaymentRequestDto CreateVnpayModel(VnPaymentRequestDto input)
-        {
-            if (input == null || input.Amount <= 0)
-                return null;
-
-            return new VnPaymentRequestDto
-            {
-                RequestId = input.RequestId,
-                ServiceId = input.ServiceId,
-                Amount = input.Amount,
-                CreatedDate = DateTime.Now
-            };
-        }
-
-        public VnPaymentResponseDto ExecutePayment(VnPaymentResponseFromFe request)
+        public VnPaymentResponseDto ExecutePayment(VnPaymentResponseFromFe response)
         {
             var vnpay = new VnPayLibrary();
             var responseData = new Dictionary<string, string>
-            {
-                { "vnp_Amount", request.Amount },
-                { "vnp_BankCode", request.BankCode },
-                { "vnp_BankTranNo", request.BankTranNo },
-                { "vnp_CardType", request.CardType },
-                { "vnp_OrderInfo", request.OrderInfo },
-                { "vnp_PayDate", request.PayDate },
-                { "vnp_ResponseCode", request.VnPayResponseCode },
-                { "vnp_TmnCode", request.TmnCode },
-                { "vnp_TransactionNo", request.TransactionNo },
-                { "vnp_TransactionStatus", request.TransactionStatus },
-                { "vnp_TxnRef", request.TxnRef },
-                { "vnp_SecureHash", request.SecureHash }
-            };
+        {
+            { "vnp_Amount", response.Amount ?? "" },
+            { "vnp_BankCode", response.BankCode ?? "" },
+            { "vnp_BankTranNo", response.BankTranNo ?? "" },
+            { "vnp_CardType", response.CardType ?? "" },
+            { "vnp_OrderInfo", response.OrderInfo ?? "" },
+            { "vnp_PayDate", response.PayDate ?? "" },
+            { "vnp_ResponseCode", response.VnPayResponseCode ?? "" },
+            { "vnp_TmnCode", response.TmnCode ?? "" },
+            { "vnp_TransactionNo", response.TransactionNo ?? "" },
+            { "vnp_TransactionStatus", response.TransactionStatus ?? "" },
+            { "vnp_TxnRef", response.TxnRef ?? "" },
+            { "vnp_SecureHash", response.SecureHash ?? "" }
+        };
 
             foreach (var kv in responseData)
-            {
                 vnpay.AddResponseData(kv.Key, kv.Value);
-            }
 
-            var isValidSignature = vnpay.ValidateSignature(request.SecureHash, _config["VnPay:HashSecret"]);
-            if (!isValidSignature)
+            if (!vnpay.ValidateSignature(response.SecureHash ?? "", _config["VnPay:HashSecret"]))
             {
                 return new VnPaymentResponseDto
                 {
                     Success = false,
-                    VnPayResponseCode = "InvalidSignature"
+                    VnPayResponseCode = "InvalidSignature",
+                    Message = "Invalid signature from VNPAY."
                 };
             }
 
-            if (request.TransactionStatus != "00")
+            if (response.TransactionStatus != "00")
             {
                 return new VnPaymentResponseDto
                 {
                     Success = false,
-                    VnPayResponseCode = request.VnPayResponseCode
+                    VnPayResponseCode = response.VnPayResponseCode,
+                    Message = "Transaction failed at VNPAY."
                 };
             }
 
-            // Parse order info
-            var orderInfoDict = ParseOrderInfo(request.OrderInfo);
-            if (!orderInfoDict.TryGetValue("requestId", out var reqIdStr) ||
-                !orderInfoDict.TryGetValue("serviceId", out var svcIdStr) ||
-                !orderInfoDict.TryGetValue("amount", out var amountStr))
+            var orderInfo = ParseOrderInfo(response.OrderInfo ?? "");
+            if (!orderInfo.TryGetValue("requestId", out var reqId) ||
+                !orderInfo.TryGetValue("serviceId", out var svcId) ||
+                !orderInfo.TryGetValue("amount", out var amt))
             {
                 return new VnPaymentResponseDto
                 {
                     Success = false,
-                    VnPayResponseCode = "MissingOrderInfo"
+                    VnPayResponseCode = "MissingOrderInfo",
+                    Message = "Missing order info from VNPAY response."
                 };
             }
 
             return new VnPaymentResponseDto
             {
                 Success = true,
+                OrderDescription = response.OrderInfo,
+                OrderId = int.TryParse(reqId, out var orderId) ? orderId : null,
                 PaymentMethod = "VnPay",
-                OrderDescription = request.OrderInfo,
-                OrderId = int.Parse(reqIdStr),
-                TransactionId = request.TransactionNo,
-                Token = request.SecureHash,
-                VnPayResponseCode = request.VnPayResponseCode
+                TransactionId = response.TransactionNo,
+                Token = response.SecureHash,
+                VnPayResponseCode = response.VnPayResponseCode
             };
         }
 
@@ -131,9 +113,9 @@ namespace DiamondAssessmentSystem.Application.Services
         {
             return orderInfo
                 .Split(';', StringSplitOptions.RemoveEmptyEntries)
-                .Select(pair => pair.Split('='))
-                .Where(parts => parts.Length == 2)
-                .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim());
+                .Select(part => part.Split('='))
+                .Where(arr => arr.Length == 2)
+                .ToDictionary(arr => arr[0].Trim(), arr => arr[1].Trim());
         }
     }
 }

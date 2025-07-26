@@ -111,7 +111,7 @@ namespace DiamondAssessmentSystem.Presentation
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IChatLogRepository, ChatLogRepository>();
-
+            builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
             // Đăng ký Session
             builder.Services.AddSession(options =>
@@ -233,6 +233,8 @@ namespace DiamondAssessmentSystem.Presentation
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapControllers();
 
             app.MapControllerRoute(
                 name: "default",
