@@ -3,10 +3,13 @@ using DiamondAssessmentSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;  // For SelectList
+using Microsoft.AspNetCore.WebUtilities;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DiamondAssessmentSystem.Presentation.Controllers
@@ -14,10 +17,12 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
     public class AuthController : Controller 
     {
         private readonly IAuthService _authService;
+        private readonly UserManager<Infrastructure.Models.User> _userManager;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, UserManager<Infrastructure.Models.User> userManager)
         {
             _authService = authService;
+            _userManager = userManager;
         }
 
         // GET: Auth/Login
@@ -69,25 +74,55 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterCustomer(RegisterDto registerDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(registerDto);
+
+            try
             {
-                try
-                {
-                    var message = await _authService.RegisterCustomerAsync(registerDto);
-                    TempData["Success"] = "Registration successful. Please log in.";
-                    return RedirectToAction("Login", "Auth");
-                }
-                catch (ArgumentException ex)
-                {
-                    TempData["Error"] = ex.Message;
-                }
-                catch (Exception ex)
-                {
-                    TempData["Error"] = ex.Message;
-                }
+                var newUser = await _authService.RegisterCustomerAsync(registerDto);
+                await _authService.SendConfirmationEmailAsync(newUser);
+
+                return RedirectToAction("ConfirmEmailNotice", "Auth", new { email = newUser.Email });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(registerDto);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return View("ConfirmEmailFailed");
             }
 
-            return View(registerDto);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return View("ConfirmEmailFailed");
+            }
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+            if (result.Succeeded)
+            {
+                return View("ConfirmEmailSuccess", user.Email); // Truyền email nếu muốn hiển thị
+            }
+            else
+            {
+                return View("ConfirmEmailFailed");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmEmailNotice(string email)
+        {
+            ViewBag.Email = email;
+            return View();
         }
 
 
