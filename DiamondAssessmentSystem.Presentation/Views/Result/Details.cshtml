@@ -35,7 +35,10 @@
     </div>
 
     <div class="mt-6 flex justify-between">
-        <a asp-action="Edit" asp-route-id="@Model.ResultId" class="text-sm text-yellow-600 hover:underline">✏️ Edit</a>
+        @if (!User.IsInRole("Customer"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.ResultId" class="text-sm text-yellow-600 hover:underline">✏️ Edit</a>
+        }
         <a asp-action="Index" class="text-sm text-blue-600 hover:underline">← Back to List</a>
     </div>
 </div>

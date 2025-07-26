@@ -22,7 +22,6 @@
     <h1 class="text-3xl font-bold text-gray-900 mb-8">@ViewData["Title"]</h1>
 
     <form asp-action="Create" method="post" class="space-y-8">
-        @* Hidden fields *@
         <input type="hidden" asp-for="RequestId" />
 
         <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm mb-4"></div>
@@ -30,6 +29,7 @@
         <div>
             <label asp-for="DiamondOrigin" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="DiamondOrigin" type="text" placeholder="Enter Diamond Origin"
+                   pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="DiamondOrigin" class="text-red-500 text-sm"></span>
         </div>
@@ -37,6 +37,7 @@
         <div>
             <label asp-for="Shape" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Shape" type="text" placeholder="Enter Shape"
+                   pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Shape" class="text-red-500 text-sm"></span>
         </div>
@@ -59,6 +60,7 @@
         <div>
             <label asp-for="Color" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Color" type="text" placeholder="Enter Color"
+                   pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Color" class="text-red-500 text-sm"></span>
         </div>
@@ -66,6 +68,7 @@
         <div>
             <label asp-for="Clarity" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Clarity" type="text" placeholder="Enter Clarity"
+                   pattern="[A-Za-z0-9\s]+" title="Letters, numbers, and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Clarity" class="text-red-500 text-sm"></span>
         </div>
@@ -73,6 +76,7 @@
         <div>
             <label asp-for="Cut" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Cut" type="text" placeholder="Enter Cut"
+                   pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Cut" class="text-red-500 text-sm"></span>
         </div>
@@ -87,6 +91,7 @@
         <div>
             <label asp-for="Polish" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Polish" type="text" placeholder="Enter Polish (optional)"
+                   pattern="[A-Za-z\s]*" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Polish" class="text-red-500 text-sm"></span>
         </div>
@@ -94,6 +99,7 @@
         <div>
             <label asp-for="Symmetry" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Symmetry" type="text" placeholder="Enter Symmetry (optional)"
+                   pattern="[A-Za-z\s]*" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Symmetry" class="text-red-500 text-sm"></span>
         </div>
@@ -101,6 +107,7 @@
         <div>
             <label asp-for="Fluorescence" class="block text-gray-700 font-semibold mb-1"></label>
             <input asp-for="Fluorescence" type="text" placeholder="Enter Fluorescence (optional)"
+                   pattern="[A-Za-z\s]*" title="Only letters and spaces allowed"
                    class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span asp-validation-for="Fluorescence" class="text-red-500 text-sm"></span>
         </div>
@@ -117,7 +124,6 @@
             <span asp-validation-for="Status" class="text-red-500 text-sm mt-1 block"></span>
         </div>
 
-
         <div class="flex justify-between items-center pt-6 border-t">
             <a asp-action="Index" class="text-blue-600 hover:underline font-semibold">← Back to List</a>
             <button type="submit"
@@ -131,4 +137,3 @@
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
-

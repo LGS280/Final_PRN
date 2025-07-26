@@ -48,24 +48,26 @@ namespace DiamondAssessmentSystem.Application.Services
                 return EmployeeEnum.NotFound;
 
             var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(userId);
-
             if (existingEmployee == null)
                 return EmployeeEnum.NotFound;
 
-            if (employeeDto.Phone != null)
+            if (employeeDto.Phone != null && !IsPhoneNumberValid(employeeDto.Phone, "VN"))
+                return EmployeeEnum.InvalidPhoneNumber;
+
+            // Map thủ công
+            existingEmployee.Salary = employeeDto.Salary;
+            if (existingEmployee.User != null)
             {
-                if (!IsPhoneNumberValid(employeeDto.Phone, "VN"))
-                {
-                    return EmployeeEnum.InvalidPhoneNumber;
-                }
+                existingEmployee.User.FirstName = employeeDto.FirstName;
+                existingEmployee.User.LastName = employeeDto.LastName;
+                existingEmployee.User.PhoneNumber = employeeDto.Phone;
+                existingEmployee.User.Gender = employeeDto.Gender;
             }
 
-            _mapper.Map(employeeDto, existingEmployee);
-
             var updateSuccess = await _employeeRepository.UpdateEmployeeAsync(existingEmployee);
-
             return updateSuccess ? EmployeeEnum.Success : EmployeeEnum.UpdateFailed;
         }
+
 
         public async Task<bool> DeleteEmployeeAsync(string userId)
         {

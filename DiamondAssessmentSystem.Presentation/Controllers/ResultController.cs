@@ -71,6 +71,9 @@ namespace DiamondAssessmentSystem.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ResultCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return View(dto);
+
             try
             {
                 // Validate RequestId trước (nếu cần)

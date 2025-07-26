@@ -3,6 +3,7 @@ using DiamondAssessmentSystem.Application.DTO;
 using DiamondAssessmentSystem.Application.Interfaces;
 using DiamondAssessmentSystem.Infrastructure.IRepository;
 using DiamondAssessmentSystem.Infrastructure.Models;
+using PhoneNumbers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,9 +60,17 @@ namespace DiamondAssessmentSystem.Application.Services
         public async Task<AccountDto> CreateEmployeeAsync(RegisterEmployeesDto dto, string role)
         {
             var newUser = _mapper.Map<User>(dto);
+
+            if (!IsPhoneNumberValid(dto.PhoneNumber, "VN"))
+            {
+                throw new Exception($"Phone is invalid!");
+
+            }
+
             newUser.UserType = "Employee";
             newUser.Status = "Active";
             newUser.DateCreated = DateTime.Now;
+            newUser.EmailConfirmed = true;
 
             var result = await _userRepository.CreateEmployeeWithRoleAsync(newUser, dto.Password, role);
             if (!result.Succeeded)
@@ -108,6 +117,25 @@ namespace DiamondAssessmentSystem.Application.Services
 
             user.Status = newStatus;
             return await _userRepository.UpdateUserAsync(user);
+        }
+
+        private bool IsPhoneNumberValid(string phoneNumber, string regionCode)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return false;
+            }
+
+            try
+            {
+                var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+                var parsedNumber = phoneNumberUtil.Parse(phoneNumber, regionCode);
+                return phoneNumberUtil.IsValidNumber(parsedNumber);
+            }
+            catch (NumberParseException)
+            {
+                return false;
+            }
         }
     }
 }

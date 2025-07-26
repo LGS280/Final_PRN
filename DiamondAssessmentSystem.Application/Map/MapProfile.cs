@@ -136,6 +136,8 @@ namespace DiamondAssessmentSystem.Application.Map
 
             CreateMap<OrderCreateDto, Order>().ReverseMap();
 
+            CreateMap<EmployeeUpdateDto, Employee>();
+
             CreateMap<Order, OrderDto>()
                 .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.Service.ServiceType));
 
